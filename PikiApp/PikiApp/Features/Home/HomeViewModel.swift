@@ -38,14 +38,25 @@ final class HomeViewModel {
         messages.append(userMessage)
 
         let assistantMessageId = UUID().uuidString
-        messages.append(
-            ChatMessage(
-                id: assistantMessageId,
-                role: .assistant,
-                content: "",
-                timestamp: Date()
+            messages.append(
+                ChatMessage(
+                    id: assistantMessageId,
+                    role: .assistant,
+                    content: "",
+                    timestamp: Date(),
+                    traceItems: [
+                        ChatTraceItem(
+                            kind: "progress",
+                            title: "正在思考",
+                            summary: "正在创建任务。",
+                            category: "model",
+                            status: "running"
+                        )
+                    ],
+                    isRunning: true,
+                    isTraceExpanded: true
+                )
             )
-        )
         isSending = true
         statusText = "Creating task..."
 
@@ -102,11 +113,11 @@ final class HomeViewModel {
                 ?? task.summary
                 ?? finalEventContent
                 ?? "Task finished without a final message."
-            updateMessage(id: assistantMessageId, content: content)
+            finishMessage(id: assistantMessageId, content: content)
             await loadRecentJournal(appState: appState)
             statusText = nil
         } catch {
-            updateMessage(id: assistantMessageId, content: "Task failed: \(error.localizedDescription)")
+            failMessage(id: assistantMessageId, content: "Task failed: \(error.localizedDescription)")
             statusText = nil
         }
         isSending = false
@@ -144,11 +155,13 @@ final class HomeViewModel {
         switch event.type {
         case "agent.progress":
             if let title = event.payload.title {
-                appendProgressStep(
+                appendTraceEvent(
                     messageId: assistantMessageId,
+                    kind: "progress",
                     title: title,
-                    detail: event.payload.detail,
-                    stage: event.payload.stage
+                    summary: event.payload.detail ?? "",
+                    category: event.payload.category,
+                    status: "running"
                 )
                 if let detail = event.payload.detail, !detail.isEmpty {
                     statusText = "\(title) · \(detail)"
@@ -159,9 +172,54 @@ final class HomeViewModel {
             return nil
         case "message.delta":
             if let delta = event.payload.delta, !delta.isEmpty {
-                appendMessageDelta(id: assistantMessageId, delta: delta)
+                appendLiveDelta(id: assistantMessageId, delta: delta)
                 statusText = "正在生成回答"
             }
+            return nil
+        case "agent.trace.delta":
+            if let delta = event.payload.delta, !delta.isEmpty {
+                appendTraceDelta(id: assistantMessageId, delta: delta)
+            }
+            return nil
+        case "agent.trace.event":
+            appendTraceEvent(
+                messageId: assistantMessageId,
+                kind: event.payload.kind ?? "event",
+                title: event.payload.title ?? friendlyTraceTitle(for: event),
+                summary: event.payload.summary ?? event.payload.detail ?? "",
+                category: event.payload.category,
+                status: event.payload.status
+            )
+            return nil
+        case "tool.started":
+            appendTraceEvent(
+                messageId: assistantMessageId,
+                kind: "tool_started",
+                title: event.payload.title ?? friendlyTraceTitle(for: event),
+                summary: event.payload.summary ?? event.payload.tool ?? "",
+                category: event.payload.category,
+                status: "running"
+            )
+            return nil
+        case "tool.finished":
+            appendTraceEvent(
+                messageId: assistantMessageId,
+                kind: "tool_finished",
+                title: event.payload.title ?? "工具调用完成",
+                summary: event.payload.summary ?? event.payload.tool ?? "",
+                category: event.payload.category,
+                status: "completed"
+            )
+            return nil
+        case "tool.failed":
+            appendTraceEvent(
+                messageId: assistantMessageId,
+                kind: "tool_failed",
+                title: event.payload.title ?? "工具调用失败",
+                summary: event.payload.error ?? event.payload.tool ?? "",
+                category: event.payload.category,
+                status: "failed"
+            )
             return nil
         case "task.completed":
             let content = event.payload.answer
@@ -169,9 +227,10 @@ final class HomeViewModel {
                 ?? event.payload.content
                 ?? "Task completed."
             statusText = "已完成"
+            finishMessage(id: assistantMessageId, content: content)
             return content
         case "task.failed":
-            updateMessage(
+            failMessage(
                 id: assistantMessageId,
                 content: event.payload.error ?? event.payload.summary ?? "Task failed."
             )
@@ -200,29 +259,101 @@ final class HomeViewModel {
         }
     }
 
-    private func updateMessage(id: String, content: String) {
-        guard let index = messages.firstIndex(where: { $0.id == id }) else { return }
-        messages[index].content = content
-    }
-
-    private func appendMessageDelta(id: String, delta: String) {
-        guard let index = messages.firstIndex(where: { $0.id == id }) else { return }
-        messages[index].content += delta
-    }
-
-    private func appendProgressStep(messageId: String, title: String, detail: String?, stage: String?) {
-        guard let index = messages.firstIndex(where: { $0.id == messageId }) else { return }
-        if messages[index].progressSteps.last?.title == title,
-           messages[index].progressSteps.last?.detail == detail {
-            return
+    private func friendlyTraceTitle(for event: TaskEvent) -> String {
+        switch event.payload.category {
+        case "read": "正在阅读 Wiki"
+        case "write": "正在写入 Wiki"
+        case "convert": "正在转换文档"
+        default: event.payload.title ?? "Agent 事件"
         }
-        messages[index].progressSteps.append(
-            ChatProgressStep(
-                title: title,
-                detail: detail ?? "",
-                stage: stage ?? ""
+    }
+
+    private func updateMessage(id: String, content: String) {
+        mutateMessage(id: id) { message in
+            message.content = content
+        }
+    }
+
+    private func appendLiveDelta(id: String, delta: String) {
+        mutateMessage(id: id) { message in
+            message.liveContent += delta
+        }
+    }
+
+    private func appendTraceDelta(id: String, delta: String) {
+        mutateMessage(id: id) { message in
+            if let lastIndex = message.traceItems.indices.last,
+               message.traceItems[lastIndex].kind == "model_delta" {
+                message.traceItems[lastIndex].summary += delta
+                return
+            }
+            message.traceItems.append(
+                ChatTraceItem(
+                    kind: "model_delta",
+                    title: "模型输出",
+                    summary: delta,
+                    category: "model",
+                    status: "running"
+                )
             )
-        )
+        }
+    }
+
+    private func appendTraceEvent(
+        messageId: String,
+        kind: String,
+        title: String,
+        summary: String,
+        category: String?,
+        status: String?
+    ) {
+        mutateMessage(id: messageId) { message in
+            if message.traceItems.last?.kind == kind,
+               message.traceItems.last?.title == title,
+               message.traceItems.last?.summary == summary {
+                return
+            }
+            message.traceItems.append(
+                ChatTraceItem(
+                    kind: kind,
+                    title: title,
+                    summary: summary,
+                    category: category ?? "",
+                    status: status ?? ""
+                )
+            )
+        }
+    }
+
+    private func finishMessage(id: String, content: String) {
+        mutateMessage(id: id) { message in
+            message.content = content
+            message.liveContent = ""
+            message.isRunning = false
+            message.isTraceExpanded = false
+        }
+    }
+
+    private func failMessage(id: String, content: String) {
+        mutateMessage(id: id) { message in
+            message.content = content
+            message.liveContent = ""
+            message.isRunning = false
+            message.isTraceExpanded = true
+        }
+    }
+
+    func toggleTrace(messageId: String) {
+        mutateMessage(id: messageId) { message in
+            message.isTraceExpanded.toggle()
+        }
+    }
+
+    private func mutateMessage(id: String, _ mutate: (inout ChatMessage) -> Void) {
+        guard let index = messages.firstIndex(where: { $0.id == id }) else { return }
+        var message = messages[index]
+        mutate(&message)
+        messages[index] = message
     }
 
     private func appendSystemMessage(_ content: String) {
@@ -253,18 +384,23 @@ struct ChatMessage: Identifiable {
     var content: String
     let timestamp: Date
     var citations: [Citation] = []
-    var progressSteps: [ChatProgressStep] = []
+    var liveContent: String = ""
+    var traceItems: [ChatTraceItem] = []
+    var isRunning: Bool = false
+    var isTraceExpanded: Bool = false
 
     enum MessageRole {
         case user, assistant, system
     }
 }
 
-struct ChatProgressStep: Identifiable {
+struct ChatTraceItem: Identifiable {
     let id = UUID().uuidString
+    let kind: String
     let title: String
-    let detail: String
-    let stage: String
+    var summary: String
+    let category: String
+    let status: String
 }
 
 struct Citation: Identifiable {

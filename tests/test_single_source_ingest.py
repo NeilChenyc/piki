@@ -49,7 +49,7 @@ class FakeIngestRunner:
 
         async def invoke(tool_name: str, payload: dict):
             tool = tools[tool_name]
-            return await tool.on_invoke_tool(
+            raw = await tool.on_invoke_tool(
                 ToolContext(
                     context=None,
                     tool_name=tool_name,
@@ -58,6 +58,10 @@ class FakeIngestRunner:
                 ),
                 json.dumps(payload, ensure_ascii=False),
             )
+            data = raw if isinstance(raw, dict) else json.loads(raw)
+            if not data.get("ok"):
+                raise RuntimeError(data.get("error") or f"{tool_name} failed")
+            return data["payload"]
 
         async def run_tools():
             await invoke("read_file", {"path": source_path, "max_bytes": 20000})
@@ -194,10 +198,10 @@ def test_single_source_ingest_writes_wiki_and_persists_result(tmp_path: Path, mo
     task_id = response.json()["task_id"]
     task = client.get(f"/tasks/{task_id}").json()
 
-    assert task["task_kind"] == "ingest"
+    assert task["task_kind"] == "agent"
     assert task["status"] == "completed"
-    assert task["output"]["source_title"] == "测试来源"
-    assert "wiki/sources/测试来源.md" in task["output"]["changed_pages"]
+    assert "已将测试来源编译进 wiki" in task["output"]["answer"]
+    assert "wiki/sources/测试来源.md" in task["output"]["affected_files"]
     assert task["output"]["journal_entry"] is not None
     assert (vault_path / "wiki/sources/测试来源.md").exists()
     assert (vault_path / "wiki/concepts/个人知识库.md").exists()
@@ -205,11 +209,9 @@ def test_single_source_ingest_writes_wiki_and_persists_result(tmp_path: Path, mo
     assert "ingest | 测试来源" in (vault_path / "wiki/log.md").read_text(encoding="utf-8")
 
     events = client.get(f"/tasks/{task_id}/events").text
-    assert "event: ingest.started" in events
     assert "event: sdk.run.started" in events
     assert "event: file.changed" in events
     assert "event: journal_entry.created" in events
-    assert "event: ingest.completed" in events
 
 
 def test_ingest_requires_configured_sdk_runtime(tmp_path: Path):

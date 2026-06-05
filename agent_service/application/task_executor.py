@@ -7,14 +7,13 @@ from pathlib import Path
 from agent_service.application.events import EventPublisher
 from agent_service.application.task_router import TaskPlan
 from agent_service.config import ServiceConfig
-from agent_service.context import assemble_baseline_context
-from agent_service.models import EventType, FileSnapshot, TaskCreateRequest, TaskKind, TaskStatus
+from agent_service.context import assemble_agent_task_input, assemble_baseline_context
+from agent_service.models import EventType, FileSnapshot, TaskCreateRequest, TaskStatus
 from agent_service.runtime import PikiWikiAgentRunner
 from agent_service.store import SQLiteStore
 from agent_service.tools import VaultToolRegistry
 from agent_service.vault import Vault, VaultAccessError
-from agent_service.workflows import SourceIntakeError, run_read_only_query, run_source_intake
-from agent_service.workflows import read_source_meta, validate_canonical_source
+from agent_service.workflows import run_read_only_query
 
 
 class TaskExecutor:
@@ -35,7 +34,7 @@ class TaskExecutor:
         vault = Vault(request.vault_path)
         try:
             vault.validate()
-            self.events.progress(task_id, "reading_vault", "正在读取知识库", "正在读取 vault 规则、目的和索引。")
+            self.events.progress(task_id, "thinking", "正在思考", "正在装配本轮 agent 上下文。")
             manifest, context_contents = assemble_baseline_context(vault)
         except VaultAccessError as exc:
             self.events.task_failed(task_id, str(exc))
@@ -44,104 +43,18 @@ class TaskExecutor:
 
         self.events.emit(task_id, EventType.CONTEXT_LOADED, manifest.model_dump())
 
-        if plan.task_kind == TaskKind.SOURCE_CLEAR:
+        action_context = dict(request.action_context or {})
+        if request.mode == "clear-inbox-item" and "action" not in action_context:
+            action_context["action"] = "clear_inbox_item"
+        if action_context.get("action") == "clear_inbox_item":
             self._execute_source_clear(task_id=task_id, request=request, vault=vault)
             return
-        if plan.task_kind == TaskKind.INGEST:
-            self._execute_ingest(
-                task_id=task_id,
-                request=request,
-                vault=vault,
-                context_contents=context_contents,
-                source_path=plan.ingest_source_path,
-                ingest_error=plan.ingest_error,
-            )
-            return
-        if plan.task_kind == TaskKind.AGENT:
-            self._execute_agent(
-                task_id=task_id,
-                request=request,
-                vault=vault,
-                context_contents=context_contents,
-            )
-            return
-        if plan.task_kind == TaskKind.SOURCE_INTAKE:
-            self._execute_source_intake(
-                task_id=task_id,
-                request=request,
-                vault=vault,
-                context_contents=context_contents,
-            )
-
-    def _execute_ingest(
-        self,
-        *,
-        task_id: str,
-        request: TaskCreateRequest,
-        vault: Vault,
-        context_contents: dict[str, str],
-        source_path: str | None,
-        ingest_error: str | None,
-    ):
-        self.events.progress(task_id, "organizing_source", "正在整理资料", "正在准备单 source ingest。")
-        self.events.emit(task_id, EventType.INGEST_STARTED, {"source_path": source_path, "error": ingest_error})
-        if ingest_error:
-            self.events.task_failed(task_id, ingest_error)
-            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=ingest_error)
-            return
-        if not self.runner.can_run(self.config):
-            error = "Single source ingest requires configured OpenAI Agents SDK runtime."
-            self.events.task_failed(task_id, error)
-            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=error)
-            return
-        try:
-            canonical_path = validate_canonical_source(vault, source_path or "")
-            source_meta = read_source_meta(vault, canonical_path)
-            tools = VaultToolRegistry(vault=vault, events=self.events, task_id=task_id)
-            self.events.progress(task_id, "thinking", "正在思考和生成", "正在让 Agent 分析 source 并规划 wiki 更新。")
-            ingest_result = self.runner.run_ingest(
-                config=self.config,
-                events=self.events,
-                task_id=task_id,
-                conversation_id=request.conversation_id or task_id,
-                source_path=canonical_path,
-                source_meta=source_meta,
-                context_contents=context_contents,
-                tool_registry=tools,
-            )
-        except Exception as exc:
-            self.events.task_failed(task_id, str(exc))
-            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
-            return
-
-        summary = ingest_result.summary
-        if ingest_result.changed_pages:
-            self.events.progress(task_id, "writing_vault", "正在写入知识库", "已更新相关 wiki 页面。")
-        if ingest_result.journal_entry:
-            self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
-        self.store.update_task(
-            task_id,
-            status=TaskStatus.COMPLETED,
-            summary=summary,
-            affected_files=ingest_result.changed_pages,
-            output=ingest_result.model_dump(mode="json"),
+        self._execute_agent(
+            task_id=task_id,
+            request=request,
+            vault=vault,
+            context_contents=context_contents,
         )
-        self.events.emit(
-            task_id,
-            EventType.INGEST_COMPLETED,
-            {
-                "source_path": ingest_result.source_meta.path,
-                "changed_pages": ingest_result.changed_pages,
-                "journal_entry_id": ingest_result.journal_entry.id if ingest_result.journal_entry else None,
-            },
-        )
-        self.events.task_completed(
-            task_id,
-            summary=summary,
-            answer=summary,
-            journal_entry_id=ingest_result.journal_entry.id if ingest_result.journal_entry else None,
-        )
-        self.events.progress(task_id, "completed", "已完成")
 
     def _execute_agent(
         self,
@@ -151,36 +64,79 @@ class TaskExecutor:
         vault: Vault,
         context_contents: dict[str, str],
     ):
+        conversation_id = request.conversation_id or task_id
+        conversation_messages = self.store.get_conversation_messages(conversation_id, limit=10)
+        task_input = assemble_agent_task_input(
+            request=request,
+            conversation_messages=conversation_messages,
+        )
         if self.runner.can_run(self.config):
-            tools = VaultToolRegistry(vault=vault, events=self.events, task_id=task_id)
+            tools = VaultToolRegistry(
+                vault=vault,
+                events=self.events,
+                task_id=task_id,
+                allowed_external_paths=request.selected_paths,
+            )
             try:
-                self.events.progress(task_id, "reading_vault", "正在读取知识库", "正在让 Agent 查找相关记忆和页面。")
+                self.events.progress(task_id, "thinking", "正在思考", "正在让 Agent 判断本轮需要调用哪些工具。")
                 agent_result = self.runner.run_task(
                     config=self.config,
                     events=self.events,
                     task_id=task_id,
-                    conversation_id=request.conversation_id or task_id,
+                    conversation_id=conversation_id,
                     user_input=request.user_input,
+                    agent_input=task_input.render_prompt(),
                     context_contents=context_contents,
                     tool_registry=tools,
                 )
             except Exception as exc:
-                self.events.task_failed(task_id, str(exc), fallback="read_only_query")
-                self.events.progress(task_id, "reading_vault", "正在读取知识库", "SDK 失败，正在使用本地只读 query fallback。")
-                query_result = run_read_only_query(vault, request.user_input, mode=request.mode)
-                self._persist_query_result(task_id, query_result)
+                if isinstance(exc, TimeoutError):
+                    if _requires_configured_agent(request):
+                        self.events.task_failed(task_id, str(exc))
+                        self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
+                        return
+                    self._execute_local_fallback(
+                        task_id=task_id,
+                        request=request,
+                        vault=vault,
+                        conversation_id=conversation_id,
+                        reason=str(exc),
+                        kind="sdk_timeout_fallback",
+                    )
+                    return
+                if _requires_configured_agent(request):
+                    self.events.task_failed(task_id, str(exc))
+                    self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
+                    return
+                self._execute_local_fallback(
+                    task_id=task_id,
+                    request=request,
+                    vault=vault,
+                    conversation_id=conversation_id,
+                    reason=str(exc),
+                    kind="sdk_error_fallback",
+                )
                 return
 
             if agent_result.affected_files:
-                self.events.progress(task_id, "writing_vault", "正在写入知识库", "已更新 vault 文件。")
+                self.events.progress(task_id, "writing_wiki", "正在写入 Wiki", "已更新 vault 文件。")
             if agent_result.journal_entry:
                 self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
+            output = agent_result.model_dump(mode="json")
+            output["action_context"] = task_input.action_context
+            output["selected_paths"] = task_input.selected_paths
+            if tools.last_source_intake_result:
+                output["source_intake"] = tools.last_source_intake_result
+            if tools.last_lint_result:
+                output["lint_result"] = tools.last_lint_result
+            if tools.last_lint_fix_result:
+                output["lint_fix_result"] = tools.last_lint_fix_result
             self.store.update_task(
                 task_id,
                 status=TaskStatus.COMPLETED,
                 summary=agent_result.summary,
                 affected_files=agent_result.affected_files,
-                output=agent_result.model_dump(mode="json"),
+                output=output,
             )
             self.events.task_completed(
                 task_id,
@@ -188,175 +144,29 @@ class TaskExecutor:
                 answer=agent_result.answer or agent_result.summary,
                 journal_entry_id=agent_result.journal_entry.id if agent_result.journal_entry else None,
             )
+            self._append_conversation_messages(
+                conversation_id=conversation_id,
+                task_id=task_id,
+                user_input=request.user_input,
+                answer=agent_result.answer or agent_result.summary,
+                metadata={"action_context": task_input.action_context, "selected_paths": task_input.selected_paths},
+            )
             self.events.progress(task_id, "completed", "已完成")
             return
 
-        self.events.progress(task_id, "reading_vault", "正在读取知识库", "正在使用本地只读 query fallback。")
-        query_result = run_read_only_query(vault, request.user_input, mode=request.mode)
-        self._persist_query_result(task_id, query_result)
-
-    def _execute_source_intake(
-        self,
-        *,
-        task_id: str,
-        request: TaskCreateRequest,
-        vault: Vault,
-        context_contents: dict[str, str],
-    ):
-        self.events.progress(task_id, "organizing_source", "正在整理资料", "正在把文件规范化为 source。")
-        self.events.emit(task_id, EventType.SOURCE_INTAKE_STARTED, {"selected_paths": request.selected_paths})
-        try:
-            if len(request.selected_paths) != 1:
-                raise SourceIntakeError("Capture requires exactly one selected path in Phase 3.")
-            intake_result = run_source_intake(vault, request.selected_paths[0])
-        except SourceIntakeError as exc:
-            self.events.task_failed(task_id, str(exc))
-            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
+        if _requires_configured_agent(request):
+            error = "This task requires configured OpenAI Agents SDK runtime because it includes files, system action context, or an explicit write/ingest intent."
+            self.events.task_failed(task_id, error)
+            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=error)
             return
-
-        self.events.emit(
-            task_id,
-            EventType.SOURCE_INTAKE_COPIED,
-            {"asset_path": intake_result.asset_path, "reused": intake_result.reused},
+        self._execute_local_fallback(
+            task_id=task_id,
+            request=request,
+            vault=vault,
+            conversation_id=conversation_id,
+            reason="OpenAI Agents SDK runtime is not configured.",
+            kind="sdk_unconfigured_fallback",
         )
-        self.events.emit(
-            task_id,
-            EventType.SOURCE_INTAKE_NORMALIZED,
-            {
-                "source_path": intake_result.source_path,
-                "format": intake_result.format.value,
-                "hash": intake_result.hash,
-            },
-        )
-        self.events.progress(
-            task_id,
-            "organizing_source",
-            "正在转换为 Markdown Source",
-            f"已生成 canonical source：{intake_result.source_path}",
-        )
-        self.events.emit(
-            task_id,
-            EventType.SOURCE_MANIFEST_UPDATED,
-            {
-                "hash": intake_result.hash,
-                "source_path": intake_result.source_path,
-                "reused": intake_result.reused,
-            },
-        )
-        if self.runner.can_run(self.config):
-            self._compile_intake_source(
-                task_id=task_id,
-                request=request,
-                vault=vault,
-                context_contents=context_contents,
-                intake_result=intake_result,
-            )
-            return
-
-        summary = (
-            f"已复用 source：{intake_result.source_path}。SDK runtime 未配置，尚未编译进 wiki。"
-            if intake_result.reused
-            else f"已生成 source：{intake_result.source_path}。SDK runtime 未配置，尚未编译进 wiki。"
-        )
-        self.store.update_task(
-            task_id,
-            status=TaskStatus.COMPLETED,
-            summary=summary,
-            output={
-                **intake_result.model_dump(mode="json"),
-                "summary": summary,
-                "answer": summary,
-                "intake": intake_result.model_dump(mode="json"),
-            },
-        )
-        self.events.task_completed(task_id, summary=summary, answer=summary)
-        self.events.progress(task_id, "completed", "已完成")
-
-    def _compile_intake_source(self, *, task_id: str, request: TaskCreateRequest, vault: Vault, context_contents, intake_result):
-        try:
-            self.events.progress(
-                task_id,
-                "reading_vault",
-                "正在读取知识库",
-                "正在读取索引和相关页面，准备把 source 编译进 wiki。",
-            )
-            source_meta = read_source_meta(vault, intake_result.source_path)
-            tools = VaultToolRegistry(vault=vault, events=self.events, task_id=task_id)
-            self.events.emit(
-                task_id,
-                EventType.INGEST_STARTED,
-                {"source_path": intake_result.source_path, "trigger": "source_intake_pipeline"},
-            )
-            self.events.progress(
-                task_id,
-                "organizing_source",
-                "正在编译进 Wiki",
-                "正在让 Agent 更新 source、concept、entity、domain、index 和 log。",
-            )
-            ingest_result = self.runner.run_ingest(
-                config=self.config,
-                events=self.events,
-                task_id=task_id,
-                conversation_id=request.conversation_id or task_id,
-                source_path=intake_result.source_path,
-                source_meta=source_meta,
-                context_contents=context_contents,
-                tool_registry=tools,
-            )
-        except Exception as exc:
-            summary = f"已生成 source：{intake_result.source_path}；但 wiki ingest 失败：{exc}"
-            self.events.task_failed(task_id, summary)
-            self.store.update_task(
-                task_id,
-                status=TaskStatus.FAILED,
-                summary=summary,
-                output={
-                    **intake_result.model_dump(mode="json"),
-                    "summary": summary,
-                    "answer": summary,
-                    "intake": intake_result.model_dump(mode="json"),
-                },
-            )
-            return
-
-        if ingest_result.changed_pages:
-            self.events.progress(task_id, "writing_vault", "正在写入知识库", "已更新相关 wiki 页面。")
-        if ingest_result.journal_entry:
-            self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
-        summary = (
-            f"已记录并编译《{ingest_result.source_title}》。"
-            f" Source：{intake_result.source_path}；"
-            f"更新 {len(ingest_result.changed_pages)} 个 wiki 文件。"
-        )
-        self.store.update_task(
-            task_id,
-            status=TaskStatus.COMPLETED,
-            summary=summary,
-            affected_files=ingest_result.changed_pages,
-            output={
-                **intake_result.model_dump(mode="json"),
-                "summary": summary,
-                "answer": summary,
-                "intake": intake_result.model_dump(mode="json"),
-                "ingest": ingest_result.model_dump(mode="json"),
-            },
-        )
-        self.events.emit(
-            task_id,
-            EventType.INGEST_COMPLETED,
-            {
-                "source_path": ingest_result.source_meta.path,
-                "changed_pages": ingest_result.changed_pages,
-                "journal_entry_id": ingest_result.journal_entry.id if ingest_result.journal_entry else None,
-            },
-        )
-        self.events.task_completed(
-            task_id,
-            summary=summary,
-            answer=summary,
-            journal_entry_id=ingest_result.journal_entry.id if ingest_result.journal_entry else None,
-        )
-        self.events.progress(task_id, "completed", "已完成")
 
     def _execute_source_clear(self, *, task_id: str, request: TaskCreateRequest, vault: Vault):
         self.events.progress(task_id, "clearing_source", "正在清理文件", "正在清理单个 inbox 文件。")
@@ -408,7 +218,7 @@ class TaskExecutor:
         self.events.task_completed(task_id, summary=summary, answer=summary, journal_entry_id=journal_entry.id)
         self.events.progress(task_id, "completed", "已完成")
 
-    def _persist_query_result(self, task_id: str, query_result):
+    def _persist_query_result(self, task_id: str, query_result, *, conversation_id: str | None = None, user_input: str = ""):
         self.events.emit(
             task_id,
             EventType.QUERY_SEARCHED,
@@ -436,7 +246,104 @@ class TaskExecutor:
             },
         )
         self.events.task_completed(task_id, summary=query_result.answer, answer=query_result.answer)
+        if conversation_id:
+            self._append_conversation_messages(
+                conversation_id=conversation_id,
+                task_id=task_id,
+                user_input=user_input,
+                answer=query_result.answer,
+                metadata={"fallback": "read_only_query"},
+            )
         self.events.progress(task_id, "completed", "已完成")
+
+    def _execute_local_fallback(
+        self,
+        *,
+        task_id: str,
+        request: TaskCreateRequest,
+        vault: Vault,
+        conversation_id: str,
+        reason: str,
+        kind: str,
+    ):
+        if _is_small_talk(request.user_input):
+            answer = _small_talk_fallback_answer(request.user_input)
+            self.events.trace_event(
+                task_id,
+                kind=kind,
+                title="切换到本地回复",
+                summary=reason,
+                status="completed",
+            )
+            self._persist_direct_answer(
+                task_id,
+                answer,
+                conversation_id=conversation_id,
+                user_input=request.user_input,
+                metadata={"fallback": "small_talk", "reason": reason},
+            )
+            return
+
+        self.events.trace_event(
+            task_id,
+            kind=kind,
+            title="切换到本地查询",
+            summary=reason,
+            status="completed",
+        )
+        self.events.progress(task_id, "reading_wiki", "正在阅读 Wiki", "SDK 暂不可用，正在使用本地只读 query fallback。")
+        query_result = run_read_only_query(vault, request.user_input, mode=request.mode)
+        self._persist_query_result(task_id, query_result, conversation_id=conversation_id, user_input=request.user_input)
+
+    def _persist_direct_answer(
+        self,
+        task_id: str,
+        answer: str,
+        *,
+        conversation_id: str | None = None,
+        user_input: str = "",
+        metadata: dict | None = None,
+    ):
+        self.store.update_task(
+            task_id,
+            status=TaskStatus.COMPLETED,
+            summary=answer,
+            output={"answer": answer, "summary": answer, **(metadata or {})},
+        )
+        self.events.task_completed(task_id, summary=answer, answer=answer)
+        if conversation_id:
+            self._append_conversation_messages(
+                conversation_id=conversation_id,
+                task_id=task_id,
+                user_input=user_input,
+                answer=answer,
+                metadata=metadata,
+            )
+        self.events.progress(task_id, "completed", "已完成")
+
+    def _append_conversation_messages(
+        self,
+        *,
+        conversation_id: str,
+        task_id: str,
+        user_input: str,
+        answer: str,
+        metadata: dict | None = None,
+    ):
+        self.store.append_conversation_message(
+            conversation_id,
+            role="user",
+            content=user_input,
+            task_id=task_id,
+            metadata=metadata,
+        )
+        self.store.append_conversation_message(
+            conversation_id,
+            role="assistant",
+            content=answer,
+            task_id=task_id,
+            metadata=metadata,
+        )
 
 
 def _relative_inbox_path(vault: Vault, raw_path: str) -> str:
@@ -464,3 +371,52 @@ def _delete_diff(relative_path: str, before_content: str) -> str:
             tofile=f"b/{relative_path}",
         )
     )
+
+
+WRITE_INTENT_MARKERS = (
+    "/wiki:ingest",
+    "/wiki:compile",
+    "记一下",
+    "记录",
+    "保存",
+    "收进",
+    "摄入",
+    "整理进去",
+    "更新",
+    "修正",
+    "改成",
+    "补充",
+)
+
+
+SMALL_TALK_INPUTS = {
+    "hi",
+    "hello",
+    "hey",
+    "你好",
+    "您好",
+    "嗨",
+    "在吗",
+    "你在吗",
+    "你是谁",
+    "你能做什么",
+}
+
+
+def _is_small_talk(user_input: str) -> bool:
+    normalized = user_input.strip().lower()
+    normalized = normalized.strip(" \t\r\n,.!?。！？")
+    return normalized in SMALL_TALK_INPUTS
+
+
+def _small_talk_fallback_answer(user_input: str) -> str:
+    normalized = user_input.strip().lower().strip(" \t\r\n,.!?。！？")
+    if normalized in {"你能做什么", "你是谁"}:
+        return "我可以帮你查询这个 Piki wiki、整理上传资料、把内容写入 Wiki，也可以按按钮动作执行 lint 或 inbox ingest。"
+    return "你好，我在。你可以直接问我关于这个 Piki wiki 的问题，或让我帮你整理/记录资料。"
+
+
+def _requires_configured_agent(request: TaskCreateRequest) -> bool:
+    if request.selected_paths or request.action_context or request.mode == "clear-inbox-item":
+        return True
+    return any(marker in request.user_input for marker in WRITE_INTENT_MARKERS)

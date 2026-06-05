@@ -37,7 +37,12 @@ struct HomeView: View {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(viewModel.messages) { message in
-                            ChatBubbleView(message: message)
+                            ChatBubbleView(
+                                message: message,
+                                onToggleTrace: {
+                                    viewModel.toggleTrace(messageId: message.id)
+                                }
+                            )
                         }
                     }
                     .padding(24)

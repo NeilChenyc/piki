@@ -61,6 +61,8 @@ class EventType(StrEnum):
     SDK_RUN_STARTED = "sdk.run.started"
     SDK_RUN_COMPLETED = "sdk.run.completed"
     MESSAGE_DELTA = "message.delta"
+    AGENT_TRACE_DELTA = "agent.trace.delta"
+    AGENT_TRACE_EVENT = "agent.trace.event"
     TOOL_STARTED = "tool.started"
     TOOL_FINISHED = "tool.finished"
     TOOL_FAILED = "tool.failed"
@@ -88,6 +90,7 @@ class TaskCreateRequest(BaseModel):
     vault_path: Path
     user_input: str = Field(min_length=1)
     selected_paths: list[str] = Field(default_factory=list)
+    action_context: dict[str, Any] = Field(default_factory=dict)
     conversation_id: str | None = None
     mode: str = "normal"
     async_mode: bool = False

@@ -147,7 +147,11 @@ final class InboxViewModel {
                 let request = TaskCreateRequest(
                     vaultPath: vaultPath.path(percentEncoded: false),
                     userInput: "请摄入这个文件。",
-                    selectedPaths: [url.path(percentEncoded: false)]
+                    selectedPaths: [url.path(percentEncoded: false)],
+                    actionContext: [
+                        "action": "ingest_file",
+                        "target_path": url.path(percentEncoded: false)
+                    ]
                 )
                 _ = try await appState.apiClient.createTask(request)
                 loadVaultInbox(vaultURL: vaultPath)

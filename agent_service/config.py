@@ -42,6 +42,12 @@ class ServiceConfig(BaseModel):
     openai_base_url: str = Field(default_factory=openai_base_url_from_env)
     enable_sdk_runtime: bool = Field(default_factory=lambda: env_flag("PIKI_ENABLE_SDK_RUNTIME"))
     tracing_enabled: bool = Field(default_factory=lambda: env_flag("PIKI_TRACING_ENABLED"))
+    agent_task_timeout_seconds: int = Field(
+        default_factory=lambda: int(os.environ.get("PIKI_AGENT_TASK_TIMEOUT_SECONDS", "180"))
+    )
+    agent_stream_idle_timeout_seconds: int = Field(
+        default_factory=lambda: int(os.environ.get("PIKI_AGENT_STREAM_IDLE_TIMEOUT_SECONDS", "20"))
+    )
 
     @property
     def api_key_configured(self) -> bool:

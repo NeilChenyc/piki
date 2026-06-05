@@ -53,7 +53,9 @@ class TaskService:
                 "task_kind": plan.task_kind.value,
                 "risk_level": plan.risk_level.value,
                 "selected_paths": request.selected_paths,
-                "tool_context_policy": "all vault tools are available to the agent; vault writes are direct inside allowed paths and raw/wiki changes are journaled",
+                "action_context": request.action_context,
+                "mode": request.mode,
+                "tool_context_policy": "all vault tools are available to the agent; selected external files are read-allowlisted; raw/wiki changes are journaled only when write tools change content",
                 "reason": plan.summary,
             },
         )

@@ -18,7 +18,9 @@ enum SSEClient {
                     var dataBuffer = ""
 
                     for try await line in bytes.lines {
-                        if line.hasPrefix("event:") {
+                        if line.hasPrefix(":") {
+                            continue
+                        } else if line.hasPrefix("event:") {
                             continue
                         } else if line.hasPrefix("data:") {
                             dataBuffer += String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces)

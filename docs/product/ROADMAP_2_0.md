@@ -369,6 +369,7 @@ Roadmap 2.0 的目标不是重做 MVP，而是在现有 Mac App、本地 Agent S
 
 - `POST /tasks` 主路径统一进入 agent，不再让服务端先判断 query、ingest、record 或 update。
 - 每次 agent run 都装配基础上下文、用户上下文和会话上下文。
+- Mac App 中的 `Run Lint`、Inbox 单文件 `Ingest` 等按钮也触发一轮标准 agent 调用；按钮只额外注入系统动作上下文，例如 `action=run_lint` 或 `action=ingest_file`、目标文件路径、当前页面和选中文本。
 - 文件路径只是用户上下文和外部读取 allowlist；文件转换、canonical source 写入和 wiki ingest 由 agent 调用工具完成。
 - 除 journal 判断外，其他业务判断和执行均由 agent 自主完成。
 - Journal 只看当轮写工具是否真实改变 `raw/` 或 `wiki/`。
@@ -378,7 +379,8 @@ Roadmap 2.0 的目标不是重做 MVP，而是在现有 Mac App、本地 Agent S
 
 1. 统一 context envelope：
    - 新增用户上下文和近 10 条会话上下文装配。
-   - UI button action 改为注入上下文调用 agent，而不是绕过 agent 执行业务逻辑。
+   - UI button action 改为创建 agent task 并注入系统动作上下文，而不是绕过 agent 执行业务逻辑。
+   - `Run Lint` 注入 `action=run_lint`；Inbox 单文件 `Ingest` 注入 `action=ingest_file` 和 `target_path`。
 
 2. 工具化 source intake：
    - 增加 PDF/DOCX/MD/TXT 转 Markdown 工具。
@@ -387,7 +389,8 @@ Roadmap 2.0 的目标不是重做 MVP，而是在现有 Mac App、本地 Agent S
 
 3. 收敛 task router：
    - `POST /tasks` 主路径只创建统一 agent task。
-   - 旧 ingest/source/clear endpoint 或 mode 保留兼容，但内部转换成 agent task 或受控工具动作。
+   - 旧 ingest/source endpoint 或 mode 保留兼容，但内部转换成带 system action context 的 agent task。
+   - clear/delete 作为文件管理动作可以保留受控服务动作；若修改 `raw/` 或 `wiki/`，仍按真实变更进入 journal。
 
 4. 工具驱动 UI 状态：
    - `agent.progress` 只由 `tool.started`、journal commit 和 terminal event 推动。
@@ -400,6 +403,7 @@ Roadmap 2.0 的目标不是重做 MVP，而是在现有 Mac App、本地 Agent S
 ### 验收标准
 
 - 普通问候、知识库查询、继续追问、记录对话内容、上传文件记录、修正 wiki 都走统一 agent task。
+- Mac App 的 `Run Lint` 和 Inbox 单文件 `Ingest` 都走统一 agent task，并能在 task input 中看到明确的 system action context。
 - 问“孟岩正在做点啥？”时，只有 agent 真实调用读工具才显示“正在阅读wiki”，不会由服务端预设状态伪造。
 - 上传文件并说“帮我记录这个文档”时，转换、读库、写库和记录变更都来自 agent 工具调用。
 - 未调用写工具或写入无变化的对话不进入 Recent Activity。

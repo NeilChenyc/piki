@@ -109,14 +109,21 @@ final class APIClient {
     // MARK: - Lint
 
     func runLint(vaultPath: String) async throws -> LintResultDTO {
-        let url = baseURL.appending(path: "lint")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try JSONSerialization.data(withJSONObject: ["vault_path": vaultPath])
-        let (data, response) = try await URLSession.shared.data(for: req)
-        try validate(response: response, data: data)
-        return try JSONDecoder().decode(LintResultDTO.self, from: data)
+        let response = try await createTask(
+            TaskCreateRequest(
+                vaultPath: vaultPath,
+                userInput: "Run vault lint.",
+                actionContext: ["action": "run_lint"]
+            )
+        )
+        let task = try await getTask(taskId: response.taskId)
+        if task.status == "failed" {
+            throw APIError.serverMessage(task.summary ?? "Lint agent task failed.")
+        }
+        guard let lintResult = task.output?.lintResult else {
+            throw APIError.serverMessage("Lint agent task did not return a lint result.")
+        }
+        return lintResult
     }
 
     func fixLint(vaultPath: String, issueIds: [String]? = nil) async throws {

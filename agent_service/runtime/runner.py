@@ -7,7 +7,7 @@ from agent_service.agents.prompts import build_piki_instructions, build_single_s
 from agent_service.application.events import EventPublisher
 from agent_service.config import ServiceConfig
 from agent_service.models import AgentResult, EventType, IngestResult, SourceMeta, TaskStatus
-from agent_service.runtime.event_mapper import extract_text_delta
+from agent_service.runtime.event_mapper import extract_text_delta, map_stream_event
 from agent_service.runtime.tool_factory import build_sdk_tools
 from agent_service.tools import VaultToolRegistry
 from agent_service.workflows.ingest import build_ingest_user_prompt, normalize_ingest_output
@@ -69,6 +69,7 @@ class PikiWikiAgentRunner:
         task_id: str,
         conversation_id: str,
         user_input: str,
+        agent_input: str | None = None,
         context_contents: dict[str, str],
         tool_registry: VaultToolRegistry,
     ) -> AgentResult:
@@ -91,12 +92,14 @@ class PikiWikiAgentRunner:
         )
         result = self._run_with_optional_streaming(
             agent,
-            user_input,
+            agent_input or user_input,
             events=events,
             task_id=task_id,
             max_turns=8,
             run_config=run_config,
             stream_messages=True,
+            timeout_seconds=config.agent_task_timeout_seconds,
+            idle_timeout_seconds=config.agent_stream_idle_timeout_seconds,
         )
         final_output = _stringify_final_output(result)
         journal_entry = tool_registry.commit_journal_entry(
@@ -160,6 +163,8 @@ class PikiWikiAgentRunner:
             max_turns=12,
             run_config=run_config,
             stream_messages=False,
+            timeout_seconds=config.agent_task_timeout_seconds,
+            idle_timeout_seconds=config.agent_stream_idle_timeout_seconds,
         )
         raw_output = getattr(result, "final_output", "")
         final_output = _stringify_final_output(result)
@@ -219,6 +224,8 @@ class PikiWikiAgentRunner:
         max_turns: int,
         run_config,
         stream_messages: bool,
+        timeout_seconds: int,
+        idle_timeout_seconds: int,
     ):
         if not hasattr(self._runner_cls, "run_streamed"):
             return self._runner_cls.run_sync(
@@ -236,6 +243,8 @@ class PikiWikiAgentRunner:
                 max_turns=max_turns,
                 run_config=run_config,
                 stream_messages=stream_messages,
+                timeout_seconds=timeout_seconds,
+                idle_timeout_seconds=idle_timeout_seconds,
             )
         )
 
@@ -249,6 +258,8 @@ class PikiWikiAgentRunner:
         max_turns: int,
         run_config,
         stream_messages: bool,
+        timeout_seconds: int,
+        idle_timeout_seconds: int,
     ):
         result = self._runner_cls.run_streamed(
             agent,
@@ -257,18 +268,52 @@ class PikiWikiAgentRunner:
             run_config=run_config,
         )
         streamed_text = []
-        async for event in result.stream_events():
-            if not stream_messages:
-                continue
-            delta = extract_text_delta(event)
-            if not delta:
-                continue
-            streamed_text.append(delta)
-            events.message_delta(
-                task_id,
-                delta=delta,
-                content="".join(streamed_text),
-            )
+        try:
+            async with asyncio.timeout(timeout_seconds):
+                stream = result.stream_events()
+                while True:
+                    try:
+                        event = await asyncio.wait_for(stream.__anext__(), timeout=idle_timeout_seconds)
+                    except StopAsyncIteration:
+                        break
+                    except TimeoutError as exc:
+                        raise TimeoutError(f"Agent stream idle timed out after {idle_timeout_seconds} seconds") from exc
+                    if not stream_messages:
+                        continue
+                    delta = extract_text_delta(event)
+                    if delta:
+                        streamed_text.append(delta)
+                        content = "".join(streamed_text)
+                        events.message_delta(
+                            task_id,
+                            delta=delta,
+                            content=content,
+                        )
+                    for mapped in map_stream_event(event):
+                        payload = dict(mapped.payload)
+                        if mapped.event_type == "agent.trace.delta":
+                            if delta:
+                                payload["content"] = "".join(streamed_text)
+                            events.trace_delta(
+                                task_id,
+                                delta=payload.get("delta", ""),
+                                content=payload.get("content", ""),
+                            )
+                        elif mapped.event_type == "agent.trace.event":
+                            events.trace_event(
+                                task_id,
+                                kind=payload.get("kind", "event"),
+                                title=payload.get("title", "Agent 事件"),
+                                summary=payload.get("summary", ""),
+                                tool=payload.get("tool"),
+                                category=payload.get("category"),
+                                status=payload.get("status"),
+                            )
+        except TimeoutError as exc:
+            if hasattr(result, "cancel"):
+                result.cancel()
+            message = str(exc) or f"Agent task timed out after {timeout_seconds} seconds"
+            raise TimeoutError(message) from exc
         return result
 
     def _build_run_config(self, config: ServiceConfig, *, workflow_name: str):
@@ -295,4 +340,3 @@ def _stringify_final_output(result) -> str:
     if hasattr(output, "model_dump_json"):
         return output.model_dump_json()
     return str(output)
-

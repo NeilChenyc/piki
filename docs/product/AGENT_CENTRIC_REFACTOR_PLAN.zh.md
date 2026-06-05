@@ -72,16 +72,22 @@ POST /tasks
 - 用户输入文本。
 - 主会话框上传/选择的文件路径。
 - Inbox 选择的文件路径。
-- UI 按钮携带的上下文，例如“对当前 wiki 页面总结”“把这条回答记下来”“修正当前选中段落”。
-- 系统动作上下文，例如当前页面、当前选中文本、当前文件 chip、当前消息引用。
+- UI 按钮触发时携带的系统动作上下文，例如 `run_lint`、`ingest_file`、`summarize_current_page`。
+- 当前界面上下文，例如当前页面、当前选中文本、当前文件 chip、当前消息引用。
 
-产品原则是：**按钮不直接实现一套业务逻辑，而是把用户意图和界面上下文注入 agent 会话。**
+产品原则是：**按钮不直接实现一套业务逻辑，而是触发一轮标准 agent 调用，并把动作意图和界面上下文注入 agent 会话。**
+
+例如：
+
+- Mac App 的 `Run Lint` 按钮：创建一轮 agent task，注入系统动作上下文 `action=run_lint`，让 agent 根据 `AGENTS.md` 和 lint 工具检查 vault，必要时调用写工具做低风险修复。
+- Inbox 单个文件的 `Ingest` 按钮：创建一轮 agent task，注入系统动作上下文 `action=ingest_file`、`target_path=<当前 inbox 文件>`，让 agent 自主读取、转换、写 canonical source，并继续编译进 wiki。
+- Wiki 页面上的“总结/修正/补充”类按钮：创建一轮 agent task，注入 `action`、当前页面路径、选中文本和用户补充输入，由 agent 自主决定读写。
 
 例外只限 UI 文件管理动作本身：
 
-- 主会话框和 Inbox 的上传/选文件，是把文件路径加入用户上下文。
+- 主会话框和 Inbox 的上传/选文件，只是把文件路径加入输入上下文，不等于立即 ingest。
 - 文件 chip 的移除，是发送前的本地输入编辑。
-- 明确的 clear/delete 文件动作可以是受控服务动作，但如果它修改 `raw/` 或 `wiki/`，仍要进入 journal 判断。
+- 明确的 clear/delete 文件动作可以是受控服务动作，不必让 agent 语义判断；但如果它修改 `raw/` 或 `wiki/`，仍要进入 journal 判断。
 
 ### 4.3 会话上下文
 
@@ -401,15 +407,18 @@ store/
 目标：每轮 agent 调用都拿到同一类上下文。
 
 - 新增 `ConversationContextAssembler`，读取近 10 条会话。
-- 新增 `UserContextAssembler`，封装 user input、selected paths、UI action context、selected message/page。
+- 新增 `UserContextAssembler`，封装 user input、selected paths、system action context、selected message/page。
 - Task executor 统一构造 `AgentTaskInput`。
 - Runner prompt 明确区分基础上下文、用户上下文、会话上下文和工具规则。
+- `Run Lint`、Inbox 单文件 `Ingest` 等按钮统一创建 agent task，只是额外注入 `action` 和目标上下文。
 
 验收：
 
 - “展开讲第二点”能依赖上一轮上下文。
 - “把你刚才说的记下来”能引用上一条 assistant message。
 - 带文件任务进入同一个 agent runner，而不是提前 source intake。
+- `Run Lint` 按钮进入同一个 agent runner，并通过 `action=run_lint` 驱动 agent 调用维护工具。
+- Inbox 单文件 `Ingest` 按钮进入同一个 agent runner，并通过 `action=ingest_file` 和 `target_path` 驱动 agent 处理该文件。
 
 ### Phase C：把 Source Intake 下沉为工具
 
@@ -418,7 +427,7 @@ store/
 - 新增文档转换工具：PDF、DOCX、MD/TXT 读取。
 - 新增受控 asset/source 写入工具。
 - `selected_paths` 只作为 agent 可读外部文件 allowlist。
-- 旧 `/ingest-queue`、Inbox ingest 入口兼容保留，但内部改为创建统一 agent task，注入“请处理这些文件”的系统上下文。
+- 旧 `/ingest-queue`、Inbox ingest 入口兼容保留，但内部改为创建统一 agent task，注入 `action=ingest_file` 和目标文件上下文。
 
 验收：
 

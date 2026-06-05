@@ -87,6 +87,20 @@ def test_query_related_mode_and_raw_source_avoidance(tmp_path: Path):
     assert (vault_path / "wiki/log.md").read_text(encoding="utf-8") == log_before
 
 
+def test_query_does_not_match_short_english_substrings(tmp_path: Path):
+    vault_path = make_query_vault(tmp_path)
+    (vault_path / "wiki/concepts/confidence.md").write_text(
+        "# Confidence\n\nconfidence: high\n",
+        encoding="utf-8",
+    )
+
+    result = run_read_only_query(Vault(vault_path), "hi")
+
+    assert result.citations == []
+    assert result.confidence == "low"
+    assert "没有在已编译 wiki 中找到足够相关的内容" in result.answer
+
+
 def test_query_task_persists_structured_output(tmp_path: Path):
     vault_path = make_query_vault(tmp_path)
     client = make_client(tmp_path)

@@ -162,6 +162,55 @@ class SQLiteStore:
             )
         return self.get_task(task_id)
 
+    def get_conversation_messages(self, conversation_id: str, *, limit: int = 10) -> list[dict]:
+        with self.connect() as conn:
+            row = conn.execute("SELECT payload_json FROM sessions WHERE id = ?", (conversation_id,)).fetchone()
+        if row is None:
+            return []
+        try:
+            payload = json.loads(row["payload_json"])
+        except json.JSONDecodeError:
+            return []
+        messages = payload.get("messages", [])
+        if not isinstance(messages, list):
+            return []
+        return messages[-limit:]
+
+    def append_conversation_message(
+        self,
+        conversation_id: str,
+        *,
+        role: str,
+        content: str,
+        task_id: str,
+        metadata: dict | None = None,
+        max_messages: int = 50,
+    ):
+        messages = self.get_conversation_messages(conversation_id, limit=max_messages)
+        messages.append(
+            {
+                "role": role,
+                "content": content,
+                "task_id": task_id,
+                "metadata": metadata or {},
+                "created_at": utc_now_iso(),
+            }
+        )
+        payload = {"messages": messages[-max_messages:]}
+        now = utc_now_iso()
+        with self.connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO sessions (id, task_id, payload_json, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                  task_id = excluded.task_id,
+                  payload_json = excluded.payload_json,
+                  updated_at = excluded.updated_at
+                """,
+                (conversation_id, task_id, json.dumps(payload, ensure_ascii=False), now, now),
+            )
+
     def add_event(self, task_id: str, event_type: EventType | str, payload: dict) -> TaskEvent:
         event_id = f"event_{uuid4().hex}"
         now = utc_now_iso()

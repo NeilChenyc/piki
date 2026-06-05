@@ -6,6 +6,7 @@ struct TaskCreateRequest: Codable {
     let vaultPath: String
     let userInput: String
     let selectedPaths: [String]
+    let actionContext: [String: String]
     let conversationId: String?
     let mode: String
     let asyncMode: Bool
@@ -14,6 +15,7 @@ struct TaskCreateRequest: Codable {
         case vaultPath = "vault_path"
         case userInput = "user_input"
         case selectedPaths = "selected_paths"
+        case actionContext = "action_context"
         case conversationId = "conversation_id"
         case mode
         case asyncMode = "async_mode"
@@ -23,6 +25,7 @@ struct TaskCreateRequest: Codable {
         vaultPath: String,
         userInput: String,
         selectedPaths: [String] = [],
+        actionContext: [String: String] = [:],
         conversationId: String? = nil,
         mode: String = "normal",
         asyncMode: Bool = false
@@ -30,6 +33,7 @@ struct TaskCreateRequest: Codable {
         self.vaultPath = vaultPath
         self.userInput = userInput
         self.selectedPaths = selectedPaths
+        self.actionContext = actionContext
         self.conversationId = conversationId
         self.mode = mode
         self.asyncMode = asyncMode
@@ -55,6 +59,13 @@ struct TaskRecordDTO: Codable {
     struct TaskRecordOutput: Codable {
         let answer: String?
         let summary: String?
+        let lintResult: LintResultDTO?
+
+        enum CodingKeys: String, CodingKey {
+            case answer
+            case summary
+            case lintResult = "lint_result"
+        }
     }
 }
 
@@ -100,6 +111,9 @@ struct TaskEventPayload: Codable {
     let finalOutputPreview: String?
     let journalEntryId: String?
     let sourcePath: String?
+    let kind: String?
+    let tool: String?
+    let category: String?
 
     init(
         summary: String? = nil,
@@ -114,7 +128,10 @@ struct TaskEventPayload: Codable {
         detail: String? = nil,
         finalOutputPreview: String? = nil,
         journalEntryId: String? = nil,
-        sourcePath: String? = nil
+        sourcePath: String? = nil,
+        kind: String? = nil,
+        tool: String? = nil,
+        category: String? = nil
     ) {
         self.summary = summary
         self.answer = answer
@@ -129,6 +146,9 @@ struct TaskEventPayload: Codable {
         self.finalOutputPreview = finalOutputPreview
         self.journalEntryId = journalEntryId
         self.sourcePath = sourcePath
+        self.kind = kind
+        self.tool = tool
+        self.category = category
     }
 
     enum CodingKeys: String, CodingKey {
@@ -145,6 +165,9 @@ struct TaskEventPayload: Codable {
         case finalOutputPreview = "final_output_preview"
         case journalEntryId = "journal_entry_id"
         case sourcePath = "source_path"
+        case kind
+        case tool
+        case category
     }
 }
 

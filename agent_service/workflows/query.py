@@ -174,25 +174,29 @@ def build_answer(
 
 def _score_page(page: WikiPage, normalized_question: str, query_tokens: list[str]) -> tuple[float, int | None, str]:
     normalized_content = _normalize(page.content)
+    compact_question_match_allowed = _allow_compact_match(normalized_question)
+    content_ascii_tokens = _ascii_tokens(page.content)
+    title_ascii_tokens = _ascii_tokens(page.title)
     score = 0.0
-    if normalized_question and normalized_question in normalized_content:
+    if compact_question_match_allowed and normalized_question in normalized_content:
         score += 20.0
     best_line = None
     best_line_score = 0.0
     best_snippet = ""
     title_normalized = _normalize(page.title)
     for token in query_tokens:
-        if token in title_normalized:
+        if _token_matches(token, title_normalized, title_ascii_tokens):
             score += 0.5 if len(token) == 1 else 4.0
-        if token in normalized_content:
+        if _token_matches(token, normalized_content, content_ascii_tokens):
             score += 0.25 if len(token) == 1 else 1.0
     for line_number, line in enumerate(page.lines, start=1):
         line_normalized = _normalize(line)
+        line_ascii_tokens = _ascii_tokens(line)
         line_score = 0.0
-        if normalized_question and normalized_question in line_normalized:
+        if compact_question_match_allowed and normalized_question in line_normalized:
             line_score += 20.0
         for token in query_tokens:
-            if token in line_normalized:
+            if _token_matches(token, line_normalized, line_ascii_tokens):
                 line_score += 0.25 if len(token) == 1 else 2.0
         if line_score > best_line_score:
             best_line_score = line_score
@@ -214,6 +218,28 @@ def _extract_title(path: Path, content: str) -> str:
 
 def _normalize(text: str) -> str:
     return re.sub(r"\s+", "", text.lower())
+
+
+def _ascii_tokens(text: str) -> set[str]:
+    return {match.group(0).lower() for match in ASCII_TOKEN_PATTERN.finditer(text)}
+
+
+def _is_ascii_token(token: str) -> bool:
+    return bool(ASCII_TOKEN_PATTERN.fullmatch(token)) and token.isascii()
+
+
+def _token_matches(token: str, normalized_text: str, ascii_tokens: set[str]) -> bool:
+    if _is_ascii_token(token):
+        return token in ascii_tokens
+    return token in normalized_text
+
+
+def _allow_compact_match(normalized_question: str) -> bool:
+    if not normalized_question:
+        return False
+    if CJK_PATTERN.search(normalized_question):
+        return True
+    return len(normalized_question) >= 3
 
 
 def _build_stem_map(pages: list[WikiPage]) -> dict[str, WikiPage]:
@@ -271,4 +297,3 @@ def _confidence(citations: list[Citation], hits: list[SearchHit]) -> QueryConfid
     if citations:
         return QueryConfidence.MEDIUM
     return QueryConfidence.LOW
-

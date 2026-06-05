@@ -3,7 +3,9 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from agent_service.app import create_app
+from agent_service.application.event_stream import EventStreamService
 from agent_service.config import ServiceConfig
+from agent_service.models import RiskLevel, TaskKind
 from agent_service.store import SQLiteStore
 
 
@@ -84,6 +86,19 @@ def test_async_task_streams_until_completion(vault_path: Path, tmp_path: Path):
     assert "event: agent.progress" in body
     assert "event: task.completed" in body
     assert client.get(f"/tasks/{task_id}").json()["status"] == "completed"
+
+
+def test_sse_stream_emits_heartbeat_for_idle_running_task(vault_path: Path, tmp_path: Path):
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    task = store.create_task(
+        task_kind=TaskKind.AGENT,
+        risk_level=RiskLevel.READ_ONLY,
+        vault_path=str(vault_path),
+        user_input="idle",
+    )
+    stream = EventStreamService(store, heartbeat_interval_seconds=0).task_sse(task.id)
+
+    assert next(stream).startswith(": ping")
 
 
 def test_proposed_patch_approval_does_not_apply_without_writer(vault_path: Path, tmp_path: Path):
