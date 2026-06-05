@@ -14,6 +14,7 @@
 ### 产品文档
 
 - `product/MVP_FEATURES.zh.md`
+- `product/AGENT_RUNTIME_DESIGN.zh.md`
 - `product/PRODUCT_NOTES.md`
 - `product/PRODUCT_OVERVIEW.zh.md`
 - `product/ROADMAP.md`

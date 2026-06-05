@@ -1,0 +1,588 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		062700A625C072D533285AD9 /* ChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAAFD82B5611F83C120CE63 /* ChatInputView.swift */; };
+		0FC6D73FF2508B7E905E85E2 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C2D417409DE30FBF447BDF /* SidebarView.swift */; };
+		1BCD7BAEE2B773E0FF9FEC77 /* WikiPageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CF698E82FC421701D5575C /* WikiPageContentView.swift */; };
+		2397CE855FBD90E003163703 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */; };
+		244F35F9F9B46A19A69360AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0364D70DD6D68CCA0968BC68 /* Assets.xcassets */; };
+		24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */; };
+		2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */; };
+		310DD29CFA6146A6AAA27BC2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF7EEE571B61A88771D7640 /* SettingsView.swift */; };
+		315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3368FD4E4A7B6A82A049E76F /* InboxFilterBar.swift */; };
+		35D44C853488583E0CF447A7 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A151F539885AC0A94B6BAC38 /* APIModels.swift */; };
+		3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F43371721B468079B54395 /* LocalServiceManager.swift */; };
+		420E59C53DC2A581E45CFB36 /* VaultStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */; };
+		443B621C0523B4FE469A9FB3 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */; };
+		490434767BFDD84D814A5496 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = A5A5FA886E43A892B6D56719 /* Markdown */; };
+		4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1996F0136E908523C15056A5 /* ContentView.swift */; };
+		5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A756DA17731FCFE154EADB /* ChatBubbleView.swift */; };
+		5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34DECA1A1AA8C54EE4EAD4EB /* InboxView.swift */; };
+		667A500AE8D9048DFE319D00 /* InboxFileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */; };
+		6AF4D9A1F1C3BBA10BC206B8 /* HealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2039447DE882C09CB87FE2A6 /* HealthView.swift */; };
+		6E28497689FB6695EC1FD09A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7249FFE507E86DAE979CD97C /* HomeView.swift */; };
+		71D3880185003E3C1DFBAA97 /* HealthScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB2F2D1BA49A3FF13C4F3AA /* HealthScoreCard.swift */; };
+		7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C8C20519720DEC42158EF5 /* PikiApp.swift */; };
+		934DDD35050AA64D863CD91E /* HealthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA3D0A2C035EBA8527FE977 /* HealthViewModel.swift */; };
+		94EE95576C4F22F1D826DB7D /* WikiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019E1FB4BC4BE44A1B0EF031 /* WikiView.swift */; };
+		A47D420AC685D113461970B9 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB4472A371809ED276CFFFE /* AppState.swift */; };
+		A85DD5EB96F812767B2E4DC3 /* ActivityRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA331709E3B66786DB4834A /* ActivityRow.swift */; };
+		ADC5A81B8B7F7523762558B4 /* FilePreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E682A82DEC365409713B51F1 /* FilePreviewPanel.swift */; };
+		B4395ABA570B52FAE4F2A7D4 /* WikiCategorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E230560BD4556819372E7A /* WikiCategorySection.swift */; };
+		BF91185CF60C597B804B9212 /* SidebarNavRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADC2BA18F8E68F018CF68C6 /* SidebarNavRow.swift */; };
+		C510D4BADEA0FDFEAEFEF495 /* FileDropZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */; };
+		C5E6688E658CD6635E6B8BDF /* InboxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */; };
+		CA0F9DB940146C27AD4B002D /* WikiViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5BF2D87FACFA4F330AE75D /* WikiViewModel.swift */; };
+		D928974A75B277134B2F9000 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAFF5590251FB2062A50EE74 /* Theme.swift */; };
+		E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940D0CDE0D10F37A3CB01678 /* SSEClient.swift */; };
+		F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158490133DDBD171883C03FA /* LintComponents.swift */; };
+		FB494BE881D6475D9E547532 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8128157562AB4210024F63 /* APIClient.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		019E1FB4BC4BE44A1B0EF031 /* WikiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiView.swift; sourceTree = "<group>"; };
+		03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDropZone.swift; sourceTree = "<group>"; };
+		0364D70DD6D68CCA0968BC68 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0CB4472A371809ED276CFFFE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		158490133DDBD171883C03FA /* LintComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LintComponents.swift; sourceTree = "<group>"; };
+		1996F0136E908523C15056A5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1ADC2BA18F8E68F018CF68C6 /* SidebarNavRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarNavRow.swift; sourceTree = "<group>"; };
+		2039447DE882C09CB87FE2A6 /* HealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthView.swift; sourceTree = "<group>"; };
+		29A756DA17731FCFE154EADB /* ChatBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubbleView.swift; sourceTree = "<group>"; };
+		2D7E221313C9D9DE368238DC /* PikiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PikiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3368FD4E4A7B6A82A049E76F /* InboxFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxFilterBar.swift; sourceTree = "<group>"; };
+		34DECA1A1AA8C54EE4EAD4EB /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxView.swift; sourceTree = "<group>"; };
+		36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultStatusCard.swift; sourceTree = "<group>"; };
+		37CF698E82FC421701D5575C /* WikiPageContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageContentView.swift; sourceTree = "<group>"; };
+		44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiLogo.swift; sourceTree = "<group>"; };
+		6FF7EEE571B61A88771D7640 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		7249FFE507E86DAE979CD97C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		940D0CDE0D10F37A3CB01678 /* SSEClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSEClient.swift; sourceTree = "<group>"; };
+		9EA3D0A2C035EBA8527FE977 /* HealthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewModel.swift; sourceTree = "<group>"; };
+		A151F539885AC0A94B6BAC38 /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
+		A5C2D417409DE30FBF447BDF /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		AD8128157562AB4210024F63 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		B3E230560BD4556819372E7A /* WikiCategorySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiCategorySection.swift; sourceTree = "<group>"; };
+		B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		BA5BF2D87FACFA4F330AE75D /* WikiViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiViewModel.swift; sourceTree = "<group>"; };
+		BAFF5590251FB2062A50EE74 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		BEA331709E3B66786DB4834A /* ActivityRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRow.swift; sourceTree = "<group>"; };
+		C6F43371721B468079B54395 /* LocalServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalServiceManager.swift; sourceTree = "<group>"; };
+		CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
+		D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxFileRow.swift; sourceTree = "<group>"; };
+		E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxViewModel.swift; sourceTree = "<group>"; };
+		E682A82DEC365409713B51F1 /* FilePreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePreviewPanel.swift; sourceTree = "<group>"; };
+		EAAAFD82B5611F83C120CE63 /* ChatInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputView.swift; sourceTree = "<group>"; };
+		ECB2F2D1BA49A3FF13C4F3AA /* HealthScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthScoreCard.swift; sourceTree = "<group>"; };
+		F6C8C20519720DEC42158EF5 /* PikiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8E53C344C220063B0E43FCBC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				490434767BFDD84D814A5496 /* Markdown in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00313DC5D94511CD99F7AFBE /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				AD8128157562AB4210024F63 /* APIClient.swift */,
+				940D0CDE0D10F37A3CB01678 /* SSEClient.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		1BA98C3BF78DEC4AB8A8BE7F /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				7A4BB5116558407CA81B0B73 /* Models */,
+				00313DC5D94511CD99F7AFBE /* Network */,
+				0CB4472A371809ED276CFFFE /* AppState.swift */,
+				C6F43371721B468079B54395 /* LocalServiceManager.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		3DDC779E2CA451982D7F2F1D /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				95F463AF43465D6C7318E53A /* Health */,
+				54E19A06F67A8E8CA246AC12 /* Home */,
+				5AED57BC8281E4C954E19EAF /* Inbox */,
+				EF21444027C2B972158E94CF /* Settings */,
+				FD809E385332C6BAAD234B8E /* Sidebar */,
+				7676690D6FA5EB02D0A26187 /* Wiki */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		54E19A06F67A8E8CA246AC12 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				BEA331709E3B66786DB4834A /* ActivityRow.swift */,
+				29A756DA17731FCFE154EADB /* ChatBubbleView.swift */,
+				EAAAFD82B5611F83C120CE63 /* ChatInputView.swift */,
+				7249FFE507E86DAE979CD97C /* HomeView.swift */,
+				44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */,
+				CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */,
+				36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		5AED57BC8281E4C954E19EAF /* Inbox */ = {
+			isa = PBXGroup;
+			children = (
+				03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */,
+				E682A82DEC365409713B51F1 /* FilePreviewPanel.swift */,
+				D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */,
+				3368FD4E4A7B6A82A049E76F /* InboxFilterBar.swift */,
+				34DECA1A1AA8C54EE4EAD4EB /* InboxView.swift */,
+				E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */,
+			);
+			path = Inbox;
+			sourceTree = "<group>";
+		};
+		7676690D6FA5EB02D0A26187 /* Wiki */ = {
+			isa = PBXGroup;
+			children = (
+				B3E230560BD4556819372E7A /* WikiCategorySection.swift */,
+				37CF698E82FC421701D5575C /* WikiPageContentView.swift */,
+				019E1FB4BC4BE44A1B0EF031 /* WikiView.swift */,
+				BA5BF2D87FACFA4F330AE75D /* WikiViewModel.swift */,
+			);
+			path = Wiki;
+			sourceTree = "<group>";
+		};
+		7A4BB5116558407CA81B0B73 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A151F539885AC0A94B6BAC38 /* APIModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		95F463AF43465D6C7318E53A /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				ECB2F2D1BA49A3FF13C4F3AA /* HealthScoreCard.swift */,
+				2039447DE882C09CB87FE2A6 /* HealthView.swift */,
+				9EA3D0A2C035EBA8527FE977 /* HealthViewModel.swift */,
+				158490133DDBD171883C03FA /* LintComponents.swift */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		A698DF6BF84A9A41541B03B8 /* SharedUI */ = {
+			isa = PBXGroup;
+			children = (
+				F91B44E0A18519DE6C6038DA /* Components */,
+				BAFF5590251FB2062A50EE74 /* Theme.swift */,
+			);
+			path = SharedUI;
+			sourceTree = "<group>";
+		};
+		B08C061F5F39BBE62558F1A3 /* PikiApp */ = {
+			isa = PBXGroup;
+			children = (
+				1BA98C3BF78DEC4AB8A8BE7F /* Core */,
+				3DDC779E2CA451982D7F2F1D /* Features */,
+				E661AC331844E9BDB3E4024E /* Resources */,
+				A698DF6BF84A9A41541B03B8 /* SharedUI */,
+				1996F0136E908523C15056A5 /* ContentView.swift */,
+				F6C8C20519720DEC42158EF5 /* PikiApp.swift */,
+			);
+			path = PikiApp;
+			sourceTree = "<group>";
+		};
+		B4F2D15D061770864B227ABE = {
+			isa = PBXGroup;
+			children = (
+				B08C061F5F39BBE62558F1A3 /* PikiApp */,
+				E6AA76FE36CBD435FF3EDEFB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E661AC331844E9BDB3E4024E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0364D70DD6D68CCA0968BC68 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		E6AA76FE36CBD435FF3EDEFB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2D7E221313C9D9DE368238DC /* PikiApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EF21444027C2B972158E94CF /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				6FF7EEE571B61A88771D7640 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		F91B44E0A18519DE6C6038DA /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */,
+				66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		FD809E385332C6BAAD234B8E /* Sidebar */ = {
+			isa = PBXGroup;
+			children = (
+				1ADC2BA18F8E68F018CF68C6 /* SidebarNavRow.swift */,
+				A5C2D417409DE30FBF447BDF /* SidebarView.swift */,
+			);
+			path = Sidebar;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F3A273F6023F8444087A3B76 /* PikiApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E3155C49ED672DBC5C48071A /* Build configuration list for PBXNativeTarget "PikiApp" */;
+			buildPhases = (
+				F367E3C39418C7A54BB61FE5 /* Sources */,
+				2E71C85B467E0CC5524B74DD /* Resources */,
+				8E53C344C220063B0E43FCBC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PikiApp;
+			packageProductDependencies = (
+				A5A5FA886E43A892B6D56719 /* Markdown */,
+			);
+			productName = PikiApp;
+			productReference = 2D7E221313C9D9DE368238DC /* PikiApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9FA56F20392AE38BC704927E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					F3A273F6023F8444087A3B76 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 3643F8F2A595633D7BFD87CA /* Build configuration list for PBXProject "PikiApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = B4F2D15D061770864B227ABE;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				96ADBB4BA073439296BCDF6D /* XCRemoteSwiftPackageReference "swift-markdown" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E6AA76FE36CBD435FF3EDEFB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F3A273F6023F8444087A3B76 /* PikiApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2E71C85B467E0CC5524B74DD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				244F35F9F9B46A19A69360AC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F367E3C39418C7A54BB61FE5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB494BE881D6475D9E547532 /* APIClient.swift in Sources */,
+				35D44C853488583E0CF447A7 /* APIModels.swift in Sources */,
+				A85DD5EB96F812767B2E4DC3 /* ActivityRow.swift in Sources */,
+				A47D420AC685D113461970B9 /* AppState.swift in Sources */,
+				5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */,
+				062700A625C072D533285AD9 /* ChatInputView.swift in Sources */,
+				4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */,
+				C510D4BADEA0FDFEAEFEF495 /* FileDropZone.swift in Sources */,
+				ADC5A81B8B7F7523762558B4 /* FilePreviewPanel.swift in Sources */,
+				443B621C0523B4FE469A9FB3 /* FlowLayout.swift in Sources */,
+				71D3880185003E3C1DFBAA97 /* HealthScoreCard.swift in Sources */,
+				6AF4D9A1F1C3BBA10BC206B8 /* HealthView.swift in Sources */,
+				934DDD35050AA64D863CD91E /* HealthViewModel.swift in Sources */,
+				6E28497689FB6695EC1FD09A /* HomeView.swift in Sources */,
+				2397CE855FBD90E003163703 /* HomeViewModel.swift in Sources */,
+				667A500AE8D9048DFE319D00 /* InboxFileRow.swift in Sources */,
+				315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */,
+				5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */,
+				C5E6688E658CD6635E6B8BDF /* InboxViewModel.swift in Sources */,
+				F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */,
+				3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */,
+				7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */,
+				2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */,
+				24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */,
+				E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */,
+				310DD29CFA6146A6AAA27BC2 /* SettingsView.swift in Sources */,
+				BF91185CF60C597B804B9212 /* SidebarNavRow.swift in Sources */,
+				0FC6D73FF2508B7E905E85E2 /* SidebarView.swift in Sources */,
+				D928974A75B277134B2F9000 /* Theme.swift in Sources */,
+				420E59C53DC2A581E45CFB36 /* VaultStatusCard.swift in Sources */,
+				B4395ABA570B52FAE4F2A7D4 /* WikiCategorySection.swift in Sources */,
+				1BCD7BAEE2B773E0FF9FEC77 /* WikiPageContentView.swift in Sources */,
+				94EE95576C4F22F1D826DB7D /* WikiView.swift in Sources */,
+				CA0F9DB940146C27AD4B002D /* WikiViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		40FF55483095359932937D77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		56221522994A1151F5704BD0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Piki;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.piki.app;
+				PRODUCT_NAME = Piki;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		CF58ED5248D64C50F40363FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Piki;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.piki.app;
+				PRODUCT_NAME = Piki;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		E62D1E7F528CD62AB2E0C2BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3643F8F2A595633D7BFD87CA /* Build configuration list for PBXProject "PikiApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40FF55483095359932937D77 /* Debug */,
+				E62D1E7F528CD62AB2E0C2BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E3155C49ED672DBC5C48071A /* Build configuration list for PBXNativeTarget "PikiApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56221522994A1151F5704BD0 /* Debug */,
+				CF58ED5248D64C50F40363FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		96ADBB4BA073439296BCDF6D /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-markdown";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A5A5FA886E43A892B6D56719 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 96ADBB4BA073439296BCDF6D /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 9FA56F20392AE38BC704927E /* Project object */;
+}

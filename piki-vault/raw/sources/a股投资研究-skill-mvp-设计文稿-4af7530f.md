@@ -1,0 +1,376 @@
+---
+title: "A股投资研究 Skill MVP 设计文稿"
+type: "raw-source"
+format: "markdown"
+hash: "4af7530f057ef6aecd2a3ce0535c44dda1c1eda131ae58efe1dc2a5c22b4da79"
+original_path: "/Users/a99/localDocuments/codeBase/ideaWorkplace/文档编写/a-share-investment-research-mvp-design.md"
+asset_path: "raw/assets/a股投资研究-skill-mvp-设计文稿-4af7530f/original.md"
+source_path: "raw/sources/a股投资研究-skill-mvp-设计文稿-4af7530f.md"
+captured_at: "2026-06-04T18:14:53.364690+00:00"
+---
+
+# A股投资研究 Skill MVP 设计文稿
+
+## 来源元数据
+
+- 原始格式：`markdown`
+- 内容哈希：`4af7530f057ef6aecd2a3ce0535c44dda1c1eda131ae58efe1dc2a5c22b4da79`
+- 原始路径：`/Users/a99/localDocuments/codeBase/ideaWorkplace/文档编写/a-share-investment-research-mvp-design.md`
+- 资产路径：`raw/assets/a股投资研究-skill-mvp-设计文稿-4af7530f/original.md`
+- Source 路径：`raw/sources/a股投资研究-skill-mvp-设计文稿-4af7530f.md`
+- 捕获时间：`2026-06-04T18:14:53.364690+00:00`
+
+## 正文
+
+# A股投资研究 Skill MVP 设计文稿
+
+## 1. 文档目的
+
+本文档用于定义 `a-share-investment-research` 这个 Skill 的 MVP 版本设计，包括定位、能力范围、工具选型、工作流、输出结构、缺口与演进路线。
+
+它基于现有方案文档 [investment-research-agent.md](/Users/a99/localDocuments/codeBase/ideaWorkplace/文档编写/investment-research-agent.md) 收敛为一个可直接开始实现的 Skill 版本。
+
+## 2. MVP 定位
+
+一句话定位：
+
+> 一个面向 A 股场景、带强时效约束的投资研究与决策辅助 Skill。它先判断当前时间和市场状态，再识别决策周期，调用行情、新闻、财务和公告信息，在有效时窗内输出结构化研究结果、风险提示和非保证性的情景建议。
+
+MVP 阶段强调：
+
+- 先把研究链路做对
+- 不做自动交易
+- 不做确定性荐股
+- 不把过期信息当成主要依据
+
+## 3. MVP 能力范围
+
+MVP 建议覆盖以下三类核心场景：
+
+### 3.1 快速问答
+
+典型问题：
+
+- 比亚迪今天为什么跌
+- 这个票现在还能不能追
+- 今天涨停的原因是什么
+
+MVP 输出重点：
+
+- 当前时间与市场状态
+- 价格表现与近端结构
+- 最新新闻/事件
+- 短线风险与情景判断
+
+### 3.2 标的研究
+
+典型问题：
+
+- 宁德时代适不适合中长期持有
+- 这家公司基本面怎么样
+
+MVP 输出重点：
+
+- 财务与基本面
+- 近期公告与新闻
+- 估值与行业位置
+- 中长期风险与情景判断
+
+### 3.3 题材/板块机会扫描
+
+典型问题：
+
+- 最近 3 天 A 股 AI 方向有什么机会
+- 机器人板块这周还能看吗
+
+MVP 输出重点：
+
+- 题材热度
+- 代表标的表现
+- 事件催化
+- 风险排序
+
+## 4. 当前工具选型结论
+
+## 4.1 主 MCP 选择
+
+MVP 阶段主 MCP 选型建议为：
+
+```text
+akshare-one-mcp
+```
+
+原因：
+
+- 已在当前本机环境完成实际连通测试
+- 安装与启动成本低
+- 覆盖实时行情、历史行情、新闻、财务报表、基础财务指标、时间信息
+- 足以支撑 MVP 第一阶段的大部分研究链路
+
+当前已验证可用的能力包括：
+
+```text
+initialize
+tools/list
+get_time_info
+get_realtime_data
+get_hist_data
+get_news_data
+get_balance_sheet
+get_income_statement
+get_cash_flow
+get_financial_metrics
+get_inner_trade_data
+```
+
+## 4.2 为什么暂不选 stock-mcp 作为 MVP 主入口
+
+`stock-mcp` 理论能力更完整，覆盖：
+
+- market
+- technical
+- fundamental
+- money_flow
+- news
+- filings
+
+但在当前环境下，本次仅完成了代码与依赖层验证，未完成本机服务拉起验证。主要原因是：
+
+- 运行时对 Redis / Postgres / Docker 依赖更重
+- 当前环境没有直接可用的 `docker compose`
+- 本地 `Redis 6379` 未开启，启动链路受影响
+
+因此对 MVP 的结论是：
+
+```text
+适合作为后续增强版候选
+不适合作为当前第一落点
+```
+
+## 4.3 一个 MCP 是否足够
+
+结论：
+
+```text
+一个 MCP 可以覆盖大部分基础需求，但不能完整覆盖 MVP 目标
+```
+
+原因是 `akshare-one-mcp` 可以解决：
+
+- 时间信息
+- 个股实时行情
+- 历史行情
+- 基础新闻
+- 财务报表
+- 基础财务指标
+
+但还不够覆盖：
+
+- 巨潮公告/问询函/业绩预告等 A 股核心公告事件
+- 更强的资金流与板块联动
+- 更权威的交易日历校验
+- 更细的风险事件识别
+
+所以 MVP 推荐组合不是“只依赖一个 MCP”，而是：
+
+```text
+akshare-one-mcp
++ Web Search
++ 巨潮公告抓取/封装
+```
+
+## 5. MVP 技术组合
+
+### 5.1 第一阶段最小可用组合
+
+```text
+主数据层：akshare-one-mcp
+新闻补充：Web Search
+公告补充：CNINFO / 巨潮公告抓取
+规则层：自建 freshness policy
+输出层：自建结构化研究模板
+```
+
+### 5.2 第二阶段增强
+
+```text
+补充资金流工具
+补充板块/行业表现工具
+补充官方交易日历校验
+补充风险事件归因
+```
+
+### 5.3 第三阶段升级
+
+```text
+接入 stock-mcp 或自建多源统一 MCP
+引入 TuShare Pro
+引入更强公告解析与缓存层
+```
+
+## 6. Skill 设计原则
+
+MVP Skill 必须把以下原则写成硬规则：
+
+### 6.1 时间优先
+
+每次分析前必须先拿到：
+
+```text
+current_datetime
+timezone
+market_status
+last_trading_day
+next_trading_day（若可得）
+```
+
+### 6.2 决策周期优先
+
+每个问题先归类再取数，不允许所有问题共用同一套模板。
+
+### 6.3 时效约束优先
+
+所有短线结论必须优先使用最近交易日或当前交易日数据。
+
+### 6.4 多源交叉验证
+
+当问题依赖“为什么涨跌、是否受公告影响、是否有最新事件”时，不能只依赖单一行情源，必须引入新闻或公告验证。
+
+### 6.5 数据缺失时允许拒答
+
+如果关键事实缺失、过期或无法验证，必须明确说明“不足以形成判断”。
+
+## 7. MVP 工作流
+
+Skill 的主流程建议固定为：
+
+```text
+1. 解析用户问题
+2. 识别市场、标的、题材、决策周期
+3. 获取当前时间与市场状态
+4. 生成本次问题的数据需求清单
+5. 调用 MCP / Web Search / 公告源
+6. 执行 freshness filter
+7. 做事件与事实交叉验证
+8. 生成结构化分析
+9. 输出风险、情景和置信度
+```
+
+## 8. 工具与能力映射
+
+### 8.1 当前可直接使用
+
+| 能力 | 首选工具 | 备注 |
+| --- | --- | --- |
+| 当前时间与最近交易日 | `get_time_info()` | 已验证可用 |
+| 实时行情 | `get_realtime_data()` | 适合短线问答 |
+| 历史走势 | `get_hist_data()` | 适合短线/波段/中线 |
+| 基础新闻 | `get_news_data()` | 适合事件线索收集 |
+| 财务三表 | `get_balance_sheet()` / `get_income_statement()` / `get_cash_flow()` | 适合基本面研究 |
+| 财务指标 | `get_financial_metrics()` | 适合中长期问答 |
+
+### 8.2 需要外部补充
+
+| 能力 | 补充方式 | 备注 |
+| --- | --- | --- |
+| 最新政策/新闻 | `web.run` | 需要最新信息时必须查 |
+| 公告/问询函/业绩预告 | 巨潮抓取或后续公告 MCP | A 股关键补足项 |
+| 节假日交易校验 | 交易所官网或权威站点 | 节假日必须校验 |
+| 板块/题材联动 | 后续加板块工具 | MVP 可先退化为代表标的观察 |
+
+## 9. MVP Skill 输出结构
+
+Skill 输出建议固定成以下骨架：
+
+```text
+1. 结论摘要
+2. 当前时间与市场状态
+3. 本次使用的数据范围
+4. 核心事实
+5. 多维分析
+6. 情景判断
+7. 操作建议
+8. 风险提示
+9. 数据来源与更新时间
+```
+
+其中：
+
+- 操作建议必须是约束型表达，不得写成确定性指令
+- 风险提示必须明确数据缺口、时效边界和事件不确定性
+- 数据来源必须尽量写出来源类别与时间
+
+## 10. MVP 缺口清单
+
+当前 MVP 明确存在以下缺口：
+
+### 10.1 公告能力不完整
+
+没有独立公告源时，对“为什么涨停”“公告后怎么看”这类问题的解释深度会受限。
+
+### 10.2 资金流和板块联动较弱
+
+`akshare-one-mcp` 当前不提供完整的板块热度、行业强弱、题材扩散链路。
+
+### 10.3 市场状态判断仍需增强
+
+仅依赖时间和最近交易日不足以完整覆盖节假日与调休场景，后续需要接入权威交易日历。
+
+### 10.4 风险事件识别需要增强
+
+MVP 阶段可以做“新闻与公告层面风险提示”，但还做不到完整的风险事件库。
+
+## 11. Skill 文件结构建议
+
+建议 Skill 以如下结构落地：
+
+```text
+a-share-investment-research/
+├── SKILL.md
+└── references/
+    ├── workflow.md
+    ├── freshness-policy.md
+    ├── output-template.md
+    ├── tooling-and-fallbacks.md
+    └── examples.md
+```
+
+设计原则：
+
+- `SKILL.md` 只保留触发条件、主流程、硬规则和引用导航
+- 细节模板与策略放到 `references/`
+- 便于后续扩展公告源、资金流源和更多 MCP
+
+## 12. 实现顺序建议
+
+### 第一阶段
+
+- 完成 Skill 主体结构
+- 固化时间感知与决策周期流程
+- 接入 `akshare-one-mcp`
+- 接入 Web Search 新闻补充
+
+### 第二阶段
+
+- 补充 CNINFO 公告抓取
+- 补充公告影响分析模板
+- 补充交易日历权威校验
+
+### 第三阶段
+
+- 接入更完整的 A 股数据层
+- 增强板块、资金流、风险事件识别
+- 视部署条件引入 `stock-mcp`
+
+## 13. 最终结论
+
+MVP 阶段最合理的 Skill 方案是：
+
+```text
+用 akshare-one-mcp 做主 MCP
+用 Web Search 补最新新闻
+用 CNINFO / 巨潮补 A 股核心公告
+把时间感知、决策周期、freshness policy 和结构化输出做成 Skill 的硬规则
+```
+
+这能在最小复杂度下，先把“正确的投资研究链路”建立起来。

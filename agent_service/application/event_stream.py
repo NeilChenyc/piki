@@ -1,0 +1,33 @@
+from __future__ import annotations
+
+import json
+import time
+from collections.abc import Iterator
+
+from agent_service.models import TaskStatus
+from agent_service.store import SQLiteStore
+
+
+class EventStreamService:
+    def __init__(self, store: SQLiteStore):
+        self.store = store
+
+    def task_sse(self, task_id: str) -> Iterator[str]:
+        seen_ids = set()
+        terminal_seen = False
+        while True:
+            emitted = False
+            for event in self.store.list_events(task_id):
+                if event.id in seen_ids:
+                    continue
+                seen_ids.add(event.id)
+                emitted = True
+                payload = event.model_dump(mode="json")
+                yield f"event: {event.type}\n"
+                yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+            task = self.store.get_task(task_id)
+            if task.status in {TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.NEEDS_APPROVAL}:
+                if terminal_seen and not emitted:
+                    break
+                terminal_seen = True
+            time.sleep(0.25)

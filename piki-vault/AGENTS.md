@@ -8,9 +8,19 @@
 
 有三层：
 
-- `raw/`：不可变的原始来源。只能读取这一层；除非用户明确要求，不要在摄入后改写、就地总结或重组来源。
+- `raw/`：原始来源层。agent 可以在 vault 内读写这一层，用于 source intake、规范化、资源保存和必要的来源修正；修改必须记录到 `wiki/log.md` 或系统变更记录。
 - `wiki/`：由大模型维护的编译知识层。负责创建、更新、交叉链接和维护这些 Markdown 页面。
-- `AGENTS.md`：后续大模型会话使用的结构约定和操作规则。只有当用户和大模型共同确认维基约定需要改变时，才更新本文件。
+- `AGENTS.md`：后续大模型会话使用的结构约定和操作规则。agent 运行时只能读取本文件，不应自行修改本文件。
+
+## 读写边界
+
+- vault 内除 `AGENTS.md` 外，agent 可以自由读写，包括 `raw/`、`wiki/`、`system/`、`purpose.md`、`wiki/index.md` 和 `wiki/log.md`。
+- `AGENTS.md` 仅可读取，不可由 agent 自主写入；如规则需要改变，应由用户明确发起维护。
+- vault 外路径仅可读取，并且必须是用户明确提供的来源路径；绝不开放 vault 外写入。
+- Change journal 是对话级记录：只有某条用户对话真实修改了 `raw/` 或 `wiki/` 目录下任意文件，才创建一条 journal entry。
+- journal entry 记录这条对话对 `raw/` / `wiki/` 的全部修改摘要、涉及路径、写前/写后 hash、必要快照和时间，供后续追踪和回退。
+- 修改 `system/`、`purpose.md` 或其他非 `raw/` / `wiki/` 文件可以记录 task event，但不进入 change journal，也不作为 MVP 回退对象。
+- 若系统提供回退能力，回退前必须校验当前文件 hash 与 journal entry 中的写后 hash 一致；不一致则回退失败，不做部分回退。
 
 维基应该复利。不要把摄入当成一次性总结。每个有意义的来源都应该更新所有相关的维基页面。
 
@@ -58,7 +68,7 @@ sources: []
 tags: []
 status: active
 confidence: medium
-review_after:
+check_after:
 ---
 ```
 
@@ -84,7 +94,7 @@ review_after:
 - `draft`
 - `stale`
 - `superseded`
-- `needs-review`
+- `needs-check`
 
 ## 链接约定
 
@@ -109,7 +119,7 @@ sources:
 tags: []
 status: active
 confidence: medium
-review_after:
+check_after:
 ---
 
 # 标题
@@ -148,7 +158,7 @@ sources: []
 tags: []
 status: active
 confidence: medium
-review_after:
+check_after:
 ---
 
 # 标题
@@ -180,7 +190,7 @@ sources: []
 tags: []
 status: active
 confidence: medium
-review_after:
+check_after:
 ---
 
 # 标题
@@ -210,7 +220,7 @@ sources: []
 tags: []
 status: active
 confidence: medium
-review_after:
+check_after:
 ---
 
 # 标题
@@ -242,7 +252,7 @@ sources: []
 tags: []
 status: active
 confidence: medium
-review_after:
+check_after:
 ---
 
 # 标题
@@ -260,7 +270,7 @@ review_after:
 ## 后续问题
 ```
 
-## 摄入工作流
+## ingest 工作流
 
 当用户要求摄入一个来源时：
 
@@ -273,9 +283,9 @@ review_after:
 7. 在 `wiki/log.md` 追加记录。
 8. 明确暴露冲突、过期说法或不确定性，不要把它们隐藏起来。
 
-摄入时，对主张要保守，对链接要慷慨。
+ingest 时，对主张要保守，对链接要慷慨。
 
-## 查询工作流
+## query 工作流
 
 当用户询问知识库问题时：
 
@@ -283,12 +293,12 @@ review_after:
 2. 搜索相关维基页面。
 3. 尽量从已编译维基页面回答。
 4. 引用用到的维基页面。
-5. 如果答案有长期价值，询问是否回存；如果用户明确要求保存综合，则直接创建 `wiki/synthesis/` 页面。
-6. 对重要查询或回存活动，在 `wiki/log.md` 追加记录。
+5. query 默认只回答和引用，不主动发起独立保存流程；如果用户明确要求写入综合，则按普通 wiki 写入处理并更新相关索引和日志。
+6. 对重要查询或用户明确要求的写入活动，在 `wiki/log.md` 追加记录。
 
 不要默认为了每次查询重读所有原始来源。只有当已编译维基不足、有争议或用户明确要求时，才读取原始来源。
 
-## 检查工作流
+## lint 工作流
 
 定期检查维基：
 
@@ -332,7 +342,6 @@ review_after:
 - `初始化`
 - `摄入`
 - `查询`
-- `回存`
 - `检查`
 - `结构`
 - `维护`
@@ -358,4 +367,4 @@ review_after:
 
 优先做小而连贯的更新，不做失控的大重写。维基应该容易通过 Git diff 检查。
 
-如果未来工作流需要新约定，先提出变更；用户确认后，再更新 `AGENTS.md`。
+如果未来工作流需要新约定，先向用户说明建议；`AGENTS.md` 的修改由用户明确发起。

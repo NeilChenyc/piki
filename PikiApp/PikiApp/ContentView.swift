@@ -1,0 +1,27 @@
+import SwiftUI
+
+struct ContentView: View {
+    @Environment(AppState.self) private var appState
+
+    var body: some View {
+        NavigationSplitView {
+            SidebarView()
+        } detail: {
+            switch appState.selectedTab {
+            case .home:
+                HomeView()
+            case .inbox:
+                InboxView()
+            case .wiki:
+                WikiView()
+            case .health:
+                HealthView()
+            }
+        }
+    }
+}
+
+#Preview {
+    ContentView()
+        .environment(AppState())
+}
