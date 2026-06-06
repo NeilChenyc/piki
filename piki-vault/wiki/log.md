@@ -2,7 +2,7 @@
 title: Piki 维基日志
 type: log
 created: 2026-06-03
-updated: 2026-06-04
+updated: 2026-06-06
 sources: []
 tags: [日志, 大模型维基]
 status: active
@@ -91,3 +91,27 @@ review_after:
 未决问题：
 
 - 阶段 1 开始实现本地 Agent Service 时，需要决定是否从当前 vault 裁剪一个更小的 golden vault 测试 fixture。
+
+## [2026-06-06] 摄入 | LightAutoDS 学术论文
+
+变更内容：
+
+- 摄入 LightAutoDS 学术论文（arXiv:2501.00251v1），关于使用大语言模型实现轻量级自动化数据科学。
+- 将 PDF 保存到 `raw/sources/lightautods-轻量级自动化数据科学.pdf`。
+- 创建来源摘要页 `wiki/sources/LightAutoDS-轻量级自动化数据科学.md`。
+- 创建两个新概念页：自动化数据科学和大语言模型代码生成。
+- 更新维基索引。
+
+涉及页面：
+
+- [[index]]
+- [[log]]
+- [[sources/LightAutoDS-轻量级自动化数据科学]]
+- [[concepts/自动化数据科学]]
+- [[concepts/大语言模型代码生成]]
+
+未决问题：
+
+- 自动化数据科学与维基中已有的"人与人工智能协作"理念如何关联？是放大人的判断，还是绕过人的思考？
+- 是否需要创建新的领域页"人工智能辅助数据分析"来组织相关内容？
+- LightAutoDS 系统的开源状态和可访问性如何？

@@ -29,7 +29,12 @@ class EventStreamService:
                 yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
                 last_emit = time.monotonic()
             task = self.store.get_task(task_id)
-            if task.status in {TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.NEEDS_APPROVAL}:
+            if task.status in {
+                TaskStatus.COMPLETED,
+                TaskStatus.FAILED,
+                TaskStatus.NEEDS_APPROVAL,
+                TaskStatus.INPUT_REQUIRED,
+            }:
                 if terminal_seen and not emitted:
                     break
                 terminal_seen = True

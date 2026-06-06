@@ -1,3 +1,7 @@
+> Superseded by `openspec/changes/migrate-to-claude-agent-sdk/specs/agent-runtime/spec.md`.
+>
+> This spec records the previous OpenAI runtime design and is no longer the active target architecture.
+
 ## ADDED Requirements
 
 ### Requirement: SDK runtime configuration

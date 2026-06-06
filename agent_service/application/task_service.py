@@ -5,7 +5,7 @@ import threading
 from agent_service.application.events import EventPublisher
 from agent_service.application.task_executor import TaskExecutor
 from agent_service.application.task_router import TaskRouter
-from agent_service.models import TaskCreateRequest, TaskCreateResponse, TaskStatus
+from agent_service.models import TaskCreateRequest, TaskCreateResponse, TaskInputRequest, TaskStatus
 from agent_service.store import SQLiteStore
 from agent_service.vault import Vault, VaultAccessError
 
@@ -55,7 +55,7 @@ class TaskService:
                 "selected_paths": request.selected_paths,
                 "action_context": request.action_context,
                 "mode": request.mode,
-                "tool_context_policy": "all vault tools are available to the agent; selected external files are read-allowlisted; raw/wiki changes are journaled only when write tools change content",
+                "tool_context_policy": "Claude built-in Read/Write/Edit/Glob/Grep/Bash/AskUserQuestion are available; selected external files are staged read-only; raw/wiki changes are journaled after Write/Edit change content",
                 "reason": plan.summary,
             },
         )
@@ -79,4 +79,11 @@ class TaskService:
         )
 
     def get_task(self, task_id: str):
+        return self.store.get_task(task_id)
+
+    def submit_task_input(self, task_id: str, request: TaskInputRequest):
+        task = self.store.get_task(task_id)
+        if task.status != TaskStatus.INPUT_REQUIRED:
+            raise ValueError(f"Task is not waiting for input: {task.status}")
+        self.executor.resume_input(task_id=task_id, message=request.message)
         return self.store.get_task(task_id)

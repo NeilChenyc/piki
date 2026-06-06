@@ -1,6 +1,9 @@
 import Foundation
+import OSLog
 
 enum SSEClient {
+    private static let logger = Logger(subsystem: "com.piki.app", category: "SSEClient")
+
     static func stream(url: URL) -> AsyncThrowingStream<TaskEvent, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
@@ -16,24 +19,49 @@ enum SSEClient {
                     }
 
                     var dataBuffer = ""
+                    func flushBuffer() {
+                        guard !dataBuffer.isEmpty else { return }
+                        defer { dataBuffer = "" }
+                        guard let data = dataBuffer.data(using: .utf8) else { return }
+                        do {
+                            let event = try JSONDecoder().decode(TaskEvent.self, from: data)
+                            #if DEBUG
+                            logger.log("SSE decoded event: \(event.type, privacy: .public)")
+                            #endif
+                            continuation.yield(event)
+                        } catch {
+                            #if DEBUG
+                            logger.error("SSE decode failed: \(error.localizedDescription, privacy: .public)")
+                            logger.error("SSE payload: \(dataBuffer, privacy: .public)")
+                            #endif
+                        }
+                    }
 
                     for try await line in bytes.lines {
                         if line.hasPrefix(":") {
+                            flushBuffer()
+                            #if DEBUG
+                            logger.log("SSE heartbeat from \(url.absoluteString, privacy: .public)")
+                            #endif
                             continue
                         } else if line.hasPrefix("event:") {
+                            flushBuffer()
+                            #if DEBUG
+                            logger.log("SSE event line: \(line, privacy: .public)")
+                            #endif
                             continue
                         } else if line.hasPrefix("data:") {
-                            dataBuffer += String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces)
-                        } else if line.isEmpty {
-                            if !dataBuffer.isEmpty {
-                                if let data = dataBuffer.data(using: .utf8),
-                                   let event = try? JSONDecoder().decode(TaskEvent.self, from: data) {
-                                    continuation.yield(event)
-                                }
+                            let payloadLine = String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces)
+                            if dataBuffer.isEmpty {
+                                dataBuffer = payloadLine
+                            } else {
+                                dataBuffer += "\n" + payloadLine
                             }
-                            dataBuffer = ""
+                        } else if line.isEmpty {
+                            flushBuffer()
                         }
                     }
+                    flushBuffer()
                     continuation.finish()
                 } catch {
                     continuation.finish(throwing: error)

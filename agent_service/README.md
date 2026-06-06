@@ -1,60 +1,114 @@
 # Agent Service 目录说明
 
-`agent_service/` 是 Piki 的本地 Agent Service，负责接收任务、装配 vault 上下文、执行 source intake、ingest queue、lint、只读 query fallback 和后续 SDK agent workflow，并把状态、事件、对话级 journal entry 和回退记录持久化。
+`agent_service/` 是 Piki 的本地 Agent Service。它不再承担“替 agent 做业务判断”的角色，而是作为一个轻量运行宿主，负责：
+
+- 任务创建、状态持久化与 SSE 事件流
+- vault 上下文装配与运行时隔离
+- Claude Agent SDK 会话、hooks、暂停与恢复
+- 对话级 journal / rollback
+- 附件 staging 与少量确定性后处理
+
+当前主链路是：
+
+```text
+SwiftUI App -> FastAPI Agent Service -> Claude Agent SDK -> Claude built-in tools
+```
+
+其中 agent 可见工具面默认只使用 Claude 内建工具：
+
+- `Read`
+- `Write`
+- `Edit`
+- `Glob`
+- `Grep`
+- `Bash`
+- `AskUserQuestion`
+
+Piki 自己保留的能力是 hooks、journal、rollback、staging、lint/extract CLI helper 和系统 API，不再维护自定义 agent-visible toolset。
 
 ## 顶层文件
 
 | 路径 | 说明 |
 | --- | --- |
 | `__init__.py` | Python package 标记文件。 |
-| `app.py` | FastAPI 应用入口，定义 task、event、ingest queue、lint、rollback、health 等本地 API。 |
-| `config.py` | 服务配置与 `.env` 加载逻辑，例如数据库路径、OpenAI key、OpenAI-compatible endpoint、model 和 SDK runtime 状态。 |
+| `app.py` | FastAPI 应用入口，定义 `/tasks`、`/health`、SSE、rollback、queue、lint 等本地 API。 |
+| `config.py` | 服务配置与 `.env` 加载逻辑，例如 Anthropic key、Claude config dir、model、runtime 开关和 staging 路径。 |
 | `README.md` | 本目录结构和职责说明。 |
 
 ## 子目录
 
 | 目录 | 说明 |
 | --- | --- |
-| `context/` | 负责为任务装配基础上下文，例如 `AGENTS.md`、`purpose.md`、`wiki/index.md`。 |
-| `models/` | 放 Pydantic 数据模型和枚举，包括 task、event、query、source intake、ingest queue、lint、journal entry、rollback。 |
-| `workflows/` | 放本地确定性 workflow，例如只读 query fallback、source intake、ingest queue、lint、journal rollback 和 source rescan。 |
-| `runtime/` | 放 OpenAI Agents SDK runner 相关封装，后续承载 `PikiWikiAgent` 的真实 agent loop。 |
-| `store/` | 放持久化实现，目前是 SQLite task/event/session 存储，后续扩展 journal entry。 |
-| `tools/` | 放可暴露给 agent 的受控工具，例如 vault 读取、搜索、Markdown 解析、写入和回退。 |
-| `vault/` | 放 vault 路径安全、读写、复制等底层访问封装。 |
+| `agents/` | Agent prompt 组装与运行时协议文案。 |
+| `api/` | 路由定义，例如 `/health`、`/tasks`、`/journal`。 |
+| `application/` | 任务执行、事件发布、SSE replay、系统动作协调。 |
+| `context/` | 基础上下文装配，例如 `AGENTS.md`、`purpose.md`、`wiki/index.md`。 |
+| `models/` | Pydantic 数据模型和枚举，包括 task、event、journal、rollback、input request。 |
+| `runtime/` | Claude Agent SDK runner、事件映射、hooks、journal tracker、CLI helpers。 |
+| `store/` | SQLite task/event/session/journal/queue 存储。 |
+| `vault/` | vault 路径安全、读写、复制等底层访问封装。 |
+| `workflows/` | 保留确定性系统工作流，例如 source intake、ingest queue、lint、rollback 和 source rescan。 |
 
 ## 关键文件
 
 | 路径 | 说明 |
 | --- | --- |
-| `context/assembler.py` | 加载任务默认上下文，并记录哪些文件被加载或跳过。 |
-| `models/core.py` | 定义核心 API 和运行时数据结构，包括 task/event、source manifest、ingest queue、update queue、lint、journal/rollback。 |
-| `workflows/query.py` | 本地只读 query fallback，负责中文友好检索、wikilink 扩展和引用输出。 |
-| `workflows/ingest.py` | 单 source ingest workflow helper，负责识别显式 ingest hint、校验 canonical source、生成 ingest prompt 和规范化 `IngestResult`。 |
-| `workflows/source_intake.py` | 单文件 source intake workflow，负责 MD/TXT/PDF/DOCX 到 `raw/sources/*.md` 的规范化。 |
-| `workflows/ingest_queue.py` | Ingest queue workflow，负责批量文件入队、同步小批处理、失败记录、重试和取消。 |
-| `workflows/lint.py` | 确定性 lint workflow，负责 frontmatter、断链、孤儿页、重复标题、索引缺失、过期和知识缺口检查，并支持低风险修复。 |
-| `workflows/rollback.py` | 根据最近两条 active journal entry 做 hash 校验回退，任一文件不匹配则整次失败。 |
-| `workflows/source_scan.py` | 扫描 `raw/sources/*.md`，更新 `system/source_manifest.json` 并为新增、修改、缺失 source 创建 update queue item。 |
-| `runtime/runner.py` | OpenAI Agents SDK runner、smoke test、动态 instructions 和 function tool 注册入口。 |
-| `store/sqlite.py` | SQLite schema 初始化和 task/event/session/journal/ingest queue/update queue 的读写方法。 |
-| `tools/vault_tools.py` | 面向 agent 的 vault-safe 工具集合，当前包含读文件、列文件、搜索和解析；后续加入直接写入和对话级 journal entry。 |
+| `context/assembler.py` | 加载任务默认上下文，并记录已加载和缺失的基础文件。 |
+| `models/core.py` | 核心 API 和运行时数据结构，包括 `TaskStatus.INPUT_REQUIRED`、Claude session 字段和事件类型。 |
+| `application/task_executor.py` | 统一任务主入口；普通 `/tasks` 不再静默 fallback 到旧 query pipeline。 |
+| `application/task_service.py` | task 创建、恢复输入、journal 查询和系统动作封装。 |
+| `runtime/runner.py` | Claude Agent SDK runner，负责 hermetic 配置、hooks、staging、stream 事件映射和会话恢复。 |
+| `runtime/event_mapper.py` | Claude partial streaming 事件到 Piki SSE 事件的映射。 |
+| `runtime/journal_tracker.py` | 跟踪 `Write/Edit` 触达文件、hash 和快照，并在任务结束后提交 journal。 |
+| `runtime/cli.py` | 供 agent 通过 `Bash` 调用的确定性 CLI helper，例如 `lint` 和 `extract-source`。 |
+| `workflows/source_intake.py` | 将外部文件规范化为 `raw/sources/*.md`。 |
+| `workflows/lint.py` | 确定性 lint / 低风险修复逻辑。 |
+| `workflows/rollback.py` | 最近两条 active journal 的 hash 校验回退。 |
+| `store/sqlite.py` | SQLite schema 初始化和任务、事件、journal、queue 的读写。 |
 | `vault/access.py` | vault-relative 路径校验、敏感文件阻断、文本读写和文件复制。 |
 
-## 当前边界
+## 当前运行时边界
 
-- 开发期可以从仓库根目录手动启动本地服务：
+- `POST /tasks` 是唯一主 agent 入口。
+- 当 `ANTHROPIC_API_KEY` 或 runtime 开关未配置时，`/health` 会明确报告不可用，`POST /tasks` 会直接失败，不再静默切到旧 query fallback。
+- 运行时默认 hermetic：
+  - `setting_sources: []`
+  - `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`
+  - `strict_mcp_config=true`
+  - `CLAUDE_CONFIG_DIR` 指向应用私有目录
+- 仓库根 `.claude/` 与用户 `~/.claude` 不作为产品 vault agent 的默认记忆来源。
+- `AGENTS.md` 继续是 vault 协议文件，但只读，不允许 agent 修改。
+- `selected_paths` 会先复制到 `.piki/task-staging/<task_id>/`；agent 默认只读 staging 内路径，而不是直接读取宿主外部绝对路径。
 
-  ```bash
-  uvicorn agent_service.app:app --host 127.0.0.1 --port 8000
-  ```
+## 文件与安全规则
 
-- Mac 客户端默认连接 `http://127.0.0.1:8000` 或 `http://localhost:8000`，通过 `/health` 判断服务状态，通过 `POST /tasks` 创建任务，并通过 `/tasks/{task_id}/events` 订阅 SSE。
-- 产品 MVP 约定由 Mac App 拉起 App bundle 内的 `agent-service/piki-agent-service` 可执行文件，参数固定为 `--host 127.0.0.1 --port 8000`；App 退出时只停止自己拉起的服务。
-- 带 `selected_paths` 的任务进入 source intake；显式 `/wiki:ingest`、`/wiki:compile` 或 `raw/sources/*.md` 路径进入 SDK-backed 单 source ingest；其他纯自然语言任务进入统一 agent 入口，未配置 SDK runtime 时由本地只读 query fallback 执行。
-- OpenAI Agents SDK runtime 已可在 `PIKI_ENABLE_SDK_RUNTIME=1`、`OPENAI_API_KEY`、`PIKI_AGENT_MODEL` 配齐后执行真实 `Runner.run_sync`；endpoint 优先读取 `OPENAI_BASE_URL`，并兼容 `OPENAI_API_BASE`、`OPENAI_API_BASE_URL`；未配置时保留本地只读 query fallback。
-- 最新产品规则要求：vault 内除 `AGENTS.md` 外可由 agent 直接读写；vault 外绝不开放写入；只有真实修改 `raw/` 或 `wiki/` 的对话才进入 change journal，并通过最近两条 journal entry 回退兜底。旧 approval/proposal 兼容接口仍保留，但新 SDK 写入路径不依赖写入前审批。
-- Rollback API 当前为 `GET /journal/recent` 和 `POST /journal/{journal_entry_id}/rollback`；回退由 Piki 系统代码执行并记录 task event，不通过 LLM 工具推理。
-- Source update scan 当前为 `POST /sources/rescan` 和 `GET /update-queue`；阶段 7 只负责发现变化和入队，不自动批量 ingest 或静默改写 wiki。
-- Ingest queue API 当前为 `POST /ingest-queue/enqueue`、`GET /ingest-queue`、`POST /ingest-queue/process`、`POST /ingest-queue/{id}/retry`、`POST /ingest-queue/{id}/cancel`；处理方式是显式同步小批量执行，不启动后台 worker。
-- Lint API 当前为 `POST /lint` 和 `POST /lint/fix`；MVP 先做确定性结构检查和低风险 index/log 修复，SDK 辅助总结可后续增强。
+- 允许 agent 修改 vault 的唯一方式是 Claude 内建 `Write/Edit`。
+- `Bash` 在 v1 只用于读取、提取、计算和调用确定性 CLI helper，不允许直接改 vault 文件。
+- `PreToolUse` hook 会拒绝：
+  - 写 `AGENTS.md`
+  - 写 vault 外路径
+  - 写 runtime 私有目录、数据库、session 存储和 staging 目录
+  - 具有文件副作用的 Bash 命令，例如重定向、`tee`、`sed -i`、`mv`、`cp`、`rm`、`git reset`
+- `PostToolUse` hook 会记录 `Write/Edit` 的写前/写后 hash、快照和 tool trace。
+- 任务结束时，只有真实修改了 `raw/` 或 `wiki/` 的对话才会生成一条 conversation-level journal entry。
+
+## 主要 API 约定
+
+- `GET /health`
+  - 返回 provider-neutral runtime 状态，例如 `provider`、`model`、`anthropic_api_key_configured`、`agent_runtime_enabled`、`agent_runtime_configured`
+- `POST /runtime/smoke-test`
+  - 运行最小 Claude runtime 检查
+- `POST /tasks`
+  - 创建任务并启动 Claude agent 主循环
+- `POST /tasks/{task_id}/input`
+  - 恢复被 `AskUserQuestion` 或审批暂停的任务
+- `GET /tasks/{task_id}/events`
+  - SSE / replay 事件流
+- `GET /journal/recent`
+  - 最近 journal 记录
+- `POST /journal/{journal_entry_id}/rollback`
+  - 对最近两条 active journal 执行 hash 校验回退
+
+## 兼容接口说明
+
+`/lint`、`/sources/rescan`、`/ingest-queue` 等系统接口暂时保留，用于兼容已有 UI 和确定性维护流程；它们不是新的 agent 主路径，也不应该再扩展成第二套产品真相。

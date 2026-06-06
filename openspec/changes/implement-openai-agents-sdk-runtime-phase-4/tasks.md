@@ -1,3 +1,7 @@
+> Superseded by `openspec/changes/migrate-to-claude-agent-sdk/`.
+>
+> The checked items below reflect the historical OpenAI phase-4 plan, not the current Claude runtime truth.
+
 ## 1. Runtime Configuration
 
 - [x] 1.1 Add base URL, model, API key, and tracing config to service settings and `/health`

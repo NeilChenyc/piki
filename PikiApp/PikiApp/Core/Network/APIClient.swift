@@ -47,6 +47,46 @@ final class APIClient {
         return try JSONDecoder().decode(TaskRecordDTO.self, from: data)
     }
 
+    func submitTaskInput(taskId: String, message: String) async throws -> TaskRecordDTO {
+        let url = baseURL.appending(path: "tasks/\(taskId)/input")
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(TaskInputRequest(message: message))
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(TaskRecordDTO.self, from: data)
+    }
+
+    func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse {
+        let url = baseURL.appending(path: "uploads")
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        let fileData = try readAttachmentData(from: fileURL)
+        var body = Data()
+
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"original_path\"\r\n\r\n".data(using: .utf8)!)
+        body.append(fileURL.path(percentEncoded: false).data(using: .utf8)!)
+        body.append("\r\n".data(using: .utf8)!)
+
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append(
+            "Content-Disposition: form-data; name=\"file\"; filename=\"\(fileURL.lastPathComponent)\"\r\n".data(using: .utf8)!
+        )
+        body.append("Content-Type: \(mimeType(for: fileURL))\r\n\r\n".data(using: .utf8)!)
+        body.append(fileData)
+        body.append("\r\n".data(using: .utf8)!)
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        let (data, response) = try await URLSession.shared.upload(for: req, from: body)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(BufferedUploadResponse.self, from: data)
+    }
+
     // MARK: - Journal
 
     func recentJournal(limit: Int = 10, vaultPath: String? = nil) async throws -> [JournalEntry] {
@@ -145,6 +185,26 @@ final class APIClient {
         guard (200..<300).contains(http.statusCode) else {
             let detail = try? JSONDecoder().decode(APIErrorResponse.self, from: data).detail
             throw APIError.serverMessage(detail ?? "Server error: \(http.statusCode)")
+        }
+    }
+
+    private func readAttachmentData(from fileURL: URL) throws -> Data {
+        let didAccess = fileURL.startAccessingSecurityScopedResource()
+        defer {
+            if didAccess {
+                fileURL.stopAccessingSecurityScopedResource()
+            }
+        }
+        return try Data(contentsOf: fileURL)
+    }
+
+    private func mimeType(for fileURL: URL) -> String {
+        switch fileURL.pathExtension.lowercased() {
+        case "pdf": return "application/pdf"
+        case "md", "markdown": return "text/markdown"
+        case "txt": return "text/plain"
+        case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        default: return "application/octet-stream"
         }
     }
 }

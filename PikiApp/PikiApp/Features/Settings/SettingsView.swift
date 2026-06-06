@@ -86,11 +86,12 @@ struct ConnectionSettingsView: View {
             if let health = appState.serviceHealth {
                 Section("Runtime") {
                     SettingsInfoRow(label: "Mode", value: appState.runtimeModeTitle)
-                    SettingsInfoRow(label: "SDK runtime", value: boolText(health.sdkRuntimeEnabled))
-                    SettingsInfoRow(label: "SDK configured", value: boolText(health.sdkRuntimeConfigured))
-                    SettingsInfoRow(label: "API key", value: boolText(health.openAIAPIKeyConfigured))
-                    SettingsInfoRow(label: "Base URL", value: health.openAIBaseURL?.isEmpty == false ? health.openAIBaseURL! : "--")
+                    SettingsInfoRow(label: "Provider", value: health.provider?.isEmpty == false ? health.provider! : "--")
+                    SettingsInfoRow(label: "Runtime enabled", value: boolText(health.agentRuntimeEnabled))
+                    SettingsInfoRow(label: "Runtime configured", value: boolText(health.agentRuntimeConfigured))
+                    SettingsInfoRow(label: "API key", value: boolText(health.anthropicAPIKeyConfigured))
                     SettingsInfoRow(label: "Model", value: health.agentModel?.isEmpty == false ? health.agentModel! : "--")
+                    SettingsInfoRow(label: "Config dir", value: health.claudeConfigDir?.isEmpty == false ? health.claudeConfigDir! : "--")
                     Text(appState.runtimeModeDetail)
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.textSecondary)

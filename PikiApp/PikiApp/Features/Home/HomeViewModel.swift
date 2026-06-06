@@ -1,13 +1,21 @@
 import SwiftUI
+import OSLog
 
 @Observable
 @MainActor
 final class HomeViewModel {
+    private let logger = Logger(subsystem: "com.piki.app", category: "HomeViewModel")
+
     var messages: [ChatMessage] = []
     var recentActivity: [ActivityEntry] = []
     var inputText: String = ""
     var isSending = false
     var statusText: String?
+    var pendingInputTaskId: String?
+    var pendingInputPrompt: String?
+    var debugEventCount: Int = 0
+    var debugLastEventType: String?
+    var debugRecentEvents: [String] = []
     private var conversationId = UUID().uuidString
 
     var greeting: String {
@@ -38,25 +46,28 @@ final class HomeViewModel {
         messages.append(userMessage)
 
         let assistantMessageId = UUID().uuidString
-            messages.append(
-                ChatMessage(
-                    id: assistantMessageId,
-                    role: .assistant,
-                    content: "",
-                    timestamp: Date(),
-                    traceItems: [
-                        ChatTraceItem(
-                            kind: "progress",
-                            title: "正在思考",
-                            summary: "正在创建任务。",
-                            category: "model",
-                            status: "running"
-                        )
-                    ],
-                    isRunning: true,
-                    isTraceExpanded: true
-                )
+        messages.append(
+            ChatMessage(
+                id: assistantMessageId,
+                role: .assistant,
+                content: "",
+                timestamp: Date(),
+                traceItems: [
+                    ChatTraceItem(
+                        key: "run",
+                        kind: "agent_run",
+                        title: "正在思考",
+                        summary: "正在创建任务并准备本轮 Agent Run。",
+                        category: "model",
+                        status: "running"
+                    )
+                ],
+                isRunning: true,
+                isTraceExpanded: true,
+                isAgentRun: true,
+                runStatus: "running"
             )
+        )
         isSending = true
         statusText = "Creating task..."
 
@@ -90,30 +101,48 @@ final class HomeViewModel {
         assistantMessageId: String
     ) async {
         do {
-            let request = TaskCreateRequest(
-                vaultPath: vaultPath.path(percentEncoded: false),
-                userInput: text.isEmpty ? "请摄入这个文件。" : text,
-                selectedPaths: selectedFiles.map { $0.path(percentEncoded: false) },
-                conversationId: conversationId,
-                asyncMode: true
-            )
-            let response = try await appState.apiClient.createTask(request)
+            let effectiveText = text.isEmpty ? "请摄入这个文件。" : text
+            let bufferedSelectedPaths = try await uploadSelectedFiles(selectedFiles, appState: appState)
+            let response: TaskCreateResponse
+            if let pendingTaskId = pendingInputTaskId {
+                response = TaskCreateResponse(taskId: pendingTaskId, status: "running")
+                _ = try await appState.apiClient.submitTaskInput(taskId: pendingTaskId, message: effectiveText)
+                pendingInputTaskId = nil
+                pendingInputPrompt = nil
+            } else {
+                let request = TaskCreateRequest(
+                    vaultPath: vaultPath.path(percentEncoded: false),
+                    userInput: effectiveText,
+                    selectedPaths: bufferedSelectedPaths,
+                    conversationId: conversationId,
+                    asyncMode: true
+                )
+                response = try await appState.apiClient.createTask(request)
+            }
             statusText = "正在理解请求"
 
             var finalEventContent: String?
             for try await event in appState.apiClient.taskEvents(taskId: response.taskId) {
+                recordDebugEvent(event)
                 if let content = handle(event, assistantMessageId: assistantMessageId) {
                     finalEventContent = content
                 }
             }
 
             let task = try await appState.apiClient.getTask(taskId: response.taskId)
-            let content = task.output?.answer
-                ?? task.output?.summary
-                ?? task.summary
-                ?? finalEventContent
-                ?? "Task finished without a final message."
-            finishMessage(id: assistantMessageId, content: content)
+            let content = preferredFinalContent(
+                id: assistantMessageId,
+                fallback: task.output?.answer
+                    ?? task.output?.summary
+                    ?? task.summary
+                    ?? finalEventContent
+                    ?? "Task finished without a final message."
+            )
+            if task.status == "input_required" {
+                setAwaitingInput(id: assistantMessageId, content: content)
+            } else {
+                finishMessage(id: assistantMessageId, content: content)
+            }
             await loadRecentJournal(appState: appState)
             statusText = nil
         } catch {
@@ -154,13 +183,19 @@ final class HomeViewModel {
     private func handle(_ event: TaskEvent, assistantMessageId: String) -> String? {
         switch event.type {
         case "agent.progress":
+            reclaimLiveAnswerToTraceIfNeeded(
+                id: assistantMessageId,
+                for: event,
+                nextTitle: event.payload.title ?? "正在继续处理"
+            )
             if let title = event.payload.title {
-                appendTraceEvent(
+                upsertTraceEvent(
                     messageId: assistantMessageId,
+                    key: "stage:\(event.payload.stage ?? title)",
                     kind: "progress",
                     title: title,
                     summary: event.payload.detail ?? "",
-                    category: event.payload.category,
+                    category: event.payload.category ?? "model",
                     status: "running"
                 )
                 if let detail = event.payload.detail, !detail.isEmpty {
@@ -172,16 +207,36 @@ final class HomeViewModel {
             return nil
         case "message.delta":
             if let delta = event.payload.delta, !delta.isEmpty {
+                upsertTraceEvent(
+                    messageId: assistantMessageId,
+                    key: "answering",
+                    kind: "answering",
+                    title: "正在生成回答",
+                    summary: "正在流式生成本轮回复。",
+                    category: "model",
+                    status: "running"
+                )
                 appendLiveDelta(id: assistantMessageId, delta: delta)
                 statusText = "正在生成回答"
             }
             return nil
         case "agent.trace.delta":
+            reclaimLiveAnswerToTraceIfNeeded(id: assistantMessageId, for: event, nextTitle: "正在继续思考")
             if let delta = event.payload.delta, !delta.isEmpty {
-                appendTraceDelta(id: assistantMessageId, delta: delta)
+                appendTraceDelta(
+                    id: assistantMessageId,
+                    key: "reasoning",
+                    title: "思考过程",
+                    delta: delta
+                )
             }
             return nil
         case "agent.trace.event":
+            reclaimLiveAnswerToTraceIfNeeded(
+                id: assistantMessageId,
+                for: event,
+                nextTitle: event.payload.title ?? friendlyTraceTitle(for: event)
+            )
             appendTraceEvent(
                 messageId: assistantMessageId,
                 kind: event.payload.kind ?? "event",
@@ -192,54 +247,133 @@ final class HomeViewModel {
             )
             return nil
         case "tool.started":
-            appendTraceEvent(
+            reclaimLiveAnswerToTraceIfNeeded(
+                id: assistantMessageId,
+                for: event,
+                nextTitle: event.payload.title ?? friendlyTraceTitle(for: event)
+            )
+            upsertTraceEvent(
                 messageId: assistantMessageId,
+                key: toolTraceKey(for: event),
                 kind: "tool_started",
                 title: event.payload.title ?? friendlyTraceTitle(for: event),
                 summary: event.payload.summary ?? event.payload.tool ?? "",
-                category: event.payload.category,
+                category: event.payload.category ?? "tool",
                 status: "running"
             )
             return nil
         case "tool.finished":
-            appendTraceEvent(
+            reclaimLiveAnswerToTraceIfNeeded(
+                id: assistantMessageId,
+                for: event,
+                nextTitle: event.payload.title ?? friendlyTraceTitle(for: event)
+            )
+            upsertTraceEvent(
                 messageId: assistantMessageId,
+                key: toolTraceKey(for: event),
                 kind: "tool_finished",
                 title: event.payload.title ?? "工具调用完成",
                 summary: event.payload.summary ?? event.payload.tool ?? "",
-                category: event.payload.category,
+                category: event.payload.category ?? "tool",
                 status: "completed"
             )
             return nil
         case "tool.failed":
-            appendTraceEvent(
+            reclaimLiveAnswerToTraceIfNeeded(
+                id: assistantMessageId,
+                for: event,
+                nextTitle: event.payload.title ?? "工具调用失败"
+            )
+            upsertTraceEvent(
                 messageId: assistantMessageId,
+                key: toolTraceKey(for: event),
                 kind: "tool_failed",
                 title: event.payload.title ?? "工具调用失败",
                 summary: event.payload.error ?? event.payload.tool ?? "",
-                category: event.payload.category,
+                category: event.payload.category ?? "tool",
                 status: "failed"
             )
             return nil
         case "task.completed":
-            let content = event.payload.answer
-                ?? event.payload.summary
-                ?? event.payload.content
-                ?? "Task completed."
+            let content = preferredFinalContent(
+                id: assistantMessageId,
+                fallback: event.payload.answer
+                    ?? event.payload.summary
+                    ?? event.payload.content
+                    ?? "Task completed."
+            )
+            pendingInputTaskId = nil
+            pendingInputPrompt = nil
             statusText = "已完成"
+            markRunFinished(id: assistantMessageId, status: "completed")
             finishMessage(id: assistantMessageId, content: content)
             return content
         case "task.failed":
+            pendingInputTaskId = nil
+            pendingInputPrompt = nil
+            markRunFinished(id: assistantMessageId, status: "failed")
             failMessage(
                 id: assistantMessageId,
                 content: event.payload.error ?? event.payload.summary ?? "Task failed."
             )
             statusText = nil
             return event.payload.error ?? event.payload.summary
-        case "sdk.run.completed":
+        case "agent.run.completed":
             statusText = "正在整理回答"
+            upsertTraceEvent(
+                messageId: assistantMessageId,
+                key: "run",
+                kind: "agent_run",
+                title: "Agent Run 已完成",
+                summary: event.payload.finalOutputPreview ?? "正在整理最终回答。",
+                category: "model",
+                status: "completed"
+            )
             return nil
-        case "sdk.run.started":
+        case "agent.run.started":
+            statusText = "正在思考"
+            upsertTraceEvent(
+                messageId: assistantMessageId,
+                key: "run",
+                kind: "agent_run",
+                title: "正在思考",
+                summary: "Agent 已启动，正在规划本轮步骤。",
+                category: "model",
+                status: "running"
+            )
+            return nil
+        case "agent.input_requested":
+            pendingInputTaskId = event.taskId.isEmpty ? pendingInputTaskId : event.taskId
+            pendingInputPrompt = event.payload.pendingInput?.prompt
+                ?? event.payload.prompt
+                ?? event.payload.detail
+                ?? event.payload.summary
+            statusText = pendingInputPrompt ?? "需要你的输入"
+            setRunStatus(id: assistantMessageId, status: "input_required")
+            if let prompt = pendingInputPrompt, !prompt.isEmpty {
+                upsertTraceEvent(
+                    messageId: assistantMessageId,
+                    key: "input_requested",
+                    kind: "input_requested",
+                    title: "等待你的输入",
+                    summary: prompt,
+                    category: "input",
+                    status: "running"
+                )
+                updateMessage(id: assistantMessageId, content: prompt)
+            }
+            return pendingInputPrompt
+        case "agent.input_resolved":
+            statusText = "已收到你的输入"
+            upsertTraceEvent(
+                messageId: assistantMessageId,
+                key: "input_requested",
+                kind: "input_requested",
+                title: "已收到你的输入",
+                summary: "Agent 将继续刚才中断的流程。",
+                category: "input",
+                status: "completed"
+            )
             return nil
         default:
             if event.type.hasSuffix(".started") {
@@ -253,7 +387,7 @@ final class HomeViewModel {
         switch eventType {
         case "source_intake.started": "正在整理资料"
         case "ingest.started", "ingest_queue.process_started": "正在整理资料"
-        case "sdk.run.started": "正在思考和生成"
+        case "agent.run.started": "正在思考和生成"
         case "rollback.completed", "rollback.failed": "正在回退变更"
         default: "正在处理"
         }
@@ -263,9 +397,24 @@ final class HomeViewModel {
         switch event.payload.category {
         case "read": "正在阅读 Wiki"
         case "write": "正在写入 Wiki"
+        case "command": "正在转换文档"
         case "convert": "正在转换文档"
         default: event.payload.title ?? "Agent 事件"
         }
+    }
+
+    private func toolTraceKey(for event: TaskEvent) -> String {
+        if let toolUseId = event.payload.toolUseId, !toolUseId.isEmpty {
+            return "tool_use:\(toolUseId)"
+        }
+        let tool = event.payload.tool ?? event.payload.category ?? "tool"
+        let subject = normalizedToolSubject(for: event)
+        if !subject.isEmpty {
+            return "tool:\(tool):\(subject)"
+        }
+        let title = event.payload.title ?? friendlyTraceTitle(for: event)
+        let summary = event.payload.summary ?? event.payload.tool ?? ""
+        return "tool:\(tool):\(title):\(summary)"
     }
 
     private func updateMessage(id: String, content: String) {
@@ -274,29 +423,141 @@ final class HomeViewModel {
         }
     }
 
+    private func preferredFinalContent(id: String, fallback: String) -> String {
+        let trimmedFallback = fallback.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedFallback.isEmpty {
+            return trimmedFallback
+        }
+        if let message = messages.first(where: { $0.id == id }) {
+            let live = message.liveContent.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !live.isEmpty {
+                return live
+            }
+            let content = message.content.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !content.isEmpty, message.runStatus == "completed" {
+                return content
+            }
+        }
+        return fallback
+    }
+
     private func appendLiveDelta(id: String, delta: String) {
         mutateMessage(id: id) { message in
+            if !message.hasStartedAnswering {
+                message.hasStartedAnswering = true
+                message.isTraceExpanded = false
+            }
             message.liveContent += delta
         }
     }
 
-    private func appendTraceDelta(id: String, delta: String) {
+    private func reclaimLiveAnswerToTraceIfNeeded(id: String, for event: TaskEvent, nextTitle: String) {
         mutateMessage(id: id) { message in
-            if let lastIndex = message.traceItems.indices.last,
-               message.traceItems[lastIndex].kind == "model_delta" {
-                message.traceItems[lastIndex].summary += delta
+            guard message.isRunning, message.hasStartedAnswering else { return }
+            guard shouldReclaimLiveAnswer(for: event) else { return }
+
+            let trimmedLive = message.liveContent.trimmingCharacters(in: .whitespacesAndNewlines)
+            message.hasStartedAnswering = false
+
+            guard !trimmedLive.isEmpty else { return }
+
+            if let index = message.traceItems.firstIndex(where: { $0.key == "reasoning" }) {
+                if !message.traceItems[index].summary.isEmpty {
+                    message.traceItems[index].summary += "\n\n"
+                }
+                message.traceItems[index].summary += trimmedLive
+                message.traceItems[index].title = nextTitle
+                message.traceItems[index].status = "running"
+            } else {
+                message.traceItems.append(
+                    ChatTraceItem(
+                        key: "reasoning",
+                        kind: "model_delta",
+                        title: nextTitle,
+                        summary: trimmedLive,
+                        category: "model",
+                        status: "running"
+                    )
+                )
+            }
+
+            message.liveContent = ""
+            message.isTraceExpanded = true
+        }
+    }
+
+    private func shouldReclaimLiveAnswer(for event: TaskEvent) -> Bool {
+        switch event.type {
+        case "tool.started", "tool.finished", "tool.failed", "agent.trace.delta", "agent.trace.event":
+            return true
+        case "agent.progress":
+            let title = event.payload.title ?? ""
+            return title != "正在生成回答" && title != "已完成"
+        default:
+            return false
+        }
+    }
+
+    private func uploadSelectedFiles(_ selectedFiles: [URL], appState: AppState) async throws -> [String] {
+        guard !selectedFiles.isEmpty else { return [] }
+        statusText = "正在上传附件"
+        var bufferedPaths: [String] = []
+        for fileURL in selectedFiles {
+            let uploaded = try await appState.apiClient.uploadFile(fileURL)
+            bufferedPaths.append(uploaded.bufferedPath)
+        }
+        return bufferedPaths
+    }
+
+    private func appendTraceDelta(id: String, key: String, title: String, delta: String) {
+        mutateMessage(id: id) { message in
+            if let index = message.traceItems.firstIndex(where: { $0.key == key }) {
+                message.traceItems[index].summary += delta
+                message.traceItems[index].status = "running"
                 return
             }
             message.traceItems.append(
                 ChatTraceItem(
+                    key: key,
                     kind: "model_delta",
-                    title: "模型输出",
+                    title: title,
                     summary: delta,
                     category: "model",
                     status: "running"
                 )
             )
         }
+    }
+
+    private func normalizedToolSubject(for event: TaskEvent) -> String {
+        let raw = (
+            event.payload.sourcePath
+            ?? event.payload.summary
+            ?? event.payload.detail
+            ?? event.payload.tool
+            ?? ""
+        )
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !raw.isEmpty else { return "" }
+
+        let prefixes = ["Read：", "Read:", "Write：", "Write:", "Edit：", "Edit:", "Glob：", "Glob:", "Grep：", "Grep:"]
+        let cleaned = prefixes.reduce(raw) { partial, prefix in
+            partial.hasPrefix(prefix) ? String(partial.dropFirst(prefix.count)).trimmingCharacters(in: .whitespacesAndNewlines) : partial
+        }
+
+        for marker in ["wiki/", "raw/", "inbox/", "system/"] {
+            if let range = cleaned.range(of: marker) {
+                return String(cleaned[range.lowerBound...])
+            }
+        }
+
+        let normalizedPath = cleaned.replacingOccurrences(of: "\\", with: "/")
+        let components = normalizedPath.split(separator: "/")
+        if components.count >= 3 {
+            return components.suffix(3).joined(separator: "/")
+        }
+        return cleaned
     }
 
     private func appendTraceEvent(
@@ -315,11 +576,45 @@ final class HomeViewModel {
             }
             message.traceItems.append(
                 ChatTraceItem(
+                    key: UUID().uuidString,
                     kind: kind,
                     title: title,
                     summary: summary,
                     category: category ?? "",
                     status: status ?? ""
+                )
+            )
+        }
+    }
+
+    private func upsertTraceEvent(
+        messageId: String,
+        key: String,
+        kind: String,
+        title: String,
+        summary: String,
+        category: String,
+        status: String
+    ) {
+        mutateMessage(id: messageId) { message in
+            if let index = message.traceItems.firstIndex(where: { $0.key == key }) {
+                message.traceItems[index].kind = kind
+                message.traceItems[index].title = title
+                if !summary.isEmpty {
+                    message.traceItems[index].summary = summary
+                }
+                message.traceItems[index].category = category
+                message.traceItems[index].status = status
+                return
+            }
+            message.traceItems.append(
+                ChatTraceItem(
+                    key: key,
+                    kind: kind,
+                    title: title,
+                    summary: summary,
+                    category: category,
+                    status: status
                 )
             )
         }
@@ -331,6 +626,7 @@ final class HomeViewModel {
             message.liveContent = ""
             message.isRunning = false
             message.isTraceExpanded = false
+            message.runStatus = message.runStatus == "running" ? "completed" : message.runStatus
         }
     }
 
@@ -340,6 +636,34 @@ final class HomeViewModel {
             message.liveContent = ""
             message.isRunning = false
             message.isTraceExpanded = true
+            message.runStatus = "failed"
+        }
+    }
+
+    private func setAwaitingInput(id: String, content: String) {
+        mutateMessage(id: id) { message in
+            message.content = content
+            message.liveContent = ""
+            message.isRunning = false
+            message.isTraceExpanded = true
+            message.runStatus = "input_required"
+        }
+    }
+
+    private func markRunFinished(id: String, status: String) {
+        mutateMessage(id: id) { message in
+            message.runStatus = status
+            for index in message.traceItems.indices {
+                if message.traceItems[index].status == "running" {
+                    message.traceItems[index].status = status == "failed" ? "failed" : "completed"
+                }
+            }
+        }
+    }
+
+    private func setRunStatus(id: String, status: String) {
+        mutateMessage(id: id) { message in
+            message.runStatus = status
         }
     }
 
@@ -351,9 +675,27 @@ final class HomeViewModel {
 
     private func mutateMessage(id: String, _ mutate: (inout ChatMessage) -> Void) {
         guard let index = messages.firstIndex(where: { $0.id == id }) else { return }
-        var message = messages[index]
+        var updatedMessages = messages
+        var message = updatedMessages[index]
         mutate(&message)
-        messages[index] = message
+        updatedMessages[index] = message
+        messages = updatedMessages
+    }
+
+    private func recordDebugEvent(_ event: TaskEvent) {
+        let detail = event.payload.title
+            ?? event.payload.summary
+            ?? event.payload.delta
+            ?? event.payload.detail
+            ?? ""
+        let line = detail.isEmpty ? event.type : "\(event.type) · \(detail)"
+        debugEventCount += 1
+        debugLastEventType = event.type
+        debugRecentEvents.insert(line, at: 0)
+        if debugRecentEvents.count > 8 {
+            debugRecentEvents.removeLast(debugRecentEvents.count - 8)
+        }
+        logger.log("Piki task event: \(line, privacy: .public)")
     }
 
     private func appendSystemMessage(_ content: String) {
@@ -388,6 +730,9 @@ struct ChatMessage: Identifiable {
     var traceItems: [ChatTraceItem] = []
     var isRunning: Bool = false
     var isTraceExpanded: Bool = false
+    var hasStartedAnswering: Bool = false
+    var isAgentRun: Bool = false
+    var runStatus: String = ""
 
     enum MessageRole {
         case user, assistant, system
@@ -396,11 +741,12 @@ struct ChatMessage: Identifiable {
 
 struct ChatTraceItem: Identifiable {
     let id = UUID().uuidString
-    let kind: String
-    let title: String
+    let key: String
+    var kind: String
+    var title: String
     var summary: String
-    let category: String
-    let status: String
+    var category: String
+    var status: String
 }
 
 struct Citation: Identifiable {

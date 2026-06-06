@@ -50,6 +50,20 @@ struct TaskCreateResponse: Codable {
     }
 }
 
+struct BufferedUploadResponse: Codable {
+    let filename: String
+    let bufferedPath: String
+    let sizeBytes: Int
+    let originalPath: String?
+
+    enum CodingKeys: String, CodingKey {
+        case filename
+        case bufferedPath = "buffered_path"
+        case sizeBytes = "size_bytes"
+        case originalPath = "original_path"
+    }
+}
+
 struct TaskRecordDTO: Codable {
     let id: String
     let status: String
@@ -60,13 +74,21 @@ struct TaskRecordDTO: Codable {
         let answer: String?
         let summary: String?
         let lintResult: LintResultDTO?
+        let sessionId: String?
+        let pendingInput: PendingInputDTO?
 
         enum CodingKeys: String, CodingKey {
             case answer
             case summary
             case lintResult = "lint_result"
+            case sessionId = "session_id"
+            case pendingInput = "pending_input"
         }
     }
+}
+
+struct TaskInputRequest: Codable {
+    let message: String
 }
 
 struct TaskEvent: Decodable, Identifiable {
@@ -101,6 +123,7 @@ struct TaskEventPayload: Codable {
     let summary: String?
     let answer: String?
     let error: String?
+    let prompt: String?
     let content: String?
     let status: String?
     let output: String?
@@ -113,12 +136,18 @@ struct TaskEventPayload: Codable {
     let sourcePath: String?
     let kind: String?
     let tool: String?
+    let toolUseId: String?
     let category: String?
+    let provider: String?
+    let sessionId: String?
+    let pendingInput: PendingInputDTO?
+    let options: [String]?
 
     init(
         summary: String? = nil,
         answer: String? = nil,
         error: String? = nil,
+        prompt: String? = nil,
         content: String? = nil,
         status: String? = nil,
         output: String? = nil,
@@ -131,11 +160,17 @@ struct TaskEventPayload: Codable {
         sourcePath: String? = nil,
         kind: String? = nil,
         tool: String? = nil,
-        category: String? = nil
+        toolUseId: String? = nil,
+        category: String? = nil,
+        provider: String? = nil,
+        sessionId: String? = nil,
+        pendingInput: PendingInputDTO? = nil,
+        options: [String]? = nil
     ) {
         self.summary = summary
         self.answer = answer
         self.error = error
+        self.prompt = prompt
         self.content = content
         self.status = status
         self.output = output
@@ -148,13 +183,19 @@ struct TaskEventPayload: Codable {
         self.sourcePath = sourcePath
         self.kind = kind
         self.tool = tool
+        self.toolUseId = toolUseId
         self.category = category
+        self.provider = provider
+        self.sessionId = sessionId
+        self.pendingInput = pendingInput
+        self.options = options
     }
 
     enum CodingKeys: String, CodingKey {
         case summary
         case answer
         case error
+        case prompt
         case content
         case status
         case output
@@ -167,7 +208,26 @@ struct TaskEventPayload: Codable {
         case sourcePath = "source_path"
         case kind
         case tool
+        case toolUseId = "tool_use_id"
         case category
+        case provider
+        case sessionId = "session_id"
+        case pendingInput = "pending_input"
+        case options
+    }
+}
+
+struct PendingInputDTO: Codable {
+    let tool: String?
+    let prompt: String?
+    let options: [String]?
+    let toolUseId: String?
+
+    enum CodingKeys: String, CodingKey {
+        case tool
+        case prompt
+        case options
+        case toolUseId = "tool_use_id"
     }
 }
 
@@ -177,23 +237,23 @@ struct ServiceHealth: Codable {
     let ok: Bool
     let runnerAvailable: Bool?
     let runnerDetail: String?
-    let openAIAPIKeyConfigured: Bool?
-    let openAIBaseURL: String?
+    let provider: String?
+    let anthropicAPIKeyConfigured: Bool?
     let agentModel: String?
-    let sdkRuntimeEnabled: Bool?
-    let sdkRuntimeConfigured: Bool?
-    let tracingEnabled: Bool?
+    let agentRuntimeEnabled: Bool?
+    let agentRuntimeConfigured: Bool?
+    let claudeConfigDir: String?
 
     enum CodingKeys: String, CodingKey {
         case ok
         case runnerAvailable = "runner_available"
         case runnerDetail = "runner_detail"
-        case openAIAPIKeyConfigured = "openai_api_key_configured"
-        case openAIBaseURL = "openai_base_url"
+        case provider
+        case anthropicAPIKeyConfigured = "anthropic_api_key_configured"
         case agentModel = "agent_model"
-        case sdkRuntimeEnabled = "sdk_runtime_enabled"
-        case sdkRuntimeConfigured = "sdk_runtime_configured"
-        case tracingEnabled = "tracing_enabled"
+        case agentRuntimeEnabled = "agent_runtime_enabled"
+        case agentRuntimeConfigured = "agent_runtime_configured"
+        case claudeConfigDir = "claude_config_dir"
     }
 }
 

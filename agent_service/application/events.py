@@ -97,39 +97,38 @@ class EventPublisher:
         meta = _tool_display_meta(tool)
         return self.emit(task_id, EventType.TOOL_FINISHED, {"tool": tool, **meta, **payload})
 
-    def tool_failed(self, task_id: str, tool: str, error: str) -> TaskEvent:
+    def tool_failed(self, task_id: str, tool: str, error: str, payload: dict[str, Any] | None = None) -> TaskEvent:
         meta = _tool_display_meta(tool)
-        return self.emit(task_id, EventType.TOOL_FAILED, {"tool": tool, **meta, "error": error})
+        extra = payload or {}
+        return self.emit(task_id, EventType.TOOL_FAILED, {"tool": tool, **meta, "error": error, **extra})
 
     def file_changed(self, task_id: str, payload: dict[str, Any]) -> TaskEvent:
         return self.emit(task_id, EventType.FILE_CHANGED, payload)
 
     def journal_created(self, task_id: str, payload: dict[str, Any]) -> TaskEvent:
-        return self.emit(task_id, EventType.JOURNAL_ENTRY_CREATED, payload)
+        return self.emit(task_id, EventType.JOURNAL_CREATED, payload)
 
 
 def _tool_display_meta(tool: str) -> dict[str, str]:
-    if tool in {"read_file", "list_files", "search_text", "parse_markdown", "run_lint"}:
+    if tool in {"Read", "Glob", "Grep"}:
         return {"category": "read", "title": "正在阅读 Wiki", "summary": _tool_summary(tool)}
-    if tool in {"write_file", "append_file"}:
+    if tool in {"Write", "Edit", "MultiEdit"}:
         return {"category": "write", "title": "正在写入 Wiki", "summary": _tool_summary(tool)}
-    if tool in {"read_external_text_file", "write_canonical_source"}:
-        return {"category": "convert", "title": "正在转换文档", "summary": _tool_summary(tool)}
-    if tool == "apply_lint_fixes":
-        return {"category": "write", "title": "正在写入 Wiki", "summary": _tool_summary(tool)}
+    if tool == "Bash":
+        return {"category": "command", "title": "正在运行命令", "summary": _tool_summary(tool)}
+    if tool == "AskUserQuestion":
+        return {"category": "input", "title": "等待你的输入", "summary": _tool_summary(tool)}
     return {"category": "tool", "title": "正在调用工具", "summary": _tool_summary(tool)}
 
 
 def _tool_summary(tool: str) -> str:
     return {
-        "read_file": "读取 Wiki 文件。",
-        "list_files": "列出 Wiki 文件。",
-        "search_text": "搜索 Wiki 内容。",
-        "parse_markdown": "解析 Markdown 页面。",
-        "run_lint": "检查知识库结构。",
-        "write_file": "写入 Wiki 文件。",
-        "append_file": "追加 Wiki 内容。",
-        "read_external_text_file": "读取用户提供的文件。",
-        "write_canonical_source": "转换并记录用户提供的文件。",
-        "apply_lint_fixes": "应用低风险维护修复。",
+        "Read": "读取 Wiki 文件。",
+        "Glob": "列出文件。",
+        "Grep": "搜索 Wiki 内容。",
+        "Write": "写入 Wiki 文件。",
+        "Edit": "编辑 Wiki 文件。",
+        "MultiEdit": "批量编辑 Wiki 文件。",
+        "Bash": "运行只读或分析命令。",
+        "AskUserQuestion": "向用户请求额外输入。",
     }.get(tool, f"调用 {tool}。")

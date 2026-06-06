@@ -24,11 +24,11 @@ final class AppState {
     var runtimeModeTitle: String {
         guard isConnected else { return "Offline" }
         guard let serviceHealth else { return "Checking runtime" }
-        if serviceHealth.sdkRuntimeConfigured == true {
-            return "SDK Agent"
+        if serviceHealth.agentRuntimeConfigured == true {
+            return "Claude Agent"
         }
         if serviceHealth.runnerAvailable == true {
-            return "Fallback Query"
+            return "Runtime not configured"
         }
         return "Runtime unavailable"
     }
@@ -40,11 +40,11 @@ final class AppState {
         guard let serviceHealth else {
             return "Checking Agent Service runtime..."
         }
-        if serviceHealth.sdkRuntimeConfigured == true {
-            return "OpenAI Agents SDK runtime is active."
+        if serviceHealth.agentRuntimeConfigured == true {
+            return "Claude Agent runtime is active."
         }
         if serviceHealth.runnerAvailable == true {
-            return "SDK runtime is not configured; chat will use local read-only wiki query fallback."
+            return "Claude runtime is installed but not configured."
         }
         return serviceHealth.runnerDetail ?? "Agent runtime is unavailable."
     }

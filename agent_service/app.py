@@ -62,7 +62,7 @@ def create_app(config: ServiceConfig | None = None, store: SQLiteStore | None = 
     app.state.task_service = task_service
 
     register_health_routes(app, config=service_config, runner=runner)
-    register_task_routes(app, task_service=task_service, event_stream=event_stream)
+    register_task_routes(app, task_service=task_service, event_stream=event_stream, config=service_config)
     register_journal_routes(app, journal_service=journal_service)
     register_source_routes(app, source_service=source_service)
     register_ingest_queue_routes(app, ingest_queue_service=ingest_queue_service)

@@ -1,18 +1,17 @@
-import asyncio
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-from agents.tool_context import ToolContext
 from fastapi.testclient import TestClient
 
 from agent_service.app import create_app
 from agent_service.config import ServiceConfig
-from agent_service.models import RiskLevel, TaskKind
-from agent_service.runtime import PikiWikiAgentRunner
+from agent_service.runtime import PikiWikiAgentRunner, RunnerStatus
+from agent_service.runtime.runner import _collect_outputs
 from agent_service.store import SQLiteStore
-from agent_service.tools import VaultToolRegistry
-from agent_service.vault import Vault
 
 
 def make_runtime_vault(tmp_path: Path) -> Path:
@@ -27,436 +26,236 @@ def make_runtime_vault(tmp_path: Path) -> Path:
     return vault
 
 
-def test_direct_write_tools_create_conversation_journal_entry(tmp_path: Path):
-    vault_path = make_runtime_vault(tmp_path)
+def make_configured_client(tmp_path: Path, monkeypatch, fake_query) -> TestClient:
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     store = SQLiteStore(tmp_path / "agent.sqlite3")
-    task = store.create_task(
-        task_kind=TaskKind.AGENT,
-        risk_level=RiskLevel.LOW,
-        vault_path=str(vault_path),
-        user_input="写入测试",
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
     )
-    tools = VaultToolRegistry(vault=Vault(vault_path), store=store, task_id=task.id)
-
-    result = tools.write_file("wiki/log.md", "# 日志\n\n- SDK 写入测试\n", reason="test")
-    journal_entry = tools.commit_journal_entry(conversation_id="conv_test", reason="test")
-
-    assert result.ok
-    assert journal_entry is not None
-    assert journal_entry.conversation_id == "conv_test"
-    assert journal_entry.affected_files == ["wiki/log.md"]
-    assert journal_entry.snapshots[0].before_hash != journal_entry.snapshots[0].after_hash
-    events = [event.type for event in store.list_events(task.id)]
-    assert "tool.started" in events
-    assert "tool.finished" in events
-    assert "file.changed" in events
-    assert "journal_entry.created" in events
+    app = create_app(config, store=store)
+    app.state.runner._query_impl = fake_query
+    app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
+    return TestClient(app)
 
 
-def test_write_tools_do_not_journal_system_only_changes_and_block_agents(tmp_path: Path):
+def _result_message(*, session_id: str, result: str = "", deferred_tool_use=None, is_error: bool = False, errors=None):
+    return type(
+        "ResultMessage",
+        (),
+        {
+            "session_id": session_id,
+            "result": result,
+            "deferred_tool_use": deferred_tool_use,
+            "is_error": is_error,
+            "errors": errors,
+        },
+    )()
+
+
+def test_claude_agent_task_uses_provider_neutral_events(tmp_path: Path, monkeypatch):
     vault_path = make_runtime_vault(tmp_path)
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    task = store.create_task(
-        task_kind=TaskKind.AGENT,
-        risk_level=RiskLevel.LOW,
-        vault_path=str(vault_path),
-        user_input="写入测试",
-    )
-    tools = VaultToolRegistry(vault=Vault(vault_path), store=store, task_id=task.id)
 
-    system_result = tools.write_file("system/runtime.json", "{}", reason="system state")
-    agents_result = tools.write_file("AGENTS.md", "# hacked\n", reason="must fail")
-    journal_entry = tools.commit_journal_entry(conversation_id="conv_test", reason="test")
+    async def fake_query(*, prompt, options):
+        assert options.setting_sources == []
+        assert options.strict_mcp_config is True
+        assert options.env["CLAUDE_CODE_DISABLE_AUTO_MEMORY"] == "1"
+        yield SimpleNamespace(
+            event={"type": "content_block_delta", "delta": {"text": "hello "}},
+            session_id="sess_1",
+        )
+        yield SimpleNamespace(
+            content=[SimpleNamespace(text="hello from Claude")],
+            session_id="sess_1",
+        )
+        yield _result_message(session_id="sess_1", result="hello from Claude")
 
-    assert system_result.ok
-    assert agents_result.ok is False
-    assert "read-only" in agents_result.error
-    assert journal_entry is None
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["answer"] == "hello from Claude"
+    assert task["output"]["session_id"] == "sess_1"
+    events = client.get(f"/tasks/{response.json()['task_id']}/events").text
+    assert "event: agent.run.started" in events
+    assert "event: message.delta" in events
+    assert "event: agent.run.completed" in events
+
+
+def test_claude_hooks_record_write_and_create_single_journal(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    async def fake_query(*, prompt, options):
+        tool_input = {"file_path": str(vault_path / "wiki/log.md")}
+        for matcher in options.hooks["PreToolUse"]:
+            for hook in matcher.hooks:
+                await hook({"tool_name": "Write", "tool_input": tool_input}, None, None)
+        (vault_path / "wiki/log.md").write_text("# 日志\n\n- Claude 写入测试\n", encoding="utf-8")
+        for matcher in options.hooks["PostToolUse"]:
+            for hook in matcher.hooks:
+                await hook({"tool_name": "Write", "tool_input": tool_input}, {"ok": True}, None)
+        yield SimpleNamespace(content=[SimpleNamespace(text="已写入 wiki/log.md")], session_id="sess_write")
+        yield _result_message(session_id="sess_write", result="已写入 wiki/log.md")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "记录一下"})
+
+    assert response.status_code == 200
+    task_id = response.json()["task_id"]
+    task = client.get(f"/tasks/{task_id}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["journal_entry"] is not None
+    assert task["output"]["affected_files"] == ["wiki/log.md"]
+    events = client.get(f"/tasks/{task_id}/events").text
+    assert "event: tool.finished" in events
+    assert "event: file.changed" in events
+    assert "event: journal.created" in events
+
+
+def test_claude_blocks_writes_to_agents_md(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    async def fake_query(*, prompt, options):
+        for matcher in options.hooks["PreToolUse"]:
+            for hook in matcher.hooks:
+                result = await hook(
+                    {"tool_name": "Write", "tool_input": {"file_path": str(vault_path / "AGENTS.md")}},
+                    None,
+                    None,
+                )
+                assert result["permissionDecision"] == "deny"
+        yield _result_message(session_id="sess_block", result="denied")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "修改协议"})
+
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "failed"
+    assert "AGENTS.md is read-only" in task["summary"]
     assert (vault_path / "AGENTS.md").read_text(encoding="utf-8") == "# Agent 规则\n"
 
 
-class FakeRunner:
-    @staticmethod
-    def run_sync(agent, user_input, *, max_turns, run_config):
-        return SimpleNamespace(final_output=f"fake sdk answer: {user_input}", new_items=[], raw_responses=[])
-
-
-class FakeStreamingResult:
-    final_output = "fake streamed answer"
-
-    async def stream_events(self):
-        for delta in ["fake ", "streamed ", "answer"]:
-            yield SimpleNamespace(
-                type="raw_response_event",
-                data=SimpleNamespace(type="response.output_text.delta", delta=delta),
-            )
-
-
-class FakeStreamingRunner:
-    @staticmethod
-    def run_streamed(agent, user_input, *, max_turns, run_config):
-        return FakeStreamingResult()
-
-
-class FakeToolStreamResult:
-    final_output = "tool streamed answer"
-
-    async def stream_events(self):
-        yield SimpleNamespace(
-            type="run_item_stream_event",
-            name="tool_called",
-            item=SimpleNamespace(raw_item=SimpleNamespace(name="read_file")),
-        )
-        yield SimpleNamespace(
-            type="run_item_stream_event",
-            name="tool_output",
-            item=SimpleNamespace(raw_item=SimpleNamespace(name="read_file"), output="read ok"),
-        )
-        yield SimpleNamespace(
-            type="run_item_stream_event",
-            name="reasoning_item_created",
-            item=SimpleNamespace(),
-        )
-
-
-class FakeToolStreamingRunner:
-    @staticmethod
-    def run_streamed(agent, user_input, *, max_turns, run_config):
-        return FakeToolStreamResult()
-
-
-class FakeTimeoutResult:
-    final_output = ""
-    cancelled = False
-
-    async def stream_events(self):
-        await asyncio.sleep(2)
-        yield SimpleNamespace(
-            type="raw_response_event",
-            data=SimpleNamespace(type="response.output_text.delta", delta="late"),
-        )
-
-    def cancel(self):
-        self.cancelled = True
-
-
-class FakeTimeoutRunner:
-    @staticmethod
-    def run_streamed(agent, user_input, *, max_turns, run_config):
-        return FakeTimeoutResult()
-
-
-class FakeLintToolRunner:
-    @staticmethod
-    def run_sync(agent, user_input, *, max_turns, run_config):
-        tools = {tool.name: tool for tool in agent.tools}
-
-        async def run_tool():
-            tool = tools["run_lint"]
-            raw = await tool.on_invoke_tool(
-                ToolContext(
-                    context=None,
-                    tool_name="run_lint",
-                    tool_call_id="fake_run_lint",
-                    tool_arguments="{}",
-                ),
-                "{}",
-            )
-            data = raw if isinstance(raw, dict) else json.loads(raw)
-            if not data.get("ok"):
-                raise RuntimeError(data.get("error") or "run_lint failed")
-            return data["payload"]
-
-        lint_result = asyncio.run(run_tool())
-        return SimpleNamespace(
-            final_output=f"lint completed: {len(lint_result['issues'])} issues",
-            new_items=[],
-            raw_responses=[],
-        )
-
-
-def test_sdk_agent_task_uses_runner_when_configured(tmp_path: Path, monkeypatch):
+def test_claude_input_request_can_resume_session(tmp_path: Path, monkeypatch):
     vault_path = make_runtime_vault(tmp_path)
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeRunner
-    client = TestClient(app)
 
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "你好",
-        },
-    )
+    async def fake_query(*, prompt, options):
+        if getattr(options, "resume", None):
+            yield SimpleNamespace(content=[SimpleNamespace(text="好的，我已经继续执行。")], session_id="sess_resume")
+            yield _result_message(session_id="sess_resume", result="好的，我已经继续执行。")
+            return
+        for matcher in options.hooks["PreToolUse"]:
+            for hook in matcher.hooks:
+                result = await hook(
+                    {
+                        "tool_name": "AskUserQuestion",
+                        "tool_input": {"question": "要写进 wiki 吗？", "options": ["是", "否"]},
+                    },
+                    None,
+                    None,
+                )
+                assert result["permissionDecision"] == "defer"
+        yield _result_message(
+            session_id="sess_resume",
+            result="需要你的输入",
+            deferred_tool_use=SimpleNamespace(
+                id="toolu_ask",
+                name="AskUserQuestion",
+                input={"question": "要写进 wiki 吗？", "options": ["是", "否"]},
+            ),
+        )
 
-    assert response.status_code == 200
-    task = client.get(f"/tasks/{response.json()['task_id']}").json()
-    assert task["status"] == "completed"
-    assert task["output"]["answer"].startswith("fake sdk answer:")
-    assert '"user_input": "你好"' in task["output"]["answer"]
-    events = client.get(f"/tasks/{response.json()['task_id']}/events").text
-    assert "event: sdk.run.started" in events
-    assert "event: sdk.run.completed" in events
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
 
-
-def test_sdk_agent_task_maps_streaming_text_delta(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeStreamingRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "你好",
-        },
-    )
-
-    assert response.status_code == 200
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "帮我整理一下"})
     task_id = response.json()["task_id"]
-    task = client.get(f"/tasks/{task_id}").json()
-    assert task["output"]["answer"] == "fake streamed answer"
-    events = client.get(f"/tasks/{task_id}/events").text
-    assert "event: message.delta" in events
-    assert "event: agent.trace.delta" in events
-    assert '"delta": "fake "' in events
+    waiting = client.get(f"/tasks/{task_id}").json()
+    assert waiting["status"] == "input_required"
+    assert waiting["output"]["pending_input"]["prompt"] == "要写进 wiki 吗？"
+
+    resumed = client.post(f"/tasks/{task_id}/input", json={"message": "是"})
+    assert resumed.status_code == 200
+    finished = client.get(f"/tasks/{task_id}").json()
+    assert finished["status"] == "completed"
+    assert finished["output"]["answer"] == "好的，我已经继续执行。"
 
 
-def test_sdk_agent_task_maps_tool_stream_events_to_trace(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeToolStreamingRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "孟岩说了什么",
-        },
-    )
-
-    assert response.status_code == 200
-    events = client.get(f"/tasks/{response.json()['task_id']}/events").text
-    assert "event: agent.trace.event" in events
-    assert '"kind": "tool_started"' in events
-    assert '"title": "正在阅读 Wiki"' in events
-    assert '"kind": "tool_finished"' in events
-    assert '"kind": "reasoning"' in events
-
-
-def test_sdk_agent_query_timeout_falls_back_to_read_only_query(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    (vault_path / "wiki/mengyan.md").write_text("# 孟岩\n\n孟岩在讨论 AI 和知识库。\n", encoding="utf-8")
-    (vault_path / "wiki/index.md").write_text("# 索引\n\n- [[mengyan|孟岩]]\n", encoding="utf-8")
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-        agent_task_timeout_seconds=1,
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeTimeoutRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "孟岩说了什么",
-        },
-    )
-
-    assert response.status_code == 200
-    task_id = response.json()["task_id"]
-    task = client.get(f"/tasks/{task_id}").json()
-    assert task["status"] == "completed"
-    assert "孟岩" in task["summary"]
-    events = client.get(f"/tasks/{task_id}/events").text
-    assert "sdk_timeout_fallback" in events
-    assert '"title": "正在阅读 Wiki"' in events
-    assert "event: task.completed" in events
-
-
-def test_sdk_agent_idle_timeout_falls_back_to_read_only_query(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    (vault_path / "wiki/mengyan.md").write_text("# 孟岩\n\n孟岩在讨论 AI 和知识库。\n", encoding="utf-8")
-    (vault_path / "wiki/index.md").write_text("# 索引\n\n- [[mengyan|孟岩]]\n", encoding="utf-8")
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-        agent_task_timeout_seconds=60,
-        agent_stream_idle_timeout_seconds=1,
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeTimeoutRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "孟岩说了什么",
-        },
-    )
-
-    assert response.status_code == 200
-    task_id = response.json()["task_id"]
-    task = client.get(f"/tasks/{task_id}").json()
-    assert task["status"] == "completed"
-    events = client.get(f"/tasks/{task_id}/events").text
-    assert "Agent stream idle timed out after 1 seconds" in events
-    assert "event: query.completed" in events
-
-
-def test_sdk_agent_idle_timeout_for_small_talk_does_not_query_wiki(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-        agent_task_timeout_seconds=60,
-        agent_stream_idle_timeout_seconds=1,
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeTimeoutRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "hi",
-        },
-    )
-
-    assert response.status_code == 200
-    task_id = response.json()["task_id"]
-    task = client.get(f"/tasks/{task_id}").json()
-    assert task["status"] == "completed"
-    assert "你好，我在" in task["summary"]
-    assert task["output"]["fallback"] == "small_talk"
-    events = client.get(f"/tasks/{task_id}/events").text
-    assert "Agent stream idle timed out after 1 seconds" in events
-    assert "event: query.completed" not in events
-    assert "event: task.failed" not in events
-    assert "event: task.completed" in events
-
-
-def test_sdk_agent_required_task_timeout_marks_failed(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    selected_file = tmp_path / "source.md"
-    selected_file.write_text("# Source\n", encoding="utf-8")
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-        agent_task_timeout_seconds=1,
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeTimeoutRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "帮我记录这个文档",
-            "selected_paths": [str(selected_file)],
-        },
-    )
-
-    assert response.status_code == 200
-    task = client.get(f"/tasks/{response.json()['task_id']}").json()
-    assert task["status"] == "failed"
-    assert "Agent task timed out after 1 seconds" in task["summary"]
-
-
-def test_run_lint_action_context_uses_agent_tool(tmp_path: Path, monkeypatch):
-    vault_path = make_runtime_vault(tmp_path)
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    store = SQLiteStore(tmp_path / "agent.sqlite3")
-    config = ServiceConfig(
-        db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
-    )
-    app = create_app(config, store=store)
-    app.state.runner._runner_cls = FakeLintToolRunner
-    client = TestClient(app)
-
-    response = client.post(
-        "/tasks",
-        json={
-            "vault_path": str(vault_path),
-            "user_input": "Run vault lint.",
-            "action_context": {"action": "run_lint"},
-        },
-    )
-
-    assert response.status_code == 200
-    task = client.get(f"/tasks/{response.json()['task_id']}").json()
-    assert task["task_kind"] == "agent"
-    assert task["status"] == "completed"
-    assert task["output"]["action_context"] == {"action": "run_lint"}
-    assert task["output"]["lint_result"]["scanned_files"] >= 2
-    events = client.get(f"/tasks/{response.json()['task_id']}/events").text
-    assert "event: tool.started" in events
-    assert '"tool": "run_lint"' in events
-    assert "event: lint.completed" in events
-
-
-def test_smoke_test_uses_configured_runner(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+def test_smoke_test_uses_claude_query(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     runner = PikiWikiAgentRunner()
-    runner._runner_cls = FakeRunner
+    runner._query_impl = lambda *, prompt, options: _single_message_stream("Piki Claude smoke test ok.")
+    runner.status = RunnerStatus(True, "Claude Agent SDK available")
     config = ServiceConfig(
         db_path=tmp_path / "agent.sqlite3",
-        enable_sdk_runtime=True,
-        agent_model="test-model",
-        openai_base_url="https://example.test/v1",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
     )
 
     result = runner.smoke_test(config=config)
 
     assert result.ok is True
-    assert result.output == "fake sdk answer: 请返回：Piki SDK smoke test ok."
+    assert result.output == "Piki Claude smoke test ok."
+
+
+async def _single_message_stream(text: str):
+    yield SimpleNamespace(content=[SimpleNamespace(text=text)], session_id="sess_smoke")
+    yield _result_message(session_id="sess_smoke", result=text)
+
+
+def test_collect_outputs_prefers_final_result_over_tool_preamble():
+    messages = [
+        SimpleNamespace(
+            content=[SimpleNamespace(text="让我先查一下。")],
+            stop_reason="tool_use",
+            session_id="sess_collect",
+        ),
+        SimpleNamespace(
+            content=[SimpleNamespace(text="真正的最终答案")],
+            stop_reason="end_turn",
+            session_id="sess_collect",
+        ),
+        _result_message(session_id="sess_collect", result="真正的最终答案"),
+    ]
+
+    output, result_message, session_id = _collect_outputs(messages)
+
+    assert output == "真正的最终答案"
+    assert result_message is not None
+    assert session_id == "sess_collect"
+
+
+def test_runtime_env_allows_cli_module_from_vault_cwd(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    vault_path = make_runtime_vault(tmp_path)
+    source = tmp_path / "sample.md"
+    source.write_text("# Sample\nhello", encoding="utf-8")
+
+    runner = PikiWikiAgentRunner()
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
+        staging_root=tmp_path / ".piki/task-staging",
+        claude_config_dir=tmp_path / ".piki/claude-runtime",
+    )
+    env = os.environ.copy()
+    env.update(runner._runtime_env(config))
+
+    result = subprocess.run(
+        [sys.executable, "-m", "agent_service.runtime.cli", "extract-source", "--path", str(source)],
+        cwd=vault_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["source_path"].startswith("raw/sources/")
+    assert "canonical_markdown" in payload

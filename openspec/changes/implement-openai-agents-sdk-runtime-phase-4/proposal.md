@@ -1,3 +1,7 @@
+> Superseded by `openspec/changes/migrate-to-claude-agent-sdk/`.
+>
+> This change captured the old OpenAI runtime plan and is kept only as historical context.
+
 ## Why
 
 Phase 1-3 built the local Agent Service shell, read-only query fallback, and source intake normalization. The service can detect whether `openai-agents` is installed, but it does not yet run a real SDK-backed `PikiWikiAgent`, register vault tools as SDK function tools, or verify an OpenAI-compatible endpoint.

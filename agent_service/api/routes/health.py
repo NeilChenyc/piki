@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from agent_service.config import ServiceConfig, openai_api_key_configured
+from agent_service.config import ServiceConfig, anthropic_api_key_configured
 
 
 def register_health_routes(app: FastAPI, *, config: ServiceConfig, runner):
@@ -12,12 +12,13 @@ def register_health_routes(app: FastAPI, *, config: ServiceConfig, runner):
             "ok": True,
             "runner_available": runner.status.available,
             "runner_detail": runner.status.detail,
-            "openai_api_key_configured": openai_api_key_configured(),
-            "openai_base_url": config.openai_base_url or None,
+            "provider": config.runtime_provider,
+            "anthropic_api_key_configured": anthropic_api_key_configured(),
+            "anthropic_base_url": config.anthropic_base_url or None,
             "agent_model": config.agent_model or None,
-            "sdk_runtime_enabled": config.enable_sdk_runtime,
-            "sdk_runtime_configured": config.sdk_runtime_configured,
-            "tracing_enabled": config.tracing_enabled,
+            "agent_runtime_enabled": config.enable_agent_runtime,
+            "agent_runtime_configured": config.agent_runtime_configured,
+            "claude_config_dir": str(config.claude_config_dir.expanduser().resolve()),
         }
 
     @app.post("/runtime/smoke-test")
@@ -28,7 +29,8 @@ def register_health_routes(app: FastAPI, *, config: ServiceConfig, runner):
             "output": result.output,
             "error": result.error,
             "runner_available": runner.status.available,
-            "sdk_runtime_configured": config.sdk_runtime_configured,
+            "provider": config.runtime_provider,
+            "agent_runtime_configured": config.agent_runtime_configured,
+            "anthropic_base_url": config.anthropic_base_url or None,
             "agent_model": config.agent_model or None,
-            "openai_base_url": config.openai_base_url or None,
         }

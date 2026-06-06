@@ -36,6 +36,7 @@ class TaskStatus(StrEnum):
     COMPLETED = "completed"
     FAILED = "failed"
     NEEDS_APPROVAL = "needs_approval"
+    INPUT_REQUIRED = "input_required"
 
 
 class ApprovalStatus(StrEnum):
@@ -46,6 +47,10 @@ class ApprovalStatus(StrEnum):
 
 class EventType(StrEnum):
     AGENT_PROGRESS = "agent.progress"
+    AGENT_RUN_STARTED = "agent.run.started"
+    AGENT_RUN_COMPLETED = "agent.run.completed"
+    AGENT_INPUT_REQUESTED = "agent.input_requested"
+    AGENT_INPUT_RESOLVED = "agent.input_resolved"
     TASK_CREATED = "task.created"
     INTENT_RECEIVED = "intent.received"
     CONTEXT_LOADED = "context.loaded"
@@ -58,8 +63,6 @@ class EventType(StrEnum):
     SOURCE_INTAKE_NORMALIZED = "source_intake.normalized"
     SOURCE_MANIFEST_UPDATED = "source_manifest.updated"
     SOURCE_CLEARED = "source.cleared"
-    SDK_RUN_STARTED = "sdk.run.started"
-    SDK_RUN_COMPLETED = "sdk.run.completed"
     MESSAGE_DELTA = "message.delta"
     AGENT_TRACE_DELTA = "agent.trace.delta"
     AGENT_TRACE_EVENT = "agent.trace.event"
@@ -67,7 +70,7 @@ class EventType(StrEnum):
     TOOL_FINISHED = "tool.finished"
     TOOL_FAILED = "tool.failed"
     FILE_CHANGED = "file.changed"
-    JOURNAL_ENTRY_CREATED = "journal_entry.created"
+    JOURNAL_CREATED = "journal.created"
     ROLLBACK_COMPLETED = "rollback.completed"
     ROLLBACK_FAILED = "rollback.failed"
     SOURCE_RESCAN_STARTED = "source_rescan.started"
@@ -96,10 +99,21 @@ class TaskCreateRequest(BaseModel):
     async_mode: bool = False
 
 
+class TaskInputRequest(BaseModel):
+    message: str = Field(min_length=1)
+
+
 class TaskCreateResponse(BaseModel):
     task_id: str
     status: TaskStatus
     events_url: str
+
+
+class BufferedUploadResponse(BaseModel):
+    filename: str
+    buffered_path: str
+    size_bytes: int
+    original_path: str | None = None
 
 
 class TaskRecord(BaseModel):
@@ -454,6 +468,9 @@ class AgentResult(BaseModel):
     proposals: list[PatchProposal] = Field(default_factory=list)
     review_items: list[dict[str, Any]] = Field(default_factory=list)
     next_actions: list[str] = Field(default_factory=list)
+    session_id: str | None = None
+    checkpoint_id: str | None = None
+    pending_input: dict[str, Any] | None = None
 
 
 class IngestResult(BaseModel):

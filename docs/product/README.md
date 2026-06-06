@@ -1,23 +1,23 @@
 # 产品文档目录
 
-这个目录集中存放 Piki 的产品定义与规划文档。
+这个目录存放 Piki 当前有效的产品定义、运行时设计和路线图。Claude Agent SDK 全量迁移后，这里的文档以“agent-first + 轻服务端 + Claude built-in tools”为统一前提。
 
 ## 文档说明
 
 - `PRODUCT_OVERVIEW.zh.md`
-  - 总体产品文档，适合先读，帮助快速建立产品全貌
+  - 产品定位、用户问题、MVP 真相源和边界
 - `MVP_FEATURES.zh.md`
-  - MVP 功能地图与能力拆解
+  - MVP 能力地图、任务模型、Claude runtime 与 UI 可观察性
 - `AGENT_RUNTIME_DESIGN.zh.md`
-  - 基于 OpenAI Agents SDK 的 Piki 本地 Agent Service 实施方案
+  - Claude Agent SDK runtime 设计、hooks、安全边界、会话和 SSE 协议
 - `AGENT_CENTRIC_REFACTOR_PLAN.zh.md`
-  - Agent-Centric 重构原则与计划：服务端减重、能力回到 agent、工具驱动 UI 状态和 journal 判断
+  - 从服务端工作流驱动迁到 agent-first 的重构原则与落地规则
 - `ROADMAP.md`
-  - MVP 开发路线图与阶段目标
+  - 当前主线路线图
 - `ROADMAP_2_0.md`
-  - MVP 初步完成后的调试、优化和真实闭环路线图
+  - 迁移完成后的稳定化、体验打磨和后续扩展路线
 - `PRODUCT_NOTES.md`
-  - 补充产品笔记、agent 入口设计和参考吸收
+  - 补充产品判断、交互原则和保留决策
 
 ## 建议阅读顺序
 

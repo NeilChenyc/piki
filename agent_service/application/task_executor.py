@@ -11,9 +11,7 @@ from agent_service.context import assemble_agent_task_input, assemble_baseline_c
 from agent_service.models import EventType, FileSnapshot, TaskCreateRequest, TaskStatus
 from agent_service.runtime import PikiWikiAgentRunner
 from agent_service.store import SQLiteStore
-from agent_service.tools import VaultToolRegistry
 from agent_service.vault import Vault, VaultAccessError
-from agent_service.workflows import run_read_only_query
 
 
 class TaskExecutor:
@@ -70,103 +68,70 @@ class TaskExecutor:
             request=request,
             conversation_messages=conversation_messages,
         )
-        if self.runner.can_run(self.config):
-            tools = VaultToolRegistry(
-                vault=vault,
-                events=self.events,
-                task_id=task_id,
-                allowed_external_paths=request.selected_paths,
-            )
-            try:
-                self.events.progress(task_id, "thinking", "正在思考", "正在让 Agent 判断本轮需要调用哪些工具。")
-                agent_result = self.runner.run_task(
-                    config=self.config,
-                    events=self.events,
-                    task_id=task_id,
-                    conversation_id=conversation_id,
-                    user_input=request.user_input,
-                    agent_input=task_input.render_prompt(),
-                    context_contents=context_contents,
-                    tool_registry=tools,
-                )
-            except Exception as exc:
-                if isinstance(exc, TimeoutError):
-                    if _requires_configured_agent(request):
-                        self.events.task_failed(task_id, str(exc))
-                        self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
-                        return
-                    self._execute_local_fallback(
-                        task_id=task_id,
-                        request=request,
-                        vault=vault,
-                        conversation_id=conversation_id,
-                        reason=str(exc),
-                        kind="sdk_timeout_fallback",
-                    )
-                    return
-                if _requires_configured_agent(request):
-                    self.events.task_failed(task_id, str(exc))
-                    self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
-                    return
-                self._execute_local_fallback(
-                    task_id=task_id,
-                    request=request,
-                    vault=vault,
-                    conversation_id=conversation_id,
-                    reason=str(exc),
-                    kind="sdk_error_fallback",
-                )
-                return
-
-            if agent_result.affected_files:
-                self.events.progress(task_id, "writing_wiki", "正在写入 Wiki", "已更新 vault 文件。")
-            if agent_result.journal_entry:
-                self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
-            output = agent_result.model_dump(mode="json")
-            output["action_context"] = task_input.action_context
-            output["selected_paths"] = task_input.selected_paths
-            if tools.last_source_intake_result:
-                output["source_intake"] = tools.last_source_intake_result
-            if tools.last_lint_result:
-                output["lint_result"] = tools.last_lint_result
-            if tools.last_lint_fix_result:
-                output["lint_fix_result"] = tools.last_lint_fix_result
-            self.store.update_task(
-                task_id,
-                status=TaskStatus.COMPLETED,
-                summary=agent_result.summary,
-                affected_files=agent_result.affected_files,
-                output=output,
-            )
-            self.events.task_completed(
-                task_id,
-                summary=agent_result.summary,
-                answer=agent_result.answer or agent_result.summary,
-                journal_entry_id=agent_result.journal_entry.id if agent_result.journal_entry else None,
-            )
-            self._append_conversation_messages(
-                conversation_id=conversation_id,
-                task_id=task_id,
-                user_input=request.user_input,
-                answer=agent_result.answer or agent_result.summary,
-                metadata={"action_context": task_input.action_context, "selected_paths": task_input.selected_paths},
-            )
-            self.events.progress(task_id, "completed", "已完成")
-            return
-
-        if _requires_configured_agent(request):
-            error = "This task requires configured OpenAI Agents SDK runtime because it includes files, system action context, or an explicit write/ingest intent."
+        if not self.runner.can_run(self.config):
+            error = "Claude Agent runtime is not configured."
             self.events.task_failed(task_id, error)
             self.store.update_task(task_id, status=TaskStatus.FAILED, summary=error)
             return
-        self._execute_local_fallback(
-            task_id=task_id,
-            request=request,
-            vault=vault,
-            conversation_id=conversation_id,
-            reason="OpenAI Agents SDK runtime is not configured.",
-            kind="sdk_unconfigured_fallback",
+
+        try:
+            self.events.progress(task_id, "thinking", "正在思考", "正在让 Claude 判断本轮需要调用哪些工具。")
+            agent_result = self.runner.run_task(
+                config=self.config,
+                store=self.store,
+                events=self.events,
+                task_id=task_id,
+                conversation_id=conversation_id,
+                user_input=request.user_input,
+                agent_input=task_input.render_prompt(),
+                context_contents=context_contents,
+                vault=vault,
+                selected_paths=request.selected_paths,
+                resume_session_id=_last_agent_session_id(conversation_messages),
+            )
+        except Exception as exc:
+            self.events.task_failed(task_id, str(exc))
+            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
+            return
+
+        if agent_result.affected_files:
+            self.events.progress(task_id, "writing_wiki", "正在写入 Wiki", "已更新 vault 文件。")
+        if agent_result.journal_entry:
+            self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
+        output = agent_result.model_dump(mode="json")
+        output["action_context"] = task_input.action_context
+        output["selected_paths"] = task_input.selected_paths
+        output["conversation_id"] = conversation_id
+        self.store.update_task(
+            task_id,
+            status=agent_result.status,
+            summary=agent_result.summary,
+            affected_files=agent_result.affected_files,
+            output=output,
         )
+        if agent_result.status == TaskStatus.INPUT_REQUIRED:
+            return
+        if agent_result.status == TaskStatus.FAILED:
+            self.events.task_failed(task_id, agent_result.summary)
+            return
+        self.events.task_completed(
+            task_id,
+            summary=agent_result.summary,
+            answer=agent_result.answer or agent_result.summary,
+            journal_entry_id=agent_result.journal_entry.id if agent_result.journal_entry else None,
+        )
+        self._append_conversation_messages(
+            conversation_id=conversation_id,
+            task_id=task_id,
+            user_input=request.user_input,
+            answer=agent_result.answer or agent_result.summary,
+            metadata={
+                "action_context": task_input.action_context,
+                "selected_paths": task_input.selected_paths,
+                "agent_session_id": agent_result.session_id,
+            },
+        )
+        self.events.progress(task_id, "completed", "已完成")
 
     def _execute_source_clear(self, *, task_id: str, request: TaskCreateRequest, vault: Vault):
         self.events.progress(task_id, "clearing_source", "正在清理文件", "正在清理单个 inbox 文件。")
@@ -218,107 +183,78 @@ class TaskExecutor:
         self.events.task_completed(task_id, summary=summary, answer=summary, journal_entry_id=journal_entry.id)
         self.events.progress(task_id, "completed", "已完成")
 
-    def _persist_query_result(self, task_id: str, query_result, *, conversation_id: str | None = None, user_input: str = ""):
-        self.events.emit(
-            task_id,
-            EventType.QUERY_SEARCHED,
-            {
-                "mode": query_result.mode.value,
-                "citations": len(query_result.citations),
-                "related_pages": query_result.related_pages,
-                "loaded_files": query_result.context_manifest.loaded_files,
-                "search_terms": query_result.context_manifest.search_terms,
-            },
+    def resume_input(self, *, task_id: str, message: str):
+        task = self.store.get_task(task_id)
+        if task.status != TaskStatus.INPUT_REQUIRED:
+            raise ValueError(f"Task is not waiting for input: {task.status}")
+        output = dict(task.output or {})
+        session_id = output.get("session_id")
+        conversation_id = output.get("conversation_id") or task_id
+        request = TaskCreateRequest(
+            vault_path=Path(task.vault_path),
+            user_input=message,
+            selected_paths=list(output.get("selected_paths") or []),
+            action_context=dict(output.get("action_context") or {}),
+            conversation_id=conversation_id,
+            mode="normal",
+            async_mode=False,
         )
         self.store.update_task(
             task_id,
-            status=TaskStatus.COMPLETED,
-            summary=query_result.answer,
-            output=query_result.model_dump(mode="json"),
+            status=TaskStatus.RUNNING,
+            summary="正在继续上一次等待输入的任务。",
+            output={**output, "pending_input": None},
         )
-        self.events.emit(
+        self.events.emit(task_id, EventType.AGENT_INPUT_RESOLVED, {"message": message, "session_id": session_id})
+        vault = Vault(task.vault_path)
+        _, context_contents = assemble_baseline_context(vault)
+        conversation_messages = self.store.get_conversation_messages(conversation_id, limit=10)
+        task_input = assemble_agent_task_input(request=request, conversation_messages=conversation_messages)
+        agent_result = self.runner.run_task(
+            config=self.config,
+            store=self.store,
+            events=self.events,
+            task_id=task_id,
+            conversation_id=conversation_id,
+            user_input=message,
+            agent_input=task_input.render_prompt(),
+            context_contents=context_contents,
+            vault=vault,
+            selected_paths=request.selected_paths,
+            resume_session_id=session_id,
+        )
+        merged_output = {
+            **output,
+            **agent_result.model_dump(mode="json"),
+            "action_context": task_input.action_context,
+            "selected_paths": task_input.selected_paths,
+            "conversation_id": conversation_id,
+        }
+        self.store.update_task(
             task_id,
-            EventType.QUERY_COMPLETED,
-            {
-                "confidence": query_result.confidence.value,
-                "citation_count": len(query_result.citations),
-                "related_page_count": len(query_result.related_pages),
-            },
+            status=agent_result.status,
+            summary=agent_result.summary,
+            affected_files=agent_result.affected_files,
+            output=merged_output,
         )
-        self.events.task_completed(task_id, summary=query_result.answer, answer=query_result.answer)
-        if conversation_id:
-            self._append_conversation_messages(
-                conversation_id=conversation_id,
-                task_id=task_id,
-                user_input=user_input,
-                answer=query_result.answer,
-                metadata={"fallback": "read_only_query"},
-            )
-        self.events.progress(task_id, "completed", "已完成")
-
-    def _execute_local_fallback(
-        self,
-        *,
-        task_id: str,
-        request: TaskCreateRequest,
-        vault: Vault,
-        conversation_id: str,
-        reason: str,
-        kind: str,
-    ):
-        if _is_small_talk(request.user_input):
-            answer = _small_talk_fallback_answer(request.user_input)
-            self.events.trace_event(
-                task_id,
-                kind=kind,
-                title="切换到本地回复",
-                summary=reason,
-                status="completed",
-            )
-            self._persist_direct_answer(
-                task_id,
-                answer,
-                conversation_id=conversation_id,
-                user_input=request.user_input,
-                metadata={"fallback": "small_talk", "reason": reason},
-            )
+        if agent_result.status == TaskStatus.FAILED:
+            self.events.task_failed(task_id, agent_result.summary)
             return
-
-        self.events.trace_event(
+        if agent_result.status == TaskStatus.INPUT_REQUIRED:
+            return
+        self.events.task_completed(
             task_id,
-            kind=kind,
-            title="切换到本地查询",
-            summary=reason,
-            status="completed",
+            summary=agent_result.summary,
+            answer=agent_result.answer or agent_result.summary,
+            journal_entry_id=agent_result.journal_entry.id if agent_result.journal_entry else None,
         )
-        self.events.progress(task_id, "reading_wiki", "正在阅读 Wiki", "SDK 暂不可用，正在使用本地只读 query fallback。")
-        query_result = run_read_only_query(vault, request.user_input, mode=request.mode)
-        self._persist_query_result(task_id, query_result, conversation_id=conversation_id, user_input=request.user_input)
-
-    def _persist_direct_answer(
-        self,
-        task_id: str,
-        answer: str,
-        *,
-        conversation_id: str | None = None,
-        user_input: str = "",
-        metadata: dict | None = None,
-    ):
-        self.store.update_task(
-            task_id,
-            status=TaskStatus.COMPLETED,
-            summary=answer,
-            output={"answer": answer, "summary": answer, **(metadata or {})},
+        self._append_conversation_messages(
+            conversation_id=conversation_id,
+            task_id=task_id,
+            user_input=message,
+            answer=agent_result.answer or agent_result.summary,
+            metadata={"agent_session_id": agent_result.session_id, "continued_task_id": task_id},
         )
-        self.events.task_completed(task_id, summary=answer, answer=answer)
-        if conversation_id:
-            self._append_conversation_messages(
-                conversation_id=conversation_id,
-                task_id=task_id,
-                user_input=user_input,
-                answer=answer,
-                metadata=metadata,
-            )
         self.events.progress(task_id, "completed", "已完成")
 
     def _append_conversation_messages(
@@ -373,50 +309,10 @@ def _delete_diff(relative_path: str, before_content: str) -> str:
     )
 
 
-WRITE_INTENT_MARKERS = (
-    "/wiki:ingest",
-    "/wiki:compile",
-    "记一下",
-    "记录",
-    "保存",
-    "收进",
-    "摄入",
-    "整理进去",
-    "更新",
-    "修正",
-    "改成",
-    "补充",
-)
-
-
-SMALL_TALK_INPUTS = {
-    "hi",
-    "hello",
-    "hey",
-    "你好",
-    "您好",
-    "嗨",
-    "在吗",
-    "你在吗",
-    "你是谁",
-    "你能做什么",
-}
-
-
-def _is_small_talk(user_input: str) -> bool:
-    normalized = user_input.strip().lower()
-    normalized = normalized.strip(" \t\r\n,.!?。！？")
-    return normalized in SMALL_TALK_INPUTS
-
-
-def _small_talk_fallback_answer(user_input: str) -> str:
-    normalized = user_input.strip().lower().strip(" \t\r\n,.!?。！？")
-    if normalized in {"你能做什么", "你是谁"}:
-        return "我可以帮你查询这个 Piki wiki、整理上传资料、把内容写入 Wiki，也可以按按钮动作执行 lint 或 inbox ingest。"
-    return "你好，我在。你可以直接问我关于这个 Piki wiki 的问题，或让我帮你整理/记录资料。"
-
-
-def _requires_configured_agent(request: TaskCreateRequest) -> bool:
-    if request.selected_paths or request.action_context or request.mode == "clear-inbox-item":
-        return True
-    return any(marker in request.user_input for marker in WRITE_INTENT_MARKERS)
+def _last_agent_session_id(messages: list[dict]) -> str | None:
+    for message in reversed(messages):
+        metadata = message.get("metadata") or {}
+        session_id = metadata.get("agent_session_id")
+        if isinstance(session_id, str) and session_id:
+            return session_id
+    return None

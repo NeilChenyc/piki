@@ -10,6 +10,10 @@ struct ChatBubbleView: View {
 
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 VStack(alignment: .leading, spacing: 8) {
+                    if message.role == .assistant && message.isAgentRun {
+                        agentRunHeader
+                    }
+
                     if shouldShowTrace {
                         traceView
                     }
@@ -19,8 +23,8 @@ struct ChatBubbleView: View {
                             .font(.system(size: 13))
                             .foregroundStyle(message.role == .user ? .white : Theme.textPrimary)
                             .textSelection(.enabled)
-                    } else if message.role == .assistant && !shouldShowTrace {
-                        Text("Working...")
+                    } else if message.role == .assistant && message.isAgentRun {
+                        Text(message.isRunning ? "Agent 正在执行本轮任务…" : "本轮 Agent Run 暂无最终正文。")
                             .font(.system(size: 13))
                             .foregroundStyle(Theme.textTertiary)
                     }
@@ -75,7 +79,28 @@ struct ChatBubbleView: View {
     }
 
     private var shouldShowTrace: Bool {
-        message.role == .assistant && !message.traceItems.isEmpty && (message.isRunning || message.isTraceExpanded)
+        message.role == .assistant
+            && !message.traceItems.isEmpty
+            && ((message.isRunning && !message.hasStartedAnswering) || message.isTraceExpanded)
+    }
+
+    private var agentRunHeader: some View {
+        HStack(spacing: 8) {
+            Label("Agent Run", systemImage: "sparkles.rectangle.stack")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+
+            Text(runStatusTitle)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(runStatusColor)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(runStatusColor.opacity(0.12))
+                .clipShape(Capsule())
+
+            Spacer(minLength: 0)
+        }
+        .padding(.bottom, shouldShowTrace ? 2 : 0)
     }
 
     private var displayContent: String {
@@ -86,28 +111,56 @@ struct ChatBubbleView: View {
     }
 
     private var traceView: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(message.traceItems) { item in
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Image(systemName: iconName(for: item))
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(color(for: item))
-                        .frame(width: 12)
-                    VStack(alignment: .leading, spacing: 1) {
+                HStack(alignment: .top, spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(color(for: item).opacity(0.14))
+                            .frame(width: 18, height: 18)
+                        Image(systemName: iconName(for: item))
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(color(for: item))
+                    }
+                    VStack(alignment: .leading, spacing: 3) {
                         Text(item.title)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(Theme.textSecondary)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(Theme.textPrimary)
                         if !item.summary.isEmpty {
                             Text(item.summary)
                                 .font(.system(size: 10))
-                                .foregroundStyle(Theme.textTertiary)
-                                .lineLimit(item.kind == "model_delta" ? 4 : 2)
+                                .foregroundStyle(Theme.textSecondary)
+                                .lineLimit(item.kind == "model_delta" ? 8 : 3)
+                                .textSelection(.enabled)
                         }
                     }
+                    Spacer(minLength: 0)
                 }
             }
         }
-        .padding(.vertical, 2)
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Theme.primaryLight.opacity(0.5))
+        )
+    }
+
+    private var runStatusTitle: String {
+        switch message.runStatus {
+        case "failed": "失败"
+        case "input_required": "等待输入"
+        case "completed": "已完成"
+        default: message.isRunning ? "运行中" : "已准备"
+        }
+    }
+
+    private var runStatusColor: Color {
+        switch message.runStatus {
+        case "failed": Theme.error
+        case "input_required": Theme.warning
+        case "completed": Theme.primary
+        default: Theme.textSecondary
+        }
     }
 
     private func iconName(for item: ChatTraceItem) -> String {
@@ -118,7 +171,9 @@ struct ChatBubbleView: View {
             switch item.category {
             case "read": return "book.fill"
             case "write": return "square.and.pencil"
+            case "command": return "terminal.fill"
             case "convert": return "doc.text.fill"
+            case "input": return "ellipsis.bubble.fill"
             case "model": return "sparkles"
             default: return "circle.dotted"
             }

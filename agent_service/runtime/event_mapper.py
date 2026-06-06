@@ -4,149 +4,156 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class MappedSdkEvent:
+class MappedClaudeEvent:
     event_type: str
     payload: dict
 
 
-def extract_text_delta(event) -> str:
-    event_type = event_value(event, "type")
-    data = event_value(event, "data")
-    raw_type = event_value(data, "type") if data is not None else None
-    raw = data if raw_type else event
-    raw_type = raw_type or event_type
-    if raw_type != "response.output_text.delta":
+def extract_text_delta(message) -> str:
+    event = getattr(message, "event", None)
+    if not isinstance(event, dict):
         return ""
-    delta = event_value(raw, "delta")
-    return delta if isinstance(delta, str) else ""
+    if event.get("type") != "content_block_delta":
+        return ""
+    delta = event.get("delta") or {}
+    if isinstance(delta, dict):
+        return str(delta.get("text") or "")
+    return ""
 
 
-def map_stream_event(event) -> list[MappedSdkEvent]:
-    delta = extract_text_delta(event)
-    if delta:
+def extract_text_snapshot(message) -> str:
+    content = getattr(message, "content", None)
+    if not isinstance(content, list):
+        return ""
+    text_parts: list[str] = []
+    for block in content:
+        text = getattr(block, "text", None)
+        if text:
+            text_parts.append(str(text))
+    return "".join(text_parts)
+
+
+def extract_thinking_delta(message) -> str:
+    event = getattr(message, "event", None)
+    if not isinstance(event, dict):
+        return ""
+    if event.get("type") != "content_block_delta":
+        return ""
+    delta = event.get("delta") or {}
+    if not isinstance(delta, dict):
+        return ""
+    return str(delta.get("thinking") or "")
+
+
+def extract_thinking_snapshot(message) -> str:
+    content = getattr(message, "content", None)
+    if not isinstance(content, list):
+        return ""
+    thoughts: list[str] = []
+    for block in content:
+        thinking = getattr(block, "thinking", None)
+        if thinking:
+            thoughts.append(str(thinking))
+    return "\n\n".join(thoughts)
+
+
+def map_stream_event(message) -> list[MappedClaudeEvent]:
+    event = getattr(message, "event", None)
+    if not isinstance(event, dict):
+        return []
+    event_type = str(event.get("type") or "")
+    if event_type == "content_block_start":
+        block = event.get("content_block") or {}
+        if isinstance(block, dict) and block.get("type") == "thinking":
+            return [
+                MappedClaudeEvent(
+                    "agent.trace.event",
+                    {
+                        "kind": "thinking_started",
+                        "title": "正在思考",
+                        "summary": "Claude 正在规划本轮回答与工具路径。",
+                        "category": "model",
+                        "status": "running",
+                    },
+                )
+            ]
+        if isinstance(block, dict) and block.get("type") == "tool_use":
+            tool_name = str(block.get("name") or "")
+            tool_use_id = str(block.get("id") or "")
+            return [
+                MappedClaudeEvent(
+                    "tool.started",
+                    {
+                        "tool": tool_name,
+                        "tool_use_id": tool_use_id,
+                        "title": _tool_title(tool_name),
+                        "summary": _tool_summary(tool_name, block.get("input")),
+                        "source_path": _tool_path(tool_name, block.get("input")),
+                        "category": _tool_category(tool_name),
+                        "status": "running",
+                    },
+                )
+            ]
+    if event_type == "content_block_stop":
         return [
-            MappedSdkEvent("agent.trace.delta", {"delta": delta}),
-        ]
-
-    event_type = event_value(event, "type")
-    if event_type == "run_item_stream_event":
-        name = event_value(event, "name") or ""
-        item = event_value(event, "item")
-        return [_map_run_item_event(name, item)]
-
-    if event_type == "agent_updated_stream_event":
-        new_agent = event_value(event, "new_agent")
-        agent_name = event_value(new_agent, "name") or "agent"
-        return [
-            MappedSdkEvent(
+            MappedClaudeEvent(
                 "agent.trace.event",
                 {
-                    "kind": "agent_updated",
-                    "title": "切换 Agent",
-                    "summary": str(agent_name),
+                    "kind": "content_block_stop",
+                    "title": "阶段完成",
+                    "summary": "Claude 完成了一个输出块。",
                     "status": "completed",
                 },
             )
         ]
-
     return []
 
 
-def _map_run_item_event(name: str, item) -> MappedSdkEvent:
-    if name == "tool_called":
-        tool_name = _tool_name_from_item(item)
-        title, category = _tool_title_and_category(tool_name)
-        return MappedSdkEvent(
-            "agent.trace.event",
-            {
-                "kind": "tool_started",
-                "title": title,
-                "summary": f"调用工具：{tool_name}" if tool_name else "调用工具。",
-                "tool": tool_name,
-                "category": category,
-                "status": "running",
-            },
-        )
-    if name == "tool_output":
-        tool_name = _tool_name_from_item(item)
-        return MappedSdkEvent(
-            "agent.trace.event",
-            {
-                "kind": "tool_finished",
-                "title": "工具调用完成",
-                "summary": _summarize_item_output(item),
-                "tool": tool_name,
-                "category": _tool_title_and_category(tool_name)[1],
-                "status": "completed",
-            },
-        )
-    if name == "reasoning_item_created":
-        return MappedSdkEvent(
-            "agent.trace.event",
-            {
-                "kind": "reasoning",
-                "title": "正在思考",
-                "summary": "模型正在规划下一步。",
-                "status": "running",
-            },
-        )
-    if name == "message_output_created":
-        return MappedSdkEvent(
-            "agent.trace.event",
-            {
-                "kind": "message_output",
-                "title": "生成回答",
-                "summary": "模型生成了一段可见回复。",
-                "status": "completed",
-            },
-        )
-    return MappedSdkEvent(
-        "agent.trace.event",
-        {
-            "kind": name or "run_item",
-            "title": "Agent 事件",
-            "summary": name or "run item",
-            "status": "completed",
-        },
-    )
+def _tool_title(tool_name: str) -> str:
+    if tool_name in {"Read", "Glob", "Grep"}:
+        return "正在阅读 Wiki"
+    if tool_name in {"Write", "Edit", "MultiEdit"}:
+        return "正在写入 Wiki"
+    if tool_name == "Bash":
+        return "正在运行命令"
+    if tool_name == "AskUserQuestion":
+        return "等待你的输入"
+    return "正在调用工具"
 
 
-def _tool_name_from_item(item) -> str:
-    raw_item = event_value(item, "raw_item") or item
-    for key in ("name", "tool_name", "function_name"):
-        value = event_value(raw_item, key) or event_value(item, key)
-        if isinstance(value, str) and value:
-            return value
-    function = event_value(raw_item, "function") or event_value(item, "function")
-    value = event_value(function, "name")
-    return value if isinstance(value, str) else ""
+def _tool_category(tool_name: str) -> str:
+    if tool_name in {"Read", "Glob", "Grep"}:
+        return "read"
+    if tool_name in {"Write", "Edit", "MultiEdit"}:
+        return "write"
+    if tool_name == "Bash":
+        return "command"
+    if tool_name == "AskUserQuestion":
+        return "input"
+    return "tool"
 
 
-def _summarize_item_output(item) -> str:
-    output = event_value(item, "output")
-    if output is None:
-        output = event_value(event_value(item, "raw_item"), "output")
-    if output is None:
-        return "工具返回了结果。"
-    text = str(output).replace("\n", " ").strip()
-    if len(text) > 160:
-        return text[:157] + "..."
-    return text or "工具返回了结果。"
+def _tool_summary(tool_name: str, tool_input) -> str:
+    if tool_name in {"Read", "Write", "Edit", "MultiEdit"} and isinstance(tool_input, dict):
+        path = tool_input.get("file_path") or tool_input.get("path")
+        if path:
+            return f"{tool_name}：{path}"
+    if tool_name == "Bash" and isinstance(tool_input, dict):
+        command = str(tool_input.get("command") or "").strip()
+        return command[:160]
+    if tool_name == "AskUserQuestion" and isinstance(tool_input, dict):
+        prompt = str(tool_input.get("question") or tool_input.get("prompt") or "").strip()
+        return prompt[:160]
+    return tool_name or "tool"
 
 
-def _tool_title_and_category(tool_name: str) -> tuple[str, str]:
-    if tool_name in {"read_file", "list_files", "search_text", "parse_markdown", "run_lint"}:
-        return "正在阅读 Wiki", "read"
-    if tool_name in {"write_file", "append_file", "apply_lint_fixes"}:
-        return "正在写入 Wiki", "write"
-    if tool_name in {"read_external_text_file", "write_canonical_source"}:
-        return "正在转换文档", "convert"
-    return "正在调用工具", "tool"
-
-
-def event_value(event, key: str):
-    if event is None:
+def _tool_path(tool_name: str, tool_input) -> str | None:
+    if not isinstance(tool_input, dict):
         return None
-    if isinstance(event, dict):
-        return event.get(key)
-    return getattr(event, key, None)
+    if tool_name in {"Read", "Write", "Edit", "MultiEdit"}:
+        path = tool_input.get("file_path") or tool_input.get("path")
+        return str(path) if path else None
+    if tool_name in {"Glob", "Grep"}:
+        path = tool_input.get("path")
+        return str(path) if path else None
+    return None
