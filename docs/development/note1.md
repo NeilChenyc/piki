@@ -6,7 +6,7 @@
 
 - `agent_service` 仍是本地 Python 运行宿主
 - 主 runtime 改为 Claude Agent SDK
-- 主配置改为 `ANTHROPIC_API_KEY` 与 `PIKI_AGENT_MODEL`
+- 主配置改为 `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_API_KEY` 与 `PIKI_AGENT_MODEL`
 - 运行时默认使用私有 `CLAUDE_CONFIG_DIR`，并关闭 auto memory
 - 普通 `/tasks` 不再静默 fallback 到旧 query pipeline
 

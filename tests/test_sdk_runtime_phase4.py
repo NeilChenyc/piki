@@ -259,3 +259,22 @@ def test_runtime_env_allows_cli_module_from_vault_cwd(tmp_path: Path, monkeypatc
     payload = json.loads(result.stdout)
     assert payload["source_path"].startswith("raw/sources/")
     assert "canonical_markdown" in payload
+
+
+def test_runtime_env_exports_anthropic_auth_token_alias(tmp_path: Path, monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "packy-token")
+
+    runner = PikiWikiAgentRunner()
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
+        anthropic_base_url="https://www.packyapi.com",
+    )
+
+    env = runner._runtime_env(config)
+
+    assert env["ANTHROPIC_BASE_URL"] == "https://www.packyapi.com"
+    assert env["ANTHROPIC_AUTH_TOKEN"] == "packy-token"
+    assert env["ANTHROPIC_API_KEY"] == "packy-token"

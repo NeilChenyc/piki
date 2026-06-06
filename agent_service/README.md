@@ -70,7 +70,7 @@ Piki 自己保留的能力是 hooks、journal、rollback、staging、lint/extrac
 ## 当前运行时边界
 
 - `POST /tasks` 是唯一主 agent 入口。
-- 当 `ANTHROPIC_API_KEY` 或 runtime 开关未配置时，`/health` 会明确报告不可用，`POST /tasks` 会直接失败，不再静默切到旧 query fallback。
+- 当 `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_API_KEY` 或 runtime 开关未配置时，`/health` 会明确报告不可用，`POST /tasks` 会直接失败，不再静默切到旧 query fallback。
 - 运行时默认 hermetic：
   - `setting_sources: []`
   - `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`

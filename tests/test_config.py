@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from agent_service.config import ServiceConfig
+from agent_service.config import ServiceConfig, anthropic_api_key_configured
 
 
 def test_agent_runtime_flag_prefers_new_env(monkeypatch):
@@ -28,3 +28,14 @@ def test_claude_config_dir_defaults_to_private_runtime_dir(monkeypatch):
     config = ServiceConfig()
 
     assert config.claude_config_dir == Path(".piki/claude-runtime")
+
+
+def test_runtime_is_configured_with_anthropic_auth_token(monkeypatch):
+    monkeypatch.setenv("PIKI_ENABLE_AGENT_RUNTIME", "1")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "test-token")
+
+    config = ServiceConfig()
+
+    assert anthropic_api_key_configured() is True
+    assert config.agent_runtime_configured is True

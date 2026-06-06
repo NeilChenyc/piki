@@ -15,8 +15,15 @@ def load_environment(env_path: Path = Path(".env")):
         load_dotenv(env_path, override=False)
 
 
+def anthropic_auth_token() -> str:
+    return (
+        os.environ.get("ANTHROPIC_AUTH_TOKEN", "").strip()
+        or os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    )
+
+
 def anthropic_api_key_configured() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+    return bool(anthropic_auth_token())
 
 
 def env_flag(name: str, default: bool = False) -> bool:

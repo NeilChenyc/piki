@@ -11,7 +11,7 @@ from typing import Any
 
 from agent_service.agents.prompts import build_piki_instructions
 from agent_service.application.events import EventPublisher
-from agent_service.config import ServiceConfig
+from agent_service.config import ServiceConfig, anthropic_auth_token
 from agent_service.models import AgentResult, EventType, TaskStatus
 from agent_service.runtime.event_mapper import (
     extract_text_delta,
@@ -425,8 +425,11 @@ class PikiWikiAgentRunner:
         )
         if config.anthropic_base_url:
             env["ANTHROPIC_BASE_URL"] = config.anthropic_base_url
-        if os.environ.get("ANTHROPIC_API_KEY"):
-            env["ANTHROPIC_API_KEY"] = os.environ["ANTHROPIC_API_KEY"]
+        token = anthropic_auth_token()
+        if token:
+            # Claude-compatible gateways vary between API_KEY and AUTH_TOKEN naming.
+            env["ANTHROPIC_AUTH_TOKEN"] = token
+            env["ANTHROPIC_API_KEY"] = token
         return env
 
 
