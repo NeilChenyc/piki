@@ -7,7 +7,10 @@ struct ChatInputView: View {
     @FocusState private var isFocused: Bool
     let placeholder: String
     let isDisabled: Bool
+    let showsStopButton: Bool
+    let isStopping: Bool
     let onSend: (String, [URL]) -> Void
+    let onStop: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -51,17 +54,32 @@ struct ChatInputView: View {
                     .font(.system(size: 13))
                     .focused($isFocused)
                     .onSubmit {
-                        sendIfNotEmpty()
+                        if showsStopButton {
+                            onStop()
+                        } else {
+                            sendIfNotEmpty()
+                        }
                     }
                     .disabled(isDisabled)
 
-                Button(action: sendIfNotEmpty) {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundStyle(!canSend ? Theme.textTertiary : Theme.primary)
+                if showsStopButton {
+                    Button(action: onStop) {
+                        Image(systemName: isStopping ? "stop.circle" : "stop.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(isStopping ? Theme.textTertiary : Theme.error)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isStopping)
+                    .help(isStopping ? "Stopping…" : "Stop current run")
+                } else {
+                    Button(action: sendIfNotEmpty) {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(!canSend ? Theme.textTertiary : Theme.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!canSend)
                 }
-                .buttonStyle(.plain)
-                .disabled(!canSend)
             }
         }
         .padding(.horizontal, 16)

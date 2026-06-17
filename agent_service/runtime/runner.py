@@ -11,6 +11,7 @@ from typing import Any
 
 from agent_service.agents.prompts import build_piki_instructions
 from agent_service.application.events import EventPublisher
+from agent_service.application.task_control import TaskRunControl
 from agent_service.config import ServiceConfig, anthropic_auth_token
 from agent_service.models import AgentResult, EventType, TaskStatus
 from agent_service.runtime.event_mapper import (
@@ -58,15 +59,19 @@ class _FallbackHookMatcher(SimpleNamespace):
 class PikiWikiAgentRunner:
     def __init__(self):
         try:
-            from claude_agent_sdk import ClaudeAgentOptions, HookMatcher, query  # type: ignore
+            from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, HookMatcher, query  # type: ignore
         except Exception as exc:  # pragma: no cover - depends on optional package
             self._options_cls = _FallbackOptions
             self._hook_matcher_cls = _FallbackHookMatcher
+            self._client_cls = None
+            self._sdk_query_impl = None
             self._query_impl = None
             self.status = RunnerStatus(False, f"Claude Agent SDK unavailable: {exc}")
         else:
             self._options_cls = ClaudeAgentOptions
             self._hook_matcher_cls = HookMatcher
+            self._client_cls = ClaudeSDKClient
+            self._sdk_query_impl = query
             self._query_impl = query
             self.status = RunnerStatus(True, "Claude Agent SDK available")
 
@@ -89,7 +94,9 @@ class PikiWikiAgentRunner:
         context_contents: dict[str, str],
         vault: Vault,
         selected_paths: list[str] | None = None,
+        action_context: dict[str, Any] | None = None,
         resume_session_id: str | None = None,
+        run_control: TaskRunControl | None = None,
     ) -> AgentResult:
         if not self.can_run(config):
             raise RuntimeError("Claude Agent runtime is not configured.")
@@ -105,7 +112,9 @@ class PikiWikiAgentRunner:
                 context_contents=context_contents,
                 vault=vault,
                 selected_paths=selected_paths or [],
+                action_context=action_context or {},
                 resume_session_id=resume_session_id,
+                run_control=run_control,
             )
         )
 
@@ -147,16 +156,27 @@ class PikiWikiAgentRunner:
         context_contents: dict[str, str],
         vault: Vault,
         selected_paths: list[str],
+        action_context: dict[str, Any],
         resume_session_id: str | None,
+        run_control: TaskRunControl | None,
     ) -> AgentResult:
+        if run_control is not None and run_control.cancel_requested:
+            return AgentResult(status=TaskStatus.CANCELLED, summary="任务已停止。", answer="")
         staged_files = _stage_selected_paths(config.staging_root, task_id, selected_paths)
         prompt = self._build_prompt(
             base_instructions=self.build_instructions(context_contents=context_contents),
             agent_input=agent_input or user_input,
             staged_files=staged_files,
         )
-        tracker = JournalTracker(vault=vault, store=store, events=events, task_id=task_id)
+        tracker = JournalTracker(
+            vault=vault,
+            store=store,
+            events=events,
+            task_id=task_id,
+            action_context=action_context,
+        )
         hooks = self._build_hooks(config=config, events=events, tracker=tracker, staged_files=staged_files)
+        max_turns = _resolve_max_turns(config=config, action_context=action_context)
         options = self._options_cls(
             system_prompt=prompt,
             model=config.agent_model or None,
@@ -171,7 +191,7 @@ class PikiWikiAgentRunner:
             include_hook_events=False,
             hooks=hooks,
             env=self._runtime_env(config),
-            max_turns=12,
+            max_turns=max_turns,
             continue_conversation=bool(resume_session_id),
             resume=resume_session_id,
             enable_file_checkpointing=config.enable_file_checkpointing,
@@ -186,6 +206,7 @@ class PikiWikiAgentRunner:
                 "tool_names": ALLOWED_TOOL_NAMES,
                 "staged_file_count": len(staged_files),
                 "resume_session_id": resume_session_id,
+                "max_turns": max_turns,
             },
         )
         messages = []
@@ -234,44 +255,54 @@ class PikiWikiAgentRunner:
             resume_session_id=resume_session_id,
         )
         transcript_task = asyncio.create_task(transcript_mirror.run(transcript_stop))
+        run_task = asyncio.current_task()
+        if run_control is not None and run_task is not None:
+            run_control.bind_async_task(asyncio.get_running_loop(), run_task)
         try:
-            async for message in self._query_impl(prompt=user_input, options=options):
-                messages.append(message)
-                if not transcript_mirror.active:
-                    stop_reason = str(getattr(message, "stop_reason", "") or "")
-
-                    text_snapshot = extract_text_snapshot(message)
-                    text_delta = extract_text_delta(message)
-                    if stop_reason == "tool_use":
-                        if text_snapshot:
-                            emit_thinking_snapshot(text_snapshot)
-                        else:
-                            emit_thinking_delta(text_delta)
-                    elif text_snapshot:
-                        emit_text_snapshot(text_snapshot)
-                    else:
-                        emit_text_delta(text_delta)
-
-                    thinking_snapshot = extract_thinking_snapshot(message)
-                    if thinking_snapshot:
-                        emit_thinking_snapshot(thinking_snapshot)
-                    else:
-                        emit_thinking_delta(extract_thinking_delta(message))
-
-                    _emit_system_progress(events=events, task_id=task_id, message=message)
-                    for mapped in map_stream_event(message):
-                        if mapped.event_type == "tool.started":
-                            events.tool_started(task_id, mapped.payload.get("tool", ""), mapped.payload)
-                        else:
-                            events.trace_event(
-                                task_id,
-                                kind=mapped.payload.get("kind", "event"),
-                                title=mapped.payload.get("title", "Agent 事件"),
-                                summary=mapped.payload.get("summary", ""),
-                                tool=mapped.payload.get("tool"),
-                                category=mapped.payload.get("category"),
-                                status=mapped.payload.get("status"),
-                            )
+            if self._client_cls is not None and self._query_impl is self._sdk_query_impl:
+                client = self._client_cls(options=options)
+                await client.connect(user_input)
+                try:
+                    async for message in client.receive_messages():
+                        if run_control is not None and run_control.cancel_requested:
+                            await _stop_active_sdk_task(client=client, messages=messages)
+                            raise asyncio.CancelledError
+                        _consume_stream_message(
+                            events=events,
+                            messages=messages,
+                            message=message,
+                            task_id=task_id,
+                            transcript_mirror_active=transcript_mirror.active,
+                            emit_text_snapshot=emit_text_snapshot,
+                            emit_text_delta=emit_text_delta,
+                            emit_thinking_snapshot=emit_thinking_snapshot,
+                            emit_thinking_delta=emit_thinking_delta,
+                        )
+                        if _is_stopped_task_notification(message):
+                            if run_control is not None:
+                                run_control.request_cancel()
+                            raise asyncio.CancelledError
+                finally:
+                    await client.disconnect()
+            else:
+                async for message in self._query_impl(prompt=user_input, options=options):
+                    if run_control is not None and run_control.cancel_requested:
+                        raise asyncio.CancelledError
+                    _consume_stream_message(
+                        events=events,
+                        messages=messages,
+                        message=message,
+                        task_id=task_id,
+                        transcript_mirror_active=transcript_mirror.active,
+                        emit_text_snapshot=emit_text_snapshot,
+                        emit_text_delta=emit_text_delta,
+                        emit_thinking_snapshot=emit_thinking_snapshot,
+                        emit_thinking_delta=emit_thinking_delta,
+                    )
+        except asyncio.CancelledError:
+            transcript_stop.set()
+            await transcript_task
+            return AgentResult(status=TaskStatus.CANCELLED, summary="任务已停止。", answer=streamed_text.strip() or None)
         except Exception as exc:
             transcript_stop.set()
             await transcript_task
@@ -280,6 +311,8 @@ class PikiWikiAgentRunner:
         await transcript_task
 
         final_output, result_message, session_id = _collect_outputs(messages)
+        if run_control is not None and run_control.cancel_requested:
+            return AgentResult(status=TaskStatus.CANCELLED, summary="任务已停止。", answer=streamed_text.strip() or final_output or None)
         pending_input = _pending_input_payload(result_message)
         journal_entry = tracker.commit(
             conversation_id=conversation_id,
@@ -293,6 +326,9 @@ class PikiWikiAgentRunner:
         elif tracker.illegal_attempts:
             status = TaskStatus.FAILED
             summary = tracker.illegal_attempts[0]
+        elif tracker.is_lint_task and tracker.lint_result is None:
+            status = TaskStatus.FAILED
+            summary = "Lint helper did not return a structured lint result."
         elif getattr(result_message, "is_error", False):
             status = TaskStatus.FAILED
             summary = _result_error_text(result_message) or "Claude agent task failed."
@@ -312,6 +348,7 @@ class PikiWikiAgentRunner:
             status=status,
             summary=summary,
             answer=final_output if status == TaskStatus.COMPLETED else None,
+            lint_result=tracker.lint_result,
             affected_files=tracker.changed_files,
             journal_entry=journal_entry,
             session_id=session_id,
@@ -351,6 +388,16 @@ class PikiWikiAgentRunner:
         async def pre_tool_use(data, tool_output, context):
             tool_name = data["tool_name"]
             tool_input = data.get("tool_input", {})
+            if tracker.is_lint_task:
+                lint_decision = _lint_tool_permission_decision(
+                    tracker=tracker,
+                    tool_name=tool_name,
+                    tool_input=tool_input,
+                )
+                if lint_decision is not None:
+                    if lint_decision.get("permissionDecision") == "deny":
+                        tracker.note_illegal_attempt(str(lint_decision.get("permissionDecisionReason") or ""))
+                    return lint_decision
             if tool_name == "AskUserQuestion":
                 payload = _pending_input_from_tool_input(tool_input)
                 events.emit(tracker.task_id, EventType.AGENT_INPUT_REQUESTED, payload)
@@ -386,6 +433,11 @@ class PikiWikiAgentRunner:
             tool_name = data["tool_name"]
             tool_input = data.get("tool_input", {})
             tool_use_id = str(data.get("tool_use_id") or "")
+            if tracker.is_lint_task and tool_name == "Bash":
+                command = str(tool_input.get("command") or "")
+                lint_payload = _extract_lint_payload(command=command, tool_output=tool_output)
+                if lint_payload is not None:
+                    tracker.record_lint_helper(command=command, payload=lint_payload)
             if tool_name in {"Write", "Edit", "MultiEdit"}:
                 target = str(tool_input.get("file_path") or tool_input.get("path") or "")
                 tracker.after_write(target)
@@ -475,9 +527,99 @@ def _validate_write_path(path: str, vault_root: Path, protected_roots: set[Path]
     return True, ""
 
 
+def _resolve_max_turns(*, config: ServiceConfig, action_context: dict[str, Any]) -> int:
+    action = str(action_context.get("action") or "").strip()
+    if action in {"run_lint", "ingest_file"}:
+        return max(1, config.agent_max_turns)
+    if config.agent_max_turns_configured:
+        return max(1, config.agent_max_turns)
+    return 12
+
+
 def _bash_writes_files(command: str) -> bool:
     normalized = f" {command.strip()} "
     return any(token in normalized for token in WRITE_BLOCKLIST_TOKENS)
+
+
+def _lint_tool_permission_decision(*, tracker: JournalTracker, tool_name: str, tool_input: dict[str, Any]) -> dict[str, str] | None:
+    if tool_name == "AskUserQuestion":
+        return None
+    if not tracker.lint_helper_completed:
+        if tool_name == "Bash" and _is_lint_helper_command(str(tool_input.get("command") or "")):
+            return None
+        return {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "run_lint must start by calling the lint helper and using its structured result.",
+        }
+
+    if tool_name == "Bash":
+        return {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "run_lint already has a helper result; continue with targeted Read/Write/Edit only.",
+        }
+    if tool_name in {"Glob", "Grep"}:
+        return {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "run_lint may not do broad Glob/Grep after the helper result is available.",
+        }
+    if tool_name in {"Read", "Write", "Edit", "MultiEdit"}:
+        target = str(tool_input.get("file_path") or tool_input.get("path") or "")
+        if target and tracker.lint_allows_path(target):
+            return None
+        return {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "run_lint may only touch pages directly implicated by the lint result plus wiki/index.md and wiki/log.md.",
+        }
+    return None
+
+
+def _is_lint_helper_command(command: str) -> bool:
+    normalized = " ".join(command.strip().split())
+    return normalized.startswith("python -m agent_service.runtime.cli lint --vault .")
+
+
+def _extract_lint_payload(*, command: str, tool_output: Any) -> dict[str, Any] | None:
+    if not _is_lint_helper_command(command):
+        return None
+    payload_text = _tool_output_text(tool_output)
+    if not payload_text:
+        return None
+    return _parse_json_payload(payload_text)
+
+
+def _tool_output_text(tool_output: Any) -> str:
+    if isinstance(tool_output, dict):
+        stdout = str(tool_output.get("stdout") or "").strip()
+        if stdout:
+            return stdout
+        content = tool_output.get("content")
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+    if isinstance(tool_output, str):
+        return tool_output.strip()
+    return ""
+
+
+def _parse_json_payload(payload_text: str) -> dict[str, Any] | None:
+    candidates = [payload_text.strip()]
+    start = payload_text.find("{")
+    end = payload_text.rfind("}")
+    if start != -1 and end != -1 and start < end:
+        candidates.append(payload_text[start:end + 1].strip())
+    for candidate in candidates:
+        if not candidate:
+            continue
+        try:
+            payload = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict) and "issues" in payload and "generated_at" in payload:
+            return payload
+    return None
 
 
 def _tool_title(tool_name: str) -> str:
@@ -545,6 +687,57 @@ def _pending_input_payload(result_message) -> dict[str, Any] | None:
     payload = _pending_input_from_tool_input(tool_input)
     payload["tool_use_id"] = getattr(deferred, "id", None)
     return payload
+
+
+def _consume_stream_message(
+    *,
+    events: EventPublisher,
+    messages: list[Any],
+    message: Any,
+    task_id: str,
+    transcript_mirror_active: bool,
+    emit_text_snapshot,
+    emit_text_delta,
+    emit_thinking_snapshot,
+    emit_thinking_delta,
+) -> None:
+    messages.append(message)
+    if transcript_mirror_active:
+        return
+    stop_reason = str(getattr(message, "stop_reason", "") or "")
+
+    text_snapshot = extract_text_snapshot(message)
+    text_delta = extract_text_delta(message)
+    if stop_reason == "tool_use":
+        if text_snapshot:
+            emit_thinking_snapshot(text_snapshot)
+        else:
+            emit_thinking_delta(text_delta)
+    elif text_snapshot:
+        emit_text_snapshot(text_snapshot)
+    else:
+        emit_text_delta(text_delta)
+
+    thinking_snapshot = extract_thinking_snapshot(message)
+    if thinking_snapshot:
+        emit_thinking_snapshot(thinking_snapshot)
+    else:
+        emit_thinking_delta(extract_thinking_delta(message))
+
+    _emit_system_progress(events=events, task_id=task_id, message=message)
+    for mapped in map_stream_event(message):
+        if mapped.event_type == "tool.started":
+            events.tool_started(task_id, mapped.payload.get("tool", ""), mapped.payload)
+        else:
+            events.trace_event(
+                task_id,
+                kind=mapped.payload.get("kind", "event"),
+                title=mapped.payload.get("title", "Agent 事件"),
+                summary=mapped.payload.get("summary", ""),
+                tool=mapped.payload.get("tool"),
+                category=mapped.payload.get("category"),
+                status=mapped.payload.get("status"),
+            )
 
 
 def _collect_outputs(messages: list[Any]) -> tuple[str, Any | None, str | None]:
@@ -623,3 +816,24 @@ def _result_error_text(result_message) -> str:
         return str(errors[0])
     result = getattr(result_message, "result", None)
     return str(result or "")
+
+
+def _is_stopped_task_notification(message: Any) -> bool:
+    return message.__class__.__name__ == "TaskNotificationMessage" and str(getattr(message, "status", "") or "") == "stopped"
+
+
+async def _stop_active_sdk_task(*, client, messages: list[Any]) -> None:
+    task_id = _latest_sdk_task_id(messages)
+    if task_id:
+        await client.stop_task(task_id)
+    else:
+        await client.interrupt()
+
+
+def _latest_sdk_task_id(messages: list[Any]) -> str | None:
+    for message in reversed(messages):
+        if getattr(message, "__class__", None).__name__ in {"TaskStartedMessage", "TaskProgressMessage", "TaskNotificationMessage"}:
+            task_id = getattr(message, "task_id", None)
+            if isinstance(task_id, str) and task_id:
+                return task_id
+    return None

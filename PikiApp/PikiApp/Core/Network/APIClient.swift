@@ -58,6 +58,16 @@ final class APIClient {
         return try JSONDecoder().decode(TaskRecordDTO.self, from: data)
     }
 
+    func cancelTask(taskId: String) async throws -> TaskRecordDTO {
+        let url = baseURL.appending(path: "tasks/\(taskId)/cancel")
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(TaskRecordDTO.self, from: data)
+    }
+
     func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse {
         let url = baseURL.appending(path: "uploads")
         let boundary = "Boundary-\(UUID().uuidString)"

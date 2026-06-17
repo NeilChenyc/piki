@@ -10,6 +10,7 @@ final class HomeViewModel {
     var recentActivity: [ActivityEntry] = []
     var inputText: String = ""
     var isSending = false
+    var isStopping = false
     var statusText: String?
     var pendingInputTaskId: String?
     var pendingInputPrompt: String?
@@ -17,6 +18,9 @@ final class HomeViewModel {
     var debugLastEventType: String?
     var debugRecentEvents: [String] = []
     private var conversationId = UUID().uuidString
+    private var activeTaskId: String?
+    private var activeAssistantMessageId: String?
+    private var currentRunTask: Task<Void, Never>?
 
     var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -28,6 +32,7 @@ final class HomeViewModel {
     }
 
     func sendMessage(_ text: String, appState: AppState, selectedFiles: [URL] = []) {
+        guard !isSending else { return }
         guard appState.isConnected else {
             appendSystemMessage(appState.serviceErrorMessage ?? "Agent Service is disconnected.")
             return
@@ -69,9 +74,10 @@ final class HomeViewModel {
             )
         )
         isSending = true
+        isStopping = false
         statusText = "Creating task..."
-
-        Task {
+        activeAssistantMessageId = assistantMessageId
+        currentRunTask = Task {
             await runTask(
                 text,
                 selectedFiles: selectedFiles,
@@ -79,6 +85,36 @@ final class HomeViewModel {
                 appState: appState,
                 assistantMessageId: assistantMessageId
             )
+        }
+    }
+
+    func stopCurrentTask(appState: AppState) {
+        guard !isStopping else { return }
+        guard currentRunTask != nil || activeAssistantMessageId != nil else { return }
+        isStopping = true
+        statusText = "正在停止当前任务"
+
+        guard let taskId = activeTaskId else {
+            logger.log("Stopping local-only run before task id is available.")
+            finalizeStoppedRun(summary: "本轮任务已停止。")
+            return
+        }
+
+        Task {
+            do {
+                let task = try await appState.apiClient.cancelTask(taskId: taskId)
+                logger.log("Task cancellation acknowledged by backend for \(taskId, privacy: .public).")
+                finalizeStoppedRun(summary: task.summary ?? "本轮任务已停止。")
+            } catch {
+                logger.error("Task cancellation failed for \(taskId, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                if shouldFallbackToLocalStop(after: error) {
+                    finalizeStoppedRun(summary: "本轮任务已停止。")
+                    return
+                }
+                isStopping = false
+                statusText = "停止失败：\(error.localizedDescription)"
+                appendSystemMessage("停止当前任务失败：\(error.localizedDescription)")
+            }
         }
     }
 
@@ -119,16 +155,19 @@ final class HomeViewModel {
                 )
                 response = try await appState.apiClient.createTask(request)
             }
+            activeTaskId = response.taskId
             statusText = "正在理解请求"
 
             var finalEventContent: String?
             for try await event in appState.apiClient.taskEvents(taskId: response.taskId) {
+                try Task.checkCancellation()
                 recordDebugEvent(event)
                 if let content = handle(event, assistantMessageId: assistantMessageId) {
                     finalEventContent = content
                 }
             }
 
+            try Task.checkCancellation()
             let task = try await appState.apiClient.getTask(taskId: response.taskId)
             let content = preferredFinalContent(
                 id: assistantMessageId,
@@ -138,18 +177,28 @@ final class HomeViewModel {
                     ?? finalEventContent
                     ?? "Task finished without a final message."
             )
-            if task.status == "input_required" {
+            if task.status == "cancelled" {
+                stopMessage(id: assistantMessageId, content: content)
+            } else if task.status == "input_required" {
                 setAwaitingInput(id: assistantMessageId, content: content)
             } else {
                 finishMessage(id: assistantMessageId, content: content)
             }
             await loadRecentJournal(appState: appState)
             statusText = nil
+        } catch is CancellationError {
+            statusText = nil
         } catch {
             failMessage(id: assistantMessageId, content: "Task failed: \(error.localizedDescription)")
             statusText = nil
         }
+        if activeTaskId == nil || activeTaskId == pendingInputTaskId {
+            activeAssistantMessageId = nil
+        }
+        activeTaskId = nil
+        currentRunTask = nil
         isSending = false
+        isStopping = false
     }
 
     func loadRecentJournal(appState: AppState) async {
@@ -308,6 +357,21 @@ final class HomeViewModel {
             markRunFinished(id: assistantMessageId, status: "completed")
             finishMessage(id: assistantMessageId, content: content)
             return content
+        case "task.cancelled":
+            pendingInputTaskId = nil
+            pendingInputPrompt = nil
+            statusText = "已停止"
+            markRunFinished(id: assistantMessageId, status: "cancelled")
+            stopMessage(
+                id: assistantMessageId,
+                content: preferredFinalContent(
+                    id: assistantMessageId,
+                    fallback: event.payload.summary
+                        ?? event.payload.content
+                        ?? "本轮任务已停止。"
+                )
+            )
+            return event.payload.summary ?? event.payload.content
         case "task.failed":
             pendingInputTaskId = nil
             pendingInputPrompt = nil
@@ -640,6 +704,23 @@ final class HomeViewModel {
         }
     }
 
+    private func stopMessage(id: String, content: String) {
+        mutateMessage(id: id) { message in
+            let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                message.content = trimmed
+            } else if !message.liveContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                message.content = message.liveContent.trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                message.content = "本轮任务已停止。"
+            }
+            message.liveContent = ""
+            message.isRunning = false
+            message.isTraceExpanded = true
+            message.runStatus = "cancelled"
+        }
+    }
+
     private func setAwaitingInput(id: String, content: String) {
         mutateMessage(id: id) { message in
             message.content = content
@@ -655,7 +736,11 @@ final class HomeViewModel {
             message.runStatus = status
             for index in message.traceItems.indices {
                 if message.traceItems[index].status == "running" {
-                    message.traceItems[index].status = status == "failed" ? "failed" : "completed"
+                    message.traceItems[index].status = switch status {
+                    case "failed": "failed"
+                    case "cancelled": "cancelled"
+                    default: "completed"
+                    }
                 }
             }
         }
@@ -717,6 +802,46 @@ final class HomeViewModel {
             return "Attached: \(names)"
         }
         return "\(trimmed)\n\nAttached: \(names)"
+    }
+
+    private func stoppedContent(for id: String, summary: String?) -> String {
+        let preferred = preferredFinalContent(id: id, fallback: summary ?? "")
+        let trimmed = preferred.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "本轮任务已停止。" : trimmed
+    }
+
+    private func finalizeStoppedRun(summary: String) {
+        currentRunTask?.cancel()
+        currentRunTask = nil
+        pendingInputTaskId = nil
+        pendingInputPrompt = nil
+        activeTaskId = nil
+        isSending = false
+        isStopping = false
+        if let assistantMessageId = activeAssistantMessageId {
+            stopMessage(
+                id: assistantMessageId,
+                content: stoppedContent(for: assistantMessageId, summary: summary)
+            )
+        }
+        activeAssistantMessageId = nil
+        statusText = "已停止当前任务"
+    }
+
+    private func shouldFallbackToLocalStop(after error: Error) -> Bool {
+        if let apiError = error as? APIError {
+            switch apiError {
+            case .connectionFailed, .invalidResponse, .serverError:
+                return true
+            case .serverMessage(let message):
+                let normalized = message.lowercased()
+                return normalized.contains("not found")
+                    || normalized.contains("404")
+                    || normalized.contains("task not found")
+                    || normalized.contains("cannot be cancelled")
+            }
+        }
+        return true
     }
 }
 

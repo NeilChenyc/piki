@@ -32,6 +32,7 @@ class EventStreamService:
             if task.status in {
                 TaskStatus.COMPLETED,
                 TaskStatus.FAILED,
+                TaskStatus.CANCELLED,
                 TaskStatus.NEEDS_APPROVAL,
                 TaskStatus.INPUT_REQUIRED,
             }:

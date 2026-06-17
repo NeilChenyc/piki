@@ -86,6 +86,41 @@ def test_claude_agent_task_uses_provider_neutral_events(tmp_path: Path, monkeypa
     assert "event: agent.run.completed" in events
 
 
+def test_default_query_max_turns_is_12(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    async def fake_query(*, prompt, options):
+        assert options.max_turns == 12
+        yield SimpleNamespace(content=[SimpleNamespace(text="hello")], session_id="sess_turns_default")
+        yield _result_message(session_id="sess_turns_default", result="hello")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+
+
+def test_explicit_agent_max_turns_overrides_default_query_limit(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+    monkeypatch.setenv("PIKI_AGENT_MAX_TURNS", "45")
+
+    async def fake_query(*, prompt, options):
+        assert options.max_turns == 45
+        yield SimpleNamespace(content=[SimpleNamespace(text="hello")], session_id="sess_turns_override")
+        yield _result_message(session_id="sess_turns_override", result="hello")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+
+
 def test_claude_hooks_record_write_and_create_single_journal(tmp_path: Path, monkeypatch):
     vault_path = make_runtime_vault(tmp_path)
 
@@ -115,6 +150,189 @@ def test_claude_hooks_record_write_and_create_single_journal(tmp_path: Path, mon
     assert "event: tool.finished" in events
     assert "event: file.changed" in events
     assert "event: journal.created" in events
+
+
+def test_run_lint_requires_helper_first_and_returns_lint_result(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    lint_payload = {
+        "generated_at": "2026-06-06T00:00:00+00:00",
+        "scanned_files": 2,
+        "issues": [
+            {
+                "id": "lint_1",
+                "kind": "missing_index_entry",
+                "severity": "warning",
+                "path": "wiki/index.md",
+                "message": "index entry missing",
+                "details": {"link_path": "concepts/example", "title": "Example"},
+                "fixable": True,
+            }
+        ],
+        "issue_counts": {"missing_index_entry": 1},
+        "fixable_issue_ids": ["lint_1"],
+    }
+
+    async def fake_query(*, prompt, options):
+        assert options.max_turns == 30
+        pre_hooks = [hook for matcher in options.hooks["PreToolUse"] for hook in matcher.hooks]
+        post_hooks = [hook for matcher in options.hooks["PostToolUse"] for hook in matcher.hooks]
+
+        helper_command = "python -m agent_service.runtime.cli lint --vault . 2>&1"
+        allowed_helper = await pre_hooks[0](
+            {"tool_name": "Bash", "tool_input": {"command": helper_command}},
+            None,
+            None,
+        )
+        assert allowed_helper == {}
+
+        await post_hooks[0](
+            {
+                "tool_name": "Bash",
+                "tool_input": {"command": helper_command},
+                "tool_use_id": "tooluse_lint_helper",
+            },
+            {"stdout": json.dumps(lint_payload, ensure_ascii=False)},
+            None,
+        )
+
+        allowed_read = await pre_hooks[0](
+            {"tool_name": "Read", "tool_input": {"file_path": str(vault_path / "wiki/index.md")}},
+            None,
+            None,
+        )
+        assert allowed_read == {}
+
+        write_input = {"file_path": str(vault_path / "wiki/index.md")}
+        allowed_write = await pre_hooks[0]({"tool_name": "Write", "tool_input": write_input}, None, None)
+        assert allowed_write == {}
+        (vault_path / "wiki/index.md").write_text("# 索引\n\n- [[concepts/example]]\n", encoding="utf-8")
+        await post_hooks[0](
+            {"tool_name": "Write", "tool_input": write_input, "tool_use_id": "tooluse_write_index"},
+            {"stdout": ""},
+            None,
+        )
+
+        yield SimpleNamespace(content=[SimpleNamespace(text="已检查并修复 1 个问题。")], session_id="sess_lint")
+        yield _result_message(session_id="sess_lint", result="已检查并修复 1 个问题。")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "Run vault lint.",
+            "action_context": {"action": "run_lint"},
+        },
+    )
+
+    assert response.status_code == 200
+    task_id = response.json()["task_id"]
+    task = client.get(f"/tasks/{task_id}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["lint_result"]["issue_counts"] == {"missing_index_entry": 1}
+    assert "wiki/index.md" in task["output"]["affected_files"]
+    events = client.get(f"/tasks/{task_id}/events").text
+    assert '"max_turns": 30' in events
+
+
+def test_run_lint_denies_reads_before_helper(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    async def fake_query(*, prompt, options):
+        pre_hooks = [hook for matcher in options.hooks["PreToolUse"] for hook in matcher.hooks]
+        denied_before_helper = await pre_hooks[0](
+            {"tool_name": "Read", "tool_input": {"file_path": str(vault_path / "wiki/index.md")}},
+            None,
+            None,
+        )
+        assert denied_before_helper["permissionDecision"] == "deny"
+        yield SimpleNamespace(content=[SimpleNamespace(text="不应该成功")], session_id="sess_lint_read_deny")
+        yield _result_message(session_id="sess_lint_read_deny", result="不应该成功")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "Run vault lint.",
+            "action_context": {"action": "run_lint"},
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "failed"
+    assert "run_lint must start by calling the lint helper" in task["summary"]
+
+
+def test_run_lint_denies_broad_search_and_unrelated_writes_after_helper(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    lint_payload = {
+        "generated_at": "2026-06-06T00:00:00+00:00",
+        "scanned_files": 1,
+        "issues": [
+            {
+                "id": "lint_2",
+                "kind": "missing_index_entry",
+                "severity": "warning",
+                "path": "wiki/index.md",
+                "message": "index entry missing",
+                "details": {"link_path": "concepts/example", "title": "Example"},
+                "fixable": True,
+            }
+        ],
+        "issue_counts": {"missing_index_entry": 1},
+        "fixable_issue_ids": ["lint_2"],
+    }
+
+    async def fake_query(*, prompt, options):
+        pre_hooks = [hook for matcher in options.hooks["PreToolUse"] for hook in matcher.hooks]
+        post_hooks = [hook for matcher in options.hooks["PostToolUse"] for hook in matcher.hooks]
+
+        helper_command = "python -m agent_service.runtime.cli lint --vault ."
+        await pre_hooks[0]({"tool_name": "Bash", "tool_input": {"command": helper_command}}, None, None)
+        await post_hooks[0](
+            {"tool_name": "Bash", "tool_input": {"command": helper_command}, "tool_use_id": "tooluse_lint_helper"},
+            {"stdout": json.dumps(lint_payload, ensure_ascii=False)},
+            None,
+        )
+
+        denied_glob = await pre_hooks[0](
+            {"tool_name": "Glob", "tool_input": {"path": "wiki"}},
+            None,
+            None,
+        )
+        assert denied_glob["permissionDecision"] == "deny"
+
+        denied_unrelated_write = await pre_hooks[0](
+            {"tool_name": "Write", "tool_input": {"file_path": str(vault_path / "wiki/entities/other.md")}},
+            None,
+            None,
+        )
+        assert denied_unrelated_write["permissionDecision"] == "deny"
+
+        yield SimpleNamespace(content=[SimpleNamespace(text="不应该成功")], session_id="sess_lint_deny")
+        yield _result_message(session_id="sess_lint_deny", result="不应该成功")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "Run vault lint.",
+            "action_context": {"action": "run_lint"},
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "failed"
+    assert "run_lint may not do broad Glob/Grep" in task["summary"] or "run_lint may only touch pages" in task["summary"]
 
 
 def test_claude_blocks_writes_to_agents_md(tmp_path: Path, monkeypatch):

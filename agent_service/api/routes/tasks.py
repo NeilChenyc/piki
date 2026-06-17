@@ -64,6 +64,15 @@ def register_task_routes(
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.post("/tasks/{task_id}/cancel")
+    def cancel_task(task_id: str):
+        try:
+            return task_service.cancel_task(task_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/tasks/{task_id}/events")
     def task_events(task_id: str):
         try:

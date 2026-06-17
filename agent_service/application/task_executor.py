@@ -5,6 +5,7 @@ import hashlib
 from pathlib import Path
 
 from agent_service.application.events import EventPublisher
+from agent_service.application.task_control import TaskRunControl
 from agent_service.application.task_router import TaskPlan
 from agent_service.config import ServiceConfig
 from agent_service.context import assemble_agent_task_input, assemble_baseline_context
@@ -28,7 +29,7 @@ class TaskExecutor:
         self.events = events
         self.runner = runner
 
-    def execute(self, *, task_id: str, request: TaskCreateRequest, plan: TaskPlan):
+    def execute(self, *, task_id: str, request: TaskCreateRequest, plan: TaskPlan, run_control: TaskRunControl | None = None):
         vault = Vault(request.vault_path)
         try:
             vault.validate()
@@ -52,6 +53,7 @@ class TaskExecutor:
             request=request,
             vault=vault,
             context_contents=context_contents,
+            run_control=run_control,
         )
 
     def _execute_agent(
@@ -61,6 +63,7 @@ class TaskExecutor:
         request: TaskCreateRequest,
         vault: Vault,
         context_contents: dict[str, str],
+        run_control: TaskRunControl | None,
     ):
         conversation_id = request.conversation_id or task_id
         conversation_messages = self.store.get_conversation_messages(conversation_id, limit=10)
@@ -87,11 +90,43 @@ class TaskExecutor:
                 context_contents=context_contents,
                 vault=vault,
                 selected_paths=request.selected_paths,
+                action_context=task_input.action_context,
                 resume_session_id=_last_agent_session_id(conversation_messages),
+                run_control=run_control,
             )
         except Exception as exc:
             self.events.task_failed(task_id, str(exc))
             self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
+            return
+
+        if _should_keep_task_cancelled(store=self.store, task_id=task_id, run_control=run_control):
+            output = agent_result.model_dump(mode="json")
+            output["action_context"] = task_input.action_context
+            output["selected_paths"] = task_input.selected_paths
+            output["conversation_id"] = conversation_id
+            self.store.update_task(
+                task_id,
+                status=TaskStatus.CANCELLED,
+                summary="任务已停止。",
+                affected_files=agent_result.affected_files,
+                output=output,
+            )
+            self.events.task_cancelled(task_id, "任务已停止。", answer=agent_result.answer or "")
+            return
+
+        if agent_result.status == TaskStatus.CANCELLED:
+            output = agent_result.model_dump(mode="json")
+            output["action_context"] = task_input.action_context
+            output["selected_paths"] = task_input.selected_paths
+            output["conversation_id"] = conversation_id
+            self.store.update_task(
+                task_id,
+                status=TaskStatus.CANCELLED,
+                summary=agent_result.summary,
+                affected_files=agent_result.affected_files,
+                output=output,
+            )
+            self.events.task_cancelled(task_id, agent_result.summary, answer=agent_result.answer or "")
             return
 
         if agent_result.affected_files:
@@ -183,7 +218,7 @@ class TaskExecutor:
         self.events.task_completed(task_id, summary=summary, answer=summary, journal_entry_id=journal_entry.id)
         self.events.progress(task_id, "completed", "已完成")
 
-    def resume_input(self, *, task_id: str, message: str):
+    def resume_input(self, *, task_id: str, message: str, run_control: TaskRunControl | None = None):
         task = self.store.get_task(task_id)
         if task.status != TaskStatus.INPUT_REQUIRED:
             raise ValueError(f"Task is not waiting for input: {task.status}")
@@ -221,7 +256,9 @@ class TaskExecutor:
             context_contents=context_contents,
             vault=vault,
             selected_paths=request.selected_paths,
+            action_context=task_input.action_context,
             resume_session_id=session_id,
+            run_control=run_control,
         )
         merged_output = {
             **output,
@@ -230,6 +267,16 @@ class TaskExecutor:
             "selected_paths": task_input.selected_paths,
             "conversation_id": conversation_id,
         }
+        if _should_keep_task_cancelled(store=self.store, task_id=task_id, run_control=run_control):
+            self.store.update_task(
+                task_id,
+                status=TaskStatus.CANCELLED,
+                summary="任务已停止。",
+                affected_files=agent_result.affected_files,
+                output=merged_output,
+            )
+            self.events.task_cancelled(task_id, "任务已停止。", answer=agent_result.answer or "")
+            return
         self.store.update_task(
             task_id,
             status=agent_result.status,
@@ -237,6 +284,9 @@ class TaskExecutor:
             affected_files=agent_result.affected_files,
             output=merged_output,
         )
+        if agent_result.status == TaskStatus.CANCELLED:
+            self.events.task_cancelled(task_id, agent_result.summary, answer=agent_result.answer or "")
+            return
         if agent_result.status == TaskStatus.FAILED:
             self.events.task_failed(task_id, agent_result.summary)
             return
@@ -316,3 +366,12 @@ def _last_agent_session_id(messages: list[dict]) -> str | None:
         if isinstance(session_id, str) and session_id:
             return session_id
     return None
+
+
+def _should_keep_task_cancelled(*, store: SQLiteStore, task_id: str, run_control: TaskRunControl | None) -> bool:
+    if run_control is not None and run_control.cancel_requested:
+        return True
+    try:
+        return store.get_task(task_id).status == TaskStatus.CANCELLED
+    except KeyError:
+        return False

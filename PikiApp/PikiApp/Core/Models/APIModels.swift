@@ -87,6 +87,12 @@ struct TaskRecordDTO: Codable {
     }
 }
 
+struct TaskCancelResponse: Codable {
+    let id: String
+    let status: String
+    let summary: String?
+}
+
 struct TaskInputRequest: Codable {
     let message: String
 }
@@ -123,6 +129,7 @@ struct TaskEventPayload: Codable {
     let summary: String?
     let answer: String?
     let error: String?
+    let reason: String?
     let prompt: String?
     let content: String?
     let status: String?
@@ -147,6 +154,7 @@ struct TaskEventPayload: Codable {
         summary: String? = nil,
         answer: String? = nil,
         error: String? = nil,
+        reason: String? = nil,
         prompt: String? = nil,
         content: String? = nil,
         status: String? = nil,
@@ -170,6 +178,7 @@ struct TaskEventPayload: Codable {
         self.summary = summary
         self.answer = answer
         self.error = error
+        self.reason = reason
         self.prompt = prompt
         self.content = content
         self.status = status
@@ -195,6 +204,7 @@ struct TaskEventPayload: Codable {
         case summary
         case answer
         case error
+        case reason
         case prompt
         case content
         case status

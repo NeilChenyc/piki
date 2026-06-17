@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from agent_service.application.events import EventPublisher
 from agent_service.journal import ChangeJournalService
@@ -16,10 +17,14 @@ class JournalTracker:
     store: SQLiteStore
     events: EventPublisher
     task_id: str
+    action_context: dict[str, Any] = field(default_factory=dict)
     protected_paths: set[Path] = field(default_factory=set)
     _snapshots: dict[str, FileSnapshot] = field(default_factory=dict)
     _changed_files: list[str] = field(default_factory=list)
     illegal_attempts: list[str] = field(default_factory=list)
+    lint_result: dict[str, Any] | None = None
+    lint_allowed_paths: set[str] = field(default_factory=set)
+    lint_helper_command: str | None = None
 
     def __post_init__(self):
         self.journal = ChangeJournalService(store=self.store, events=self.events)
@@ -28,9 +33,35 @@ class JournalTracker:
     def changed_files(self) -> list[str]:
         return list(self._changed_files)
 
+    @property
+    def action(self) -> str:
+        return str(self.action_context.get("action") or "").strip()
+
+    @property
+    def is_lint_task(self) -> bool:
+        return self.action == "run_lint"
+
+    @property
+    def lint_helper_completed(self) -> bool:
+        return self.lint_result is not None
+
     def note_illegal_attempt(self, reason: str):
         if reason not in self.illegal_attempts:
             self.illegal_attempts.append(reason)
+
+    def record_lint_helper(self, *, command: str, payload: dict[str, Any]):
+        self.lint_helper_command = command
+        self.lint_result = payload
+        self.lint_allowed_paths = _lint_allowed_paths(payload)
+
+    def lint_allows_path(self, path: str) -> bool:
+        if not self.is_lint_task or not self.lint_helper_completed:
+            return True
+        try:
+            relative, _ = self._resolve_relative(path)
+        except ValueError:
+            return False
+        return relative in self.lint_allowed_paths
 
     def before_write(self, path: str) -> tuple[str, FileSnapshot]:
         relative, file_path = self._resolve_relative(path)
@@ -83,3 +114,26 @@ def _content_hash(content: str | None) -> str | None:
     import hashlib
 
     return "sha256:" + hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
+def _lint_allowed_paths(payload: dict[str, Any]) -> set[str]:
+    allowed = {"wiki/index.md", "wiki/log.md"}
+    issues = payload.get("issues") or []
+    for issue in issues:
+        if not isinstance(issue, dict):
+            continue
+        path = str(issue.get("path") or "").strip()
+        if path:
+            allowed.add(path)
+        details = issue.get("details") or {}
+        if not isinstance(details, dict):
+            continue
+        extra_paths = details.get("paths")
+        if isinstance(extra_paths, list):
+            for extra_path in extra_paths:
+                if extra_path:
+                    allowed.add(str(extra_path))
+        link_path = str(details.get("link_path") or "").strip()
+        if link_path:
+            allowed.add(f"wiki/{link_path}.md")
+    return allowed

@@ -46,6 +46,12 @@ class ServiceConfig(BaseModel):
     agent_stream_idle_timeout_seconds: int = Field(
         default_factory=lambda: int(os.environ.get("PIKI_AGENT_STREAM_IDLE_TIMEOUT_SECONDS", "20"))
     )
+    agent_max_turns: int = Field(
+        default_factory=lambda: int(os.environ.get("PIKI_AGENT_MAX_TURNS", "30"))
+    )
+    agent_max_turns_configured: bool = Field(
+        default_factory=lambda: "PIKI_AGENT_MAX_TURNS" in os.environ
+    )
     claude_config_dir: Path = Field(
         default_factory=lambda: Path(os.environ.get("CLAUDE_CONFIG_DIR", ".piki/claude-runtime")).expanduser()
     )

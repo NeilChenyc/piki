@@ -83,8 +83,13 @@ struct HomeView: View {
                 ChatInputView(
                     placeholder: inputPlaceholder,
                     isDisabled: isInputDisabled,
+                    showsStopButton: viewModel.isSending,
+                    isStopping: viewModel.isStopping,
                     onSend: { text, files in
                         viewModel.sendMessage(text, appState: appState, selectedFiles: files)
+                    },
+                    onStop: {
+                        viewModel.stopCurrentTask(appState: appState)
                     }
                 )
                     .padding(16)
@@ -110,12 +115,13 @@ struct HomeView: View {
     }
 
     private var isInputDisabled: Bool {
-        viewModel.isSending
+        false
     }
 
     private var inputPlaceholder: String {
         if !appState.isConnected { return "Connect to Agent Service before chatting" }
         if appState.vaultPath == nil { return "Select a vault before chatting" }
+        if viewModel.isStopping { return "Stopping current run..." }
         if viewModel.isSending { return "Piki is working..." }
         if viewModel.pendingInputTaskId != nil { return "Reply to continue the current Claude task..." }
         return "Ask anything about your knowledge base..."

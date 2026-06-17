@@ -89,6 +89,9 @@ class EventPublisher:
     def task_failed(self, task_id: str, error: str, **extra: Any) -> TaskEvent:
         return self.emit(task_id, EventType.TASK_FAILED, {"error": error, **extra})
 
+    def task_cancelled(self, task_id: str, reason: str, **extra: Any) -> TaskEvent:
+        return self.emit(task_id, EventType.TASK_CANCELLED, {"reason": reason, "summary": reason, **extra})
+
     def tool_started(self, task_id: str, tool: str, payload: dict[str, Any]) -> TaskEvent:
         meta = _tool_display_meta(tool)
         return self.emit(task_id, EventType.TOOL_STARTED, {"tool": tool, **meta, **payload})

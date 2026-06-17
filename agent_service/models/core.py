@@ -35,6 +35,7 @@ class TaskStatus(StrEnum):
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
+    CANCELLED = "cancelled"
     NEEDS_APPROVAL = "needs_approval"
     INPUT_REQUIRED = "input_required"
 
@@ -87,6 +88,7 @@ class EventType(StrEnum):
     APPROVAL_RESOLVED = "approval.resolved"
     TASK_COMPLETED = "task.completed"
     TASK_FAILED = "task.failed"
+    TASK_CANCELLED = "task.cancelled"
 
 
 class TaskCreateRequest(BaseModel):
@@ -462,6 +464,7 @@ class AgentResult(BaseModel):
     status: TaskStatus
     summary: str
     answer: str | None = None
+    lint_result: LintResult | None = None
     citations: list[dict[str, Any]] = Field(default_factory=list)
     affected_files: list[str] = Field(default_factory=list)
     journal_entry: JournalEntry | None = None

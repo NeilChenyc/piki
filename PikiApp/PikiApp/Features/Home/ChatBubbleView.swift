@@ -148,6 +148,7 @@ struct ChatBubbleView: View {
     private var runStatusTitle: String {
         switch message.runStatus {
         case "failed": "失败"
+        case "cancelled": "已停止"
         case "input_required": "等待输入"
         case "completed": "已完成"
         default: message.isRunning ? "运行中" : "已准备"
@@ -157,6 +158,7 @@ struct ChatBubbleView: View {
     private var runStatusColor: Color {
         switch message.runStatus {
         case "failed": Theme.error
+        case "cancelled": Theme.warning
         case "input_required": Theme.warning
         case "completed": Theme.primary
         default: Theme.textSecondary
@@ -183,6 +185,7 @@ struct ChatBubbleView: View {
     private func color(for item: ChatTraceItem) -> Color {
         switch item.status {
         case "failed": return Theme.error
+        case "cancelled": return Theme.warning
         case "completed": return Theme.primary
         default: return Theme.textSecondary
         }
