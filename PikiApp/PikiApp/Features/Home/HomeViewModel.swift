@@ -605,6 +605,10 @@ final class HomeViewModel {
 
         guard !raw.isEmpty else { return "" }
 
+        if raw.contains("system/source_manifest.json") {
+            return "内部来源索引（source_manifest）"
+        }
+
         let prefixes = ["Read：", "Read:", "Write：", "Write:", "Edit：", "Edit:", "Glob：", "Glob:", "Grep：", "Grep:"]
         let cleaned = prefixes.reduce(raw) { partial, prefix in
             partial.hasPrefix(prefix) ? String(partial.dropFirst(prefix.count)).trimmingCharacters(in: .whitespacesAndNewlines) : partial
@@ -918,12 +922,20 @@ struct ActivityEntry: Identifiable {
         canRollback = journalEntry.eligibleForRollback
         timestamp = Date.fromISO8601(journalEntry.createdAt) ?? Date()
         type = journalEntry.status == "rolled_back" ? .rollback : .ingest
+        let visibleFiles = journalEntry.affectedFiles.filter { !$0.hasPrefix("system/") }
         if journalEntry.affectedFiles.isEmpty {
             description = "Vault change"
+        } else if visibleFiles.isEmpty {
+            description = "内部状态更新"
         } else {
-            let preview = journalEntry.affectedFiles.prefix(2).joined(separator: ", ")
-            let suffix = journalEntry.affectedFiles.count > 2 ? " +" + String(journalEntry.affectedFiles.count - 2) : ""
-            description = "\(journalEntry.affectedFiles.count) file change: \(preview)\(suffix)"
+            let preview = visibleFiles.prefix(2).joined(separator: ", ")
+            let suffix = visibleFiles.count > 2 ? " +" + String(visibleFiles.count - 2) : ""
+            let hiddenSystemCount = journalEntry.affectedFiles.count - visibleFiles.count
+            if hiddenSystemCount > 0 {
+                description = "\(visibleFiles.count) 个知识文件变更：\(preview)\(suffix)（另含 \(hiddenSystemCount) 个内部状态文件）"
+            } else {
+                description = "\(visibleFiles.count) 个知识文件变更：\(preview)\(suffix)"
+            }
         }
     }
 

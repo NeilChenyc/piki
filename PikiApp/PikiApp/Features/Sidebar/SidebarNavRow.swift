@@ -19,6 +19,7 @@ struct SidebarNavRow: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
+            .contentShape(.rect)
             .background(isSelected ? Theme.primary : .clear)
             .clipShape(.rect(cornerRadius: 8))
         }

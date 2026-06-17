@@ -2,37 +2,12 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(AppState.self) private var appState
-    @State private var viewModel = HomeViewModel()
+    @Environment(HomeViewModel.self) private var viewModel
 
     var body: some View {
         HStack(spacing: 0) {
             // Main chat area
             VStack(spacing: 0) {
-                // Header greeting
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(viewModel.greeting)
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text("Your personal knowledge workspace is ready")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.textSecondary)
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(runtimeModeColor)
-                            .frame(width: 7, height: 7)
-                        Text(appState.runtimeModeTitle)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(Theme.textSecondary)
-                    }
-                    .padding(.top, 2)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 24)
-                .padding(.top, 24)
-                .padding(.bottom, 16)
-
-                Divider()
-
                 // Chat messages
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -143,10 +118,6 @@ struct HomeView: View {
         return nil
     }
 
-    private var runtimeModeColor: Color {
-        guard appState.isConnected else { return Theme.error }
-        return appState.serviceHealth?.agentRuntimeConfigured == true ? Theme.primary : Theme.warning
-    }
 
     #if DEBUG
     private var debugEventPanel: some View {

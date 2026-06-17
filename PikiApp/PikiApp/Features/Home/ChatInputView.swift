@@ -49,9 +49,10 @@ struct ChatInputView: View {
                 .buttonStyle(.plain)
                 .help("Choose a file")
 
-                TextField(placeholder, text: $text)
+                TextField(placeholder, text: $text, axis: .vertical)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
+                    .lineLimit(1...12)
                     .focused($isFocused)
                     .onSubmit {
                         if showsStopButton {

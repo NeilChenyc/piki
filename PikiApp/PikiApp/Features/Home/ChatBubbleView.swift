@@ -19,10 +19,14 @@ struct ChatBubbleView: View {
                     }
 
                     if !displayContent.isEmpty {
-                        Text(displayContent)
-                            .font(.system(size: 13))
-                            .foregroundStyle(message.role == .user ? .white : Theme.textPrimary)
-                            .textSelection(.enabled)
+                        if message.role == .assistant {
+                            MarkdownTextView(displayContent)
+                        } else {
+                            Text(displayContent)
+                                .font(.system(size: 13))
+                                .foregroundStyle(.white)
+                                .textSelection(.enabled)
+                        }
                     } else if message.role == .assistant && message.isAgentRun {
                         Text(message.isRunning ? "Agent 正在执行本轮任务…" : "本轮 Agent Run 暂无最终正文。")
                             .font(.system(size: 13))

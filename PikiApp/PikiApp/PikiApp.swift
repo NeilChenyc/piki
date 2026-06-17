@@ -20,12 +20,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct PikiApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var appState = AppState()
+    @State private var homeViewModel = HomeViewModel()
     @State private var didStartService = false
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(appState)
+                .environment(homeViewModel)
                 .task {
                     guard !didStartService else { return }
                     didStartService = true
@@ -41,6 +43,7 @@ struct PikiApp: App {
         Settings {
             SettingsView()
                 .environment(appState)
+                .environment(homeViewModel)
         }
     }
 }
