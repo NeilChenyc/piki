@@ -335,6 +335,68 @@ def test_run_lint_denies_broad_search_and_unrelated_writes_after_helper(tmp_path
     assert "run_lint may not do broad Glob/Grep" in task["summary"] or "run_lint may only touch pages" in task["summary"]
 
 
+def test_run_lint_recovers_after_transient_edit_failures(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    lint_payload = {
+        "generated_at": "2026-06-06T00:00:00+00:00",
+        "scanned_files": 2,
+        "issues": [],
+        "issue_counts": {},
+        "fixable_issue_ids": [],
+    }
+
+    async def fake_query(*, prompt, options):
+        pre_hooks = [hook for matcher in options.hooks["PreToolUse"] for hook in matcher.hooks]
+        post_hooks = [hook for matcher in options.hooks["PostToolUse"] for hook in matcher.hooks]
+
+        helper_command = "python -m agent_service.runtime.cli lint --vault ."
+        await pre_hooks[0]({"tool_name": "Bash", "tool_input": {"command": helper_command}}, None, None)
+        await post_hooks[0](
+            {"tool_name": "Bash", "tool_input": {"command": helper_command}, "tool_use_id": "tooluse_lint_helper"},
+            {"stdout": json.dumps(lint_payload, ensure_ascii=False)},
+            None,
+        )
+
+        denied_glob = await pre_hooks[0](
+            {"tool_name": "Glob", "tool_input": {"path": "wiki"}},
+            None,
+            None,
+        )
+        assert denied_glob["permissionDecision"] == "deny"
+
+        await pre_hooks[0](
+            {"tool_name": "Edit", "tool_input": {"file_path": str(vault_path / "wiki/log.md")}},
+            None,
+            None,
+        )
+        await post_hooks[0](
+            {"tool_name": "Edit", "tool_input": {"file_path": str(vault_path / "wiki/log.md")}, "tool_use_id": "tooluse_edit_ok"},
+            "updated",
+            None,
+        )
+
+        yield SimpleNamespace(content=[SimpleNamespace(text="Lint 通过，日志已更新。")], session_id="sess_lint_recover")
+        yield _result_message(session_id="sess_lint_recover", result="Lint 通过，日志已更新。")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "Run vault lint.",
+            "action_context": {"action": "run_lint"},
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["answer"] == "Lint 通过，日志已更新。"
+    assert task["output"]["lint_result"]["scanned_files"] == 2
+
+
 def test_claude_blocks_writes_to_agents_md(tmp_path: Path, monkeypatch):
     vault_path = make_runtime_vault(tmp_path)
 
@@ -418,6 +480,49 @@ def test_smoke_test_uses_claude_query(tmp_path: Path, monkeypatch):
 
     assert result.ok is True
     assert result.output == "Piki Claude smoke test ok."
+
+
+def test_sdk_client_runtime_stops_after_result_message_even_if_stream_stays_open(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
+    class FakeClient:
+        def __init__(self, *, options):
+            self.options = options
+
+        async def connect(self, user_input):
+            return None
+
+        async def disconnect(self):
+            return None
+
+        async def receive_messages(self):
+            yield SimpleNamespace(
+                content=[SimpleNamespace(text="最终答案")],
+                session_id="sess_sdk_client",
+            )
+            yield _result_message(session_id="sess_sdk_client", result="最终答案")
+            while True:
+                yield SimpleNamespace(event={"type": "noop"})
+
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
+    )
+    app = create_app(config, store=store)
+    app.state.runner._client_cls = FakeClient
+    app.state.runner._query_impl = app.state.runner._sdk_query_impl
+    app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
+    client = TestClient(app)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["answer"] == "最终答案"
 
 
 async def _single_message_stream(text: str):

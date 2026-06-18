@@ -278,6 +278,8 @@ class PikiWikiAgentRunner:
                             emit_thinking_snapshot=emit_thinking_snapshot,
                             emit_thinking_delta=emit_thinking_delta,
                         )
+                        if _is_terminal_result_message(message):
+                            break
                         if _is_stopped_task_notification(message):
                             if run_control is not None:
                                 run_control.request_cancel()
@@ -433,19 +435,22 @@ class PikiWikiAgentRunner:
             tool_name = data["tool_name"]
             tool_input = data.get("tool_input", {})
             tool_use_id = str(data.get("tool_use_id") or "")
+            actual_tool_output = data.get("tool_response", tool_output)
             if tracker.is_lint_task and tool_name == "Bash":
                 command = str(tool_input.get("command") or "")
-                lint_payload = _extract_lint_payload(command=command, tool_output=tool_output)
+                lint_payload = _extract_lint_payload(command=command, tool_output=actual_tool_output)
                 if lint_payload is not None:
                     tracker.record_lint_helper(command=command, payload=lint_payload)
             if tool_name in {"Write", "Edit", "MultiEdit"}:
                 target = str(tool_input.get("file_path") or tool_input.get("path") or "")
                 tracker.after_write(target)
+            if tracker.is_lint_task and tracker.lint_helper_completed and tool_name in {"Read", "Write", "Edit", "MultiEdit"}:
+                tracker.clear_lint_policy_violations()
             payload = {
                 "tool": tool_name,
                 "tool_use_id": tool_use_id,
                 "title": _tool_title(tool_name),
-                "summary": _tool_summary(tool_name, tool_input, tool_output),
+                "summary": _tool_summary(tool_name, tool_input, actual_tool_output),
                 "source_path": _tool_path(tool_name, tool_input),
                 "category": _tool_category(tool_name),
                 "status": "completed",
@@ -820,6 +825,15 @@ def _result_error_text(result_message) -> str:
 
 def _is_stopped_task_notification(message: Any) -> bool:
     return message.__class__.__name__ == "TaskNotificationMessage" and str(getattr(message, "status", "") or "") == "stopped"
+
+
+def _is_terminal_result_message(message: Any) -> bool:
+    if message.__class__.__name__ == "ResultMessage":
+        return True
+    if hasattr(message, "result"):
+        return True
+    deferred = getattr(message, "deferred_tool_use", None)
+    return deferred is not None
 
 
 async def _stop_active_sdk_task(*, client, messages: list[Any]) -> None:

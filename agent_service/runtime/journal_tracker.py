@@ -25,6 +25,7 @@ class JournalTracker:
     lint_result: dict[str, Any] | None = None
     lint_allowed_paths: set[str] = field(default_factory=set)
     lint_helper_command: str | None = None
+    lint_policy_violations: list[str] = field(default_factory=list)
 
     def __post_init__(self):
         self.journal = ChangeJournalService(store=self.store, events=self.events)
@@ -48,11 +49,23 @@ class JournalTracker:
     def note_illegal_attempt(self, reason: str):
         if reason not in self.illegal_attempts:
             self.illegal_attempts.append(reason)
+        if self.is_lint_task and reason not in self.lint_policy_violations:
+            self.lint_policy_violations.append(reason)
 
     def record_lint_helper(self, *, command: str, payload: dict[str, Any]):
         self.lint_helper_command = command
         self.lint_result = payload
         self.lint_allowed_paths = _lint_allowed_paths(payload)
+
+    def clear_lint_policy_violations(self):
+        if not self.is_lint_task:
+            return
+        if not self.lint_policy_violations:
+            return
+        self.illegal_attempts = [
+            reason for reason in self.illegal_attempts if reason not in self.lint_policy_violations
+        ]
+        self.lint_policy_violations.clear()
 
     def lint_allows_path(self, path: str) -> bool:
         if not self.is_lint_task or not self.lint_helper_completed:
