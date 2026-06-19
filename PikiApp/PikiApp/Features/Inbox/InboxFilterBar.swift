@@ -42,8 +42,8 @@ struct FilterPill: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .foregroundStyle(isSelected ? .white : Theme.textSecondary)
-            .background(isSelected ? Theme.primary : Theme.cardBackground)
+            .foregroundStyle(isSelected ? Theme.textPrimary : Theme.textSecondary)
+            .background(isSelected ? Theme.selection : Theme.cardBackground)
             .clipShape(.capsule)
             .overlay(
                 Capsule()

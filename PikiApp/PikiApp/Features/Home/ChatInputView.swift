@@ -33,7 +33,7 @@ struct ChatInputView: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Theme.primaryLight)
+                        .background(Theme.surfaceSecondary)
                         .clipShape(.rect(cornerRadius: 8))
                     }
                 }
@@ -43,7 +43,7 @@ struct ChatInputView: View {
                 Button(action: chooseFile) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 20))
-                        .foregroundStyle(isDisabled ? Theme.textTertiary : Theme.primary)
+                        .foregroundStyle(isDisabled ? Theme.textTertiary : Theme.accent)
                 }
                 .disabled(isDisabled)
                 .buttonStyle(.plain)
@@ -76,7 +76,7 @@ struct ChatInputView: View {
                     Button(action: sendIfNotEmpty) {
                         Image(systemName: "arrow.up.circle.fill")
                             .font(.system(size: 24))
-                            .foregroundStyle(!canSend ? Theme.textTertiary : Theme.primary)
+                            .foregroundStyle(!canSend ? Theme.textTertiary : Theme.accent)
                     }
                     .buttonStyle(.plain)
                     .disabled(!canSend)

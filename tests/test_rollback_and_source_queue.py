@@ -94,6 +94,29 @@ def test_rollback_only_latest_two_active_journals(tmp_path: Path):
     assert (vault_path / "wiki/old.md").read_text(encoding="utf-8") == "# old\n"
 
 
+def test_rollback_two_entries_in_sequence_restores_previous_states(tmp_path: Path):
+    vault_path = make_vault(tmp_path)
+    client = make_client(tmp_path)
+    store = client.app.state.store
+    target = vault_path / "wiki/log.md"
+    target.write_text("# 日志\n", encoding="utf-8")
+
+    first = create_journal(store, vault_path, "wiki/log.md", "# 日志\n\n- 第一版\n")
+    second = create_journal(store, vault_path, "wiki/log.md", "# 日志\n\n- 第二版\n")
+
+    newest_rollback = client.post(f"/journal/{second.id}/rollback", json={"reason": "回到上一版"})
+    assert newest_rollback.status_code == 200
+    assert newest_rollback.json()["ok"] is True
+    assert target.read_text(encoding="utf-8") == "# 日志\n\n- 第一版\n"
+    assert store.get_journal_entry(second.id).status == "rolled_back"
+
+    previous_rollback = client.post(f"/journal/{first.id}/rollback", json={"reason": "继续回退"})
+    assert previous_rollback.status_code == 200
+    assert previous_rollback.json()["ok"] is True
+    assert target.read_text(encoding="utf-8") == "# 日志\n"
+    assert store.get_journal_entry(first.id).status == "rolled_back"
+
+
 def test_clear_inbox_file_creates_journal_and_can_rollback(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     client = make_client(tmp_path)

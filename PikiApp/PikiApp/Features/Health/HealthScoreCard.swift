@@ -131,7 +131,7 @@ struct SummaryMetricTile: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(Theme.primaryLight.opacity(0.6))
+        .background(Theme.surfaceSecondary)
         .clipShape(.rect(cornerRadius: 10))
     }
 }
@@ -145,12 +145,12 @@ struct BreakdownChip: View {
                 .font(.system(size: 11, weight: .medium))
             Text("\(item.count)")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Theme.primaryDark)
+                .foregroundStyle(Theme.textPrimary)
         }
         .foregroundStyle(Theme.textPrimary)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Theme.primaryLight.opacity(0.85))
+        .background(Theme.surfaceSecondary)
         .clipShape(.capsule)
     }
 }

@@ -1,27 +1,43 @@
 import SwiftUI
 
 struct Theme {
-    static let primary = Color(red: 76/255, green: 175/255, blue: 80/255)
-    static let primaryDark = Color(red: 46/255, green: 125/255, blue: 50/255)
-    static let primaryLight = Color(red: 232/255, green: 245/255, blue: 233/255)
+    // MARK: - Brand (保留绿色，极度克制使用)
+    static let accent = Color(red: 76/255, green: 175/255, blue: 80/255)
+    static let accentLight = Color(red: 232/255, green: 245/255, blue: 233/255)
+    static let accentDark = Color(red: 46/255, green: 125/255, blue: 50/255)
 
-    static let surfaceBackground = Color(nsColor: .windowBackgroundColor)
-    static let sidebarBackground = Color(nsColor: .controlBackgroundColor)
-    static let cardBackground = Color(nsColor: .textBackgroundColor)
-    static let border = Color(nsColor: .separatorColor)
+    // MARK: - Surfaces
+    static let surfaceBackground = Color(red: 247/255, green: 247/255, blue: 249/255)
+    static let sidebarBackground = Color.white
+    static let cardBackground = Color.white
+    static let surfaceSecondary = Color(red: 244/255, green: 244/255, blue: 246/255)
 
-    static let textPrimary = Color(nsColor: .labelColor)
-    static let textSecondary = Color(nsColor: .secondaryLabelColor)
-    static let textTertiary = Color(nsColor: .tertiaryLabelColor)
+    // MARK: - Selection
+    static let selection = Color(red: 238/255, green: 238/255, blue: 240/255)
 
-    static let success = Color.green
-    static let warning = Color.orange
-    static let error = Color.red
+    // MARK: - Border
+    static let border = Color(red: 232/255, green: 232/255, blue: 234/255)
 
-    static let cornerRadius: CGFloat = 12
-    static let cardShadowRadius: CGFloat = 4
+    // MARK: - Text
+    static let textPrimary = Color(red: 26/255, green: 26/255, blue: 26/255)
+    static let textSecondary = Color(red: 102/255, green: 102/255, blue: 102/255)
+    static let textTertiary = Color(red: 153/255, green: 153/255, blue: 153/255)
+
+    // MARK: - Semantic
+    static let success = Color(red: 52/255, green: 199/255, blue: 89/255)
+    static let warning = Color(red: 255/255, green: 149/255, blue: 0/255)
+    static let error = Color(red: 255/255, green: 59/255, blue: 48/255)
+
+    // MARK: - Layout
+    static let cornerRadius: CGFloat = 10
+    static let cardShadowRadius: CGFloat = 3
     static let spacing: CGFloat = 8
     static let sidebarWidth: CGFloat = 220
+
+    // MARK: - Aliases (backward compat)
+    static let primary = accent
+    static let primaryDark = accentDark
+    static let primaryLight = accentLight
 }
 
 struct CardModifier: ViewModifier {
@@ -29,7 +45,11 @@ struct CardModifier: ViewModifier {
         content
             .background(Theme.cardBackground)
             .clipShape(.rect(cornerRadius: Theme.cornerRadius))
-            .shadow(color: .black.opacity(0.06), radius: Theme.cardShadowRadius, x: 0, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.cornerRadius)
+                    .stroke(Theme.border, lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.03), radius: Theme.cardShadowRadius, x: 0, y: 1)
     }
 }
 

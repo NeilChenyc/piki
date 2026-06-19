@@ -54,7 +54,7 @@ struct LintCTACard: View {
         .padding(20)
         .background(
             LinearGradient(
-                colors: [Theme.primary, Theme.primaryDark],
+                colors: [Theme.accent, Theme.accentDark],
                 startPoint: .leading,
                 endPoint: .trailing
             )
@@ -82,7 +82,7 @@ struct LintIssueRow: View {
                 if issue.fixable {
                     Text("可修复")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Theme.primaryDark)
+                        .foregroundStyle(Theme.accent)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(Color.white.opacity(0.75))
@@ -122,7 +122,7 @@ struct AffectedPageRow: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "doc.plaintext")
                 .font(.system(size: 12))
-                .foregroundStyle(Theme.primary)
+                .foregroundStyle(Theme.textSecondary)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(page.path)

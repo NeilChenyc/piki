@@ -38,7 +38,7 @@ struct ActivityRow: View {
 
     private var iconColor: Color {
         switch entry.type {
-        case .ingest: Theme.primary
+        case .ingest: Theme.accent
         case .query: .blue
         case .lint: .orange
         case .rollback: .purple

@@ -35,7 +35,7 @@ struct InboxFileRow: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
-            .background(isSelected ? Theme.primaryLight : .clear)
+            .background(isSelected ? Theme.selection : .clear)
         }
         .buttonStyle(.plain)
     }

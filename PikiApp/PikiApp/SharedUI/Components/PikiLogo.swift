@@ -4,7 +4,7 @@ struct PikiLogo: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 6)
-                .fill(Theme.primary.gradient)
+                .fill(Theme.accent.gradient)
             // Simplified geometric pattern
             HStack(spacing: 3) {
                 Circle()

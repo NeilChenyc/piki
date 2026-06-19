@@ -14,6 +14,7 @@
 		244F35F9F9B46A19A69360AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0364D70DD6D68CCA0968BC68 /* Assets.xcassets */; };
 		24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */; };
 		2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */; };
+		2BB197355ADDA201407ED933 /* MarkdownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77CD7E7A8F080D54BFD585F9 /* MarkdownTextView.swift */; };
 		310DD29CFA6146A6AAA27BC2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF7EEE571B61A88771D7640 /* SettingsView.swift */; };
 		315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3368FD4E4A7B6A82A049E76F /* InboxFilterBar.swift */; };
 		35D44C853488583E0CF447A7 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A151F539885AC0A94B6BAC38 /* APIModels.swift */; };
@@ -62,6 +63,7 @@
 		37CF698E82FC421701D5575C /* WikiPageContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageContentView.swift; sourceTree = "<group>"; };
 		44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiLogo.swift; sourceTree = "<group>"; };
+		77CD7E7A8F080D54BFD585F9 /* MarkdownTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTextView.swift; sourceTree = "<group>"; };
 		6FF7EEE571B61A88771D7640 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7249FFE507E86DAE979CD97C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		940D0CDE0D10F37A3CB01678 /* SSEClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSEClient.swift; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 			isa = PBXGroup;
 			children = (
 				B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */,
+				77CD7E7A8F080D54BFD585F9 /* MarkdownTextView.swift */,
 				66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */,
 			);
 			path = Components;
@@ -356,6 +359,7 @@
 				3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */,
 				7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */,
 				2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */,
+				2BB197355ADDA201407ED933 /* MarkdownTextView.swift in Sources */,
 				24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */,
 				E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */,
 				310DD29CFA6146A6AAA27BC2 /* SettingsView.swift in Sources */,

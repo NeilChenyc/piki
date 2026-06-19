@@ -10,17 +10,17 @@ struct SidebarNavRow: View {
             HStack(spacing: 10) {
                 Image(systemName: tab.icon)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(isSelected ? .white : Theme.textSecondary)
+                    .foregroundStyle(isSelected ? Theme.textPrimary : Theme.textSecondary)
                     .frame(width: 20)
                 Text(tab.title)
                     .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .white : Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
                 Spacer()
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .contentShape(.rect)
-            .background(isSelected ? Theme.primary : .clear)
+            .background(isSelected ? Theme.selection : .clear)
             .clipShape(.rect(cornerRadius: 8))
         }
         .buttonStyle(.plain)

@@ -55,6 +55,7 @@ struct SidebarView: View {
             .padding(.bottom, 16)
         }
         .frame(minWidth: 200, idealWidth: 220, maxWidth: 240)
+        .background(Theme.sidebarBackground)
     }
 
     private var connectionColor: Color {

@@ -28,6 +28,7 @@ struct PikiApp: App {
             ContentView()
                 .environment(appState)
                 .environment(homeViewModel)
+                .preferredColorScheme(.light)
                 .task {
                     guard !didStartService else { return }
                     didStartService = true

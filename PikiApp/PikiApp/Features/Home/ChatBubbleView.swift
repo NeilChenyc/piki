@@ -24,7 +24,7 @@ struct ChatBubbleView: View {
                         } else {
                             Text(displayContent)
                                 .font(.system(size: 13))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Theme.textPrimary)
                                 .textSelection(.enabled)
                         }
                     } else if message.role == .assistant && message.isAgentRun {
@@ -35,7 +35,7 @@ struct ChatBubbleView: View {
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
-                .background(message.role == .user ? Theme.primary : Theme.cardBackground)
+                .background(message.role == .user ? Theme.accentLight : Theme.cardBackground)
                 .clipShape(.rect(cornerRadius: 16))
                 .shadow(color: .black.opacity(0.04), radius: 2, x: 0, y: 1)
 
@@ -145,7 +145,7 @@ struct ChatBubbleView: View {
         .padding(10)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Theme.primaryLight.opacity(0.5))
+                .fill(Theme.surfaceSecondary)
         )
     }
 

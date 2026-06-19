@@ -21,7 +21,7 @@ struct WikiCategorySection: View {
                         .frame(width: 12)
                     Image(systemName: category.icon)
                         .font(.system(size: 12))
-                        .foregroundStyle(Theme.primary)
+                        .foregroundStyle(Theme.textSecondary)
                     Text(category.title)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
@@ -44,7 +44,7 @@ struct WikiCategorySection: View {
                             .font(.system(size: 12))
                             .foregroundStyle(
                                 selectedPage?.id == page.id
-                                    ? Theme.primary
+                                    ? Theme.textPrimary
                                     : Theme.textPrimary
                             )
                             .padding(.leading, 36)
@@ -52,7 +52,7 @@ struct WikiCategorySection: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(
                                 selectedPage?.id == page.id
-                                    ? Theme.primaryLight
+                                    ? Theme.selection
                                     : .clear
                             )
                             .clipShape(.rect(cornerRadius: 4))

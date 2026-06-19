@@ -40,8 +40,8 @@ struct QuickActionChip: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .foregroundStyle(Theme.primary)
-            .background(Theme.primaryLight)
+            .foregroundStyle(Theme.textPrimary)
+            .background(Theme.surfaceSecondary)
             .clipShape(.capsule)
         }
         .buttonStyle(.plain)
