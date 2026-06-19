@@ -3,11 +3,13 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from agent_service.app import create_app
+from agent_service.application.events import EventPublisher
+from agent_service.journal import ChangeJournalService
 from agent_service.config import ServiceConfig
 from agent_service.models import RiskLevel, TaskKind
 from agent_service.store import SQLiteStore
-from agent_service.tools import VaultToolRegistry
 from agent_service.vault import Vault
+from agent_service.vault.writer import VaultWriter
 
 
 def make_vault(tmp_path: Path) -> Path:
@@ -25,7 +27,7 @@ def make_vault(tmp_path: Path) -> Path:
 
 def make_client(tmp_path: Path) -> TestClient:
     store = SQLiteStore(tmp_path / "agent.sqlite3")
-    app = create_app(ServiceConfig(db_path=tmp_path / "agent.sqlite3", enable_sdk_runtime=False), store=store)
+    app = create_app(ServiceConfig(db_path=tmp_path / "agent.sqlite3", enable_agent_runtime=False), store=store)
     return TestClient(app)
 
 
@@ -36,10 +38,15 @@ def create_journal(store: SQLiteStore, vault_path: Path, path: str, content: str
         vault_path=str(vault_path),
         user_input=f"write {path}",
     )
-    tools = VaultToolRegistry(vault=Vault(vault_path), store=store, task_id=task.id)
-    result = tools.write_file(path, content, reason="test")
-    assert result.ok
-    journal = tools.commit_journal_entry(conversation_id=task.id, reason="test")
+    writer = VaultWriter(Vault(vault_path))
+    write = writer.write(path, content)
+    assert write.changed is True
+    journal = ChangeJournalService(store=store, events=EventPublisher(store)).commit_for_task(
+        task_id=task.id,
+        conversation_id=task.id,
+        reason="test",
+        snapshots=[writer.snapshot_for(write)],
+    )
     assert journal is not None
     return journal
 

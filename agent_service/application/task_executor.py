@@ -12,6 +12,7 @@ from agent_service.context import assemble_agent_task_input, assemble_baseline_c
 from agent_service.models import EventType, FileSnapshot, TaskCreateRequest, TaskStatus
 from agent_service.runtime import PikiWikiAgentRunner
 from agent_service.store import SQLiteStore
+from agent_service.system import DeterministicActionExecutor
 from agent_service.vault import Vault, VaultAccessError
 
 
@@ -28,6 +29,7 @@ class TaskExecutor:
         self.store = store
         self.events = events
         self.runner = runner
+        self.system_actions = DeterministicActionExecutor(store=store, events=events)
 
     def execute(self, *, task_id: str, request: TaskCreateRequest, plan: TaskPlan, run_control: TaskRunControl | None = None):
         vault = Vault(request.vault_path)
@@ -47,6 +49,8 @@ class TaskExecutor:
             action_context["action"] = "clear_inbox_item"
         if action_context.get("action") == "clear_inbox_item":
             self._execute_source_clear(task_id=task_id, request=request, vault=vault)
+            return
+        if not self.runner.can_run(self.config) and self.system_actions.execute(task_id=task_id, request=request):
             return
         self._execute_agent(
             task_id=task_id,

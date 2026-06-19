@@ -3,10 +3,12 @@ from pathlib import Path
 import pytest
 
 from agent_service.context import assemble_baseline_context
-from agent_service.models import PatchChange, RiskLevel, TaskKind
+from agent_service.application.events import EventPublisher
+from agent_service.journal import ChangeJournalService
+from agent_service.models import FileSnapshot, RiskLevel, TaskKind
 from agent_service.store import SQLiteStore
-from agent_service.tools import VaultToolRegistry
 from agent_service.vault import Vault, VaultAccessError
+from agent_service.vault.writer import VaultWriter
 
 
 def test_vault_rejects_outside_path(vault_path: Path):
@@ -25,32 +27,61 @@ def test_context_assembly_loads_baseline(vault_path: Path):
     assert "AGENTS.md" in contents
 
 
-def test_vault_tools_read_parse_and_propose(vault_path: Path, tmp_path: Path):
+def test_vault_writer_and_journal_commit_changes(tmp_path: Path):
+    vault_root = tmp_path / "vault"
+    (vault_root / "wiki").mkdir(parents=True)
+    (vault_root / "AGENTS.md").write_text("# Agent 规则\n", encoding="utf-8")
+    (vault_root / "wiki/log.md").write_text("# 原始日志\n", encoding="utf-8")
     store = SQLiteStore(tmp_path / "agent.sqlite3")
     task = store.create_task(
         task_kind=TaskKind.AGENT,
         risk_level=RiskLevel.READ_ONLY,
-        vault_path=str(vault_path),
+        vault_path=str(vault_root),
         user_input="test",
     )
-    tools = VaultToolRegistry(vault=Vault(vault_path), store=store, task_id=task.id)
+    vault = Vault(vault_root)
+    writer = VaultWriter(vault)
+    write = writer.write("wiki/log.md", "# test\n")
 
-    read_result = tools.read_file("wiki/index.md")
-    assert read_result.ok
-    assert "Piki 维基索引" in read_result.payload["content"]
+    assert write.changed is True
+    assert write.path == "wiki/log.md"
+    assert write.before_content is not None
+    assert write.after_content == "# test\n"
 
-    parse_result = tools.parse_markdown("wiki/index.md")
-    assert parse_result.ok
-    assert "Piki 维基索引" in parse_result.payload["headings"]
-
-    proposal = tools.propose_patch(
+    journal = ChangeJournalService(store=store, events=EventPublisher(store)).commit_for_task(
+        task_id=task.id,
+        conversation_id=task.id,
         reason="test proposal",
-        changes=[
-            PatchChange(path="wiki/log.md", action="update", content="# test\n"),
-        ],
-        risk_level=RiskLevel.HIGH,
+        snapshots=[writer.snapshot_for(write)],
     )
 
-    assert proposal.requires_approval is True
-    assert proposal.affected_files == ["wiki/log.md"]
-    assert store.get_task(task.id).pending_approvals
+    assert journal is not None
+    assert journal.affected_files == ["wiki/log.md"]
+    assert store.list_events(task.id)[-1].type == "journal.created"
+
+
+def test_change_journal_skips_non_wiki_and_non_raw_files(tmp_path: Path):
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    task = store.create_task(
+        task_kind=TaskKind.AGENT,
+        risk_level=RiskLevel.LOW,
+        vault_path=str(tmp_path),
+        user_input="test",
+    )
+
+    journal = ChangeJournalService(store=store, events=EventPublisher(store)).commit_for_task(
+        task_id=task.id,
+        conversation_id=task.id,
+        reason="ignore system files",
+        snapshots=[
+            FileSnapshot(
+                path="system/source_manifest.json",
+                before_hash="sha256:old",
+                after_hash="sha256:new",
+                before_content="{}",
+                after_content='{"ok": true}',
+            )
+        ],
+    )
+
+    assert journal is None

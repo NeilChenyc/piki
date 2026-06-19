@@ -15,12 +15,35 @@ def test_runtime_and_workflows_do_not_import_fastapi():
     assert offenders == []
 
 
-def test_tools_do_not_import_api_or_app_layers():
-    offenders = _imports_matching(ROOT / "tools", "agent_service.api") + _imports_matching(
-        ROOT / "tools",
-        "agent_service.app",
+def test_api_routes_do_not_import_legacy_tools():
+    offenders = _imports_matching(ROOT / "api", "agent_service.tools")
+    assert offenders == []
+
+
+def test_system_workflows_do_not_import_runtime_or_tools():
+    offenders = (
+        _imports_matching(ROOT / "workflows", "agent_service.runtime")
+        + _imports_matching(ROOT / "workflows", "agent_service.tools")
     )
     assert offenders == []
+
+
+def test_runtime_entrypoints_do_not_import_workflows_package_reexports():
+    offenders = _imports_matching(ROOT / "runtime", "agent_service.workflows")
+    assert offenders == []
+
+
+def test_critical_agent_service_entrypoints_import_without_cycles():
+    entrypoints = [
+        "agent_service.app",
+        "agent_service.application.task_service",
+        "agent_service.application.task_executor",
+        "agent_service.application.maintenance",
+        "agent_service.runtime.runner",
+        "agent_service.runtime.cli",
+    ]
+    for module in entrypoints:
+        __import__(module)
 
 
 def _imports_matching(root: Path, forbidden_prefix: str) -> list[str]:

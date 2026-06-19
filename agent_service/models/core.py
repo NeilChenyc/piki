@@ -14,14 +14,10 @@ def utc_now_iso() -> str:
 
 class TaskKind(StrEnum):
     AGENT = "agent"
-    QUERY = "query"
-    INGEST = "ingest"
+    MAINTENANCE = "maintenance"
     INGEST_QUEUE = "ingest-queue"
-    LINT = "lint"
     ROLLBACK = "rollback"
     SOURCE_RESCAN = "source-rescan"
-    SOURCE_INTAKE = "source-intake"
-    SOURCE_CLEAR = "source-clear"
 
 
 class RiskLevel(StrEnum):

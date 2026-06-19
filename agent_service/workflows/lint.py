@@ -8,16 +8,12 @@ from datetime import date
 from pathlib import Path
 
 from agent_service.models import (
-    JournalEntry,
-    LintFixResult,
     LintIssue,
     LintIssueKind,
     LintResult,
     LintSeverity,
     utc_now_iso,
 )
-from agent_service.store import SQLiteStore
-from agent_service.tools import VaultToolRegistry
 from agent_service.vault import Vault
 
 
@@ -163,59 +159,6 @@ def run_wiki_lint(vault: Vault) -> LintResult:
         issue_counts=dict(sorted(issue_counts.items())),
         fixable_issue_ids=[issue.id for issue in issues if issue.fixable],
     )
-
-
-def apply_lint_fixes(
-    *,
-    vault: Vault,
-    store: SQLiteStore,
-    task_id: str,
-    issue_ids: list[str] | None = None,
-) -> LintFixResult:
-    report = run_wiki_lint(vault)
-    requested = set(issue_ids or report.fixable_issue_ids)
-    selected = [
-        issue
-        for issue in report.issues
-        if issue.id in requested and issue.kind == LintIssueKind.MISSING_INDEX_ENTRY and issue.fixable
-    ]
-    registry = VaultToolRegistry(vault=vault, store=store, task_id=task_id)
-    fixed_ids: list[str] = []
-    if selected:
-        index_path = vault.resolve_path("wiki/index.md")
-        index_text = index_path.read_text(encoding="utf-8", errors="replace") if index_path.exists() else "# 索引\n"
-        additions = []
-        for issue in selected:
-            link_path = issue.details["link_path"]
-            title = issue.details.get("title") or Path(issue.path).stem
-            line = f"- [[{link_path}]] — {title}"
-            if line not in index_text:
-                additions.append(line)
-                fixed_ids.append(issue.id)
-        if additions:
-            separator = "" if index_text.endswith("\n") else "\n"
-            registry.write_file(
-                "wiki/index.md",
-                index_text + separator + "\n".join(additions) + "\n",
-                reason="lint fix missing index entries",
-            )
-            registry.append_file(
-                "wiki/log.md",
-                f"\n## {date.today().isoformat()} 检查 | 自动补充索引\n\n- 补充索引条目：{len(additions)} 条。\n",
-                reason="lint fix log",
-            )
-    journal_entry: JournalEntry | None = registry.commit_journal_entry(
-        conversation_id=task_id,
-        reason="lint fix",
-    )
-    return LintFixResult(
-        fixed_issue_ids=fixed_ids,
-        affected_files=registry.changed_files,
-        journal_entry=journal_entry,
-        task_id=task_id,
-        summary=f"已修复 {len(fixed_ids)} 个 lint 问题。" if fixed_ids else "没有可修复的 lint 问题。",
-    )
-
 
 def _load_pages(vault: Vault) -> list[LintPage]:
     wiki_root = vault.resolve_path("wiki")

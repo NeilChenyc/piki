@@ -4,16 +4,16 @@ import argparse
 import json
 from pathlib import Path
 
-from agent_service.vault import Vault
-from agent_service.workflows.lint import run_wiki_lint
-from agent_service.workflows.source_intake import (
+from agent_service.system import (
     build_source_slug,
     detect_source_format,
     extract_text,
     extract_title,
     hash_file,
     render_canonical_source,
+    run_wiki_lint,
 )
+from agent_service.vault import Vault
 
 
 def main() -> int:

@@ -11,7 +11,6 @@ from agent_service.models import (
     IngestQueueProcessRequest,
     IngestQueueStatus,
     LintFixRequest,
-    LintRequest,
     RiskLevel,
     RollbackRequest,
     SourceRescanRequest,
@@ -20,17 +19,16 @@ from agent_service.models import (
     UpdateQueueStatus,
 )
 from agent_service.store import SQLiteStore
-from agent_service.vault import Vault, VaultAccessError
-from agent_service.workflows import (
+from agent_service.system import (
     apply_lint_fixes,
     cancel_ingest_queue_item,
     enqueue_ingest_files,
     process_ingest_queue,
     retry_ingest_queue_item,
     run_journal_rollback,
-    run_wiki_lint,
     scan_sources_for_updates,
 )
+from agent_service.vault import Vault, VaultAccessError
 
 
 class JournalService:
@@ -207,34 +205,11 @@ class LintService:
         self.store = store
         self.events = events
 
-    def lint(self, request: LintRequest):
-        vault = Vault(request.vault_path)
-        vault.validate()
-        task = self.store.create_task(
-            task_kind=TaskKind.LINT,
-            risk_level=RiskLevel.READ_ONLY,
-            vault_path=str(vault.root),
-            user_input="lint vault",
-            status=TaskStatus.RUNNING,
-            summary="检查 wiki 健康状态。",
-        )
-        self.events.emit(task.id, EventType.LINT_STARTED, {"vault_path": str(vault.root)})
-        result = run_wiki_lint(vault)
-        self.events.emit(task.id, EventType.LINT_COMPLETED, result.model_dump(mode="json"))
-        self.store.update_task(
-            task.id,
-            status=TaskStatus.COMPLETED,
-            summary=f"检查完成：发现 {len(result.issues)} 个问题。",
-            output=result.model_dump(mode="json"),
-        )
-        self.events.task_completed(task.id, summary="lint completed")
-        return result
-
     def fix(self, request: LintFixRequest):
         vault = Vault(request.vault_path)
         vault.validate()
         task = self.store.create_task(
-            task_kind=TaskKind.LINT,
+            task_kind=TaskKind.MAINTENANCE,
             risk_level=RiskLevel.LOW,
             vault_path=str(vault.root),
             user_input="lint fix",
@@ -244,6 +219,7 @@ class LintService:
         result = apply_lint_fixes(
             vault=vault,
             store=self.store,
+            events=self.events,
             task_id=task.id,
             issue_ids=request.issue_ids,
         )

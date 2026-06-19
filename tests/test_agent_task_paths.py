@@ -5,8 +5,6 @@ from fastapi.testclient import TestClient
 from agent_service.app import create_app
 from agent_service.config import ServiceConfig
 from agent_service.store import SQLiteStore
-from agent_service.vault import Vault
-from agent_service.workflows.query import run_read_only_query
 
 
 def make_query_vault(tmp_path: Path) -> Path:
@@ -53,21 +51,16 @@ title: 孟岩
     return vault
 
 
-def test_query_recalls_chinese_wiki_page_and_wikilink(tmp_path: Path):
-    vault_path = make_query_vault(tmp_path)
-
-    result = run_read_only_query(Vault(vault_path), "个人记忆如何帮助自然回忆？")
-
-    citation_paths = {citation.path for citation in result.citations}
-    assert "wiki/concepts/个人记忆系统.md" in citation_paths
-    assert "wiki/entities/孟岩.md" in result.related_pages
-    assert result.confidence in {"medium", "high"}
-
-
-def test_tasks_do_not_silently_fallback_when_runtime_unconfigured(tmp_path: Path):
+def test_tasks_fail_cleanly_when_agent_runtime_unconfigured(tmp_path: Path):
     vault_path = make_query_vault(tmp_path)
     store = SQLiteStore(tmp_path / "agent.sqlite3")
-    app = create_app(ServiceConfig(db_path=tmp_path / "agent.sqlite3", enable_agent_runtime=False), store=store)
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            enable_agent_runtime=False,
+        ),
+        store=store,
+    )
     client = TestClient(app)
 
     response = client.post(
@@ -82,3 +75,32 @@ def test_tasks_do_not_silently_fallback_when_runtime_unconfigured(tmp_path: Path
     task = client.get(f"/tasks/{response.json()['task_id']}").json()
     assert task["status"] == "failed"
     assert "Claude Agent runtime is not configured" in task["summary"]
+
+
+def test_lint_report_main_path_uses_agent_task_output(tmp_path: Path):
+    vault_path = make_query_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            enable_agent_runtime=False,
+        ),
+        store=store,
+    )
+    client = TestClient(app)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "请检查知识库健康状态。",
+            "action_context": {"action": "run_lint"},
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["task_kind"] == "agent"
+    assert task["status"] == "completed"
+    assert task["output"]["lint_result"]["scanned_files"] >= 3
+    assert "missing_index_entry" in task["output"]["lint_result"]["issue_counts"]

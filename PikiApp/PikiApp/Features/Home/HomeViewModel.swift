@@ -230,32 +230,30 @@ final class HomeViewModel {
 
     @discardableResult
     private func handle(_ event: TaskEvent, assistantMessageId: String) -> String? {
-        switch event.type {
-        case "agent.progress":
+        switch event.renderEvent {
+        case let .progress(stage, title, detail, category):
             reclaimLiveAnswerToTraceIfNeeded(
                 id: assistantMessageId,
                 for: event,
-                nextTitle: event.payload.title ?? "正在继续处理"
+                nextTitle: title
             )
-            if let title = event.payload.title {
-                upsertTraceEvent(
-                    messageId: assistantMessageId,
-                    key: "stage:\(event.payload.stage ?? title)",
-                    kind: "progress",
-                    title: title,
-                    summary: event.payload.detail ?? "",
-                    category: event.payload.category ?? "model",
-                    status: "running"
-                )
-                if let detail = event.payload.detail, !detail.isEmpty {
-                    statusText = "\(title) · \(detail)"
-                } else {
-                    statusText = title
-                }
+            upsertTraceEvent(
+                messageId: assistantMessageId,
+                key: "stage:\(stage)",
+                kind: "progress",
+                title: title,
+                summary: detail,
+                category: category,
+                status: "running"
+            )
+            if !detail.isEmpty {
+                statusText = "\(title) · \(detail)"
+            } else {
+                statusText = title
             }
             return nil
-        case "message.delta":
-            if let delta = event.payload.delta, !delta.isEmpty {
+        case let .answerDelta(delta):
+            if !delta.isEmpty {
                 upsertTraceEvent(
                     messageId: assistantMessageId,
                     key: "answering",
@@ -269,9 +267,9 @@ final class HomeViewModel {
                 statusText = "正在生成回答"
             }
             return nil
-        case "agent.trace.delta":
+        case let .traceDelta(delta):
             reclaimLiveAnswerToTraceIfNeeded(id: assistantMessageId, for: event, nextTitle: "正在继续思考")
-            if let delta = event.payload.delta, !delta.isEmpty {
+            if !delta.isEmpty {
                 appendTraceDelta(
                     id: assistantMessageId,
                     key: "reasoning",
@@ -280,76 +278,57 @@ final class HomeViewModel {
                 )
             }
             return nil
-        case "agent.trace.event":
+        case let .trace(kind, title, summary, category, status):
             reclaimLiveAnswerToTraceIfNeeded(
                 id: assistantMessageId,
                 for: event,
-                nextTitle: event.payload.title ?? friendlyTraceTitle(for: event)
+                nextTitle: title
             )
             appendTraceEvent(
                 messageId: assistantMessageId,
-                kind: event.payload.kind ?? "event",
-                title: event.payload.title ?? friendlyTraceTitle(for: event),
-                summary: event.payload.summary ?? event.payload.detail ?? "",
-                category: event.payload.category,
-                status: event.payload.status
+                kind: kind,
+                title: title,
+                summary: summary,
+                category: category,
+                status: status
             )
             return nil
-        case "tool.started":
+        case let .toolStarted(key, title, summary, category):
             reclaimLiveAnswerToTraceIfNeeded(
                 id: assistantMessageId,
                 for: event,
-                nextTitle: event.payload.title ?? friendlyTraceTitle(for: event)
+                nextTitle: title
             )
             upsertTraceEvent(
                 messageId: assistantMessageId,
-                key: toolTraceKey(for: event),
+                key: key,
                 kind: "tool_started",
-                title: event.payload.title ?? friendlyTraceTitle(for: event),
-                summary: event.payload.summary ?? event.payload.tool ?? "",
-                category: event.payload.category ?? "tool",
+                title: title,
+                summary: summary,
+                category: category,
                 status: "running"
             )
             return nil
-        case "tool.finished":
+        case let .toolFinished(key, title, summary, category, status):
             reclaimLiveAnswerToTraceIfNeeded(
                 id: assistantMessageId,
                 for: event,
-                nextTitle: event.payload.title ?? friendlyTraceTitle(for: event)
+                nextTitle: title
             )
             upsertTraceEvent(
                 messageId: assistantMessageId,
-                key: toolTraceKey(for: event),
-                kind: "tool_finished",
-                title: event.payload.title ?? "工具调用完成",
-                summary: event.payload.summary ?? event.payload.tool ?? "",
-                category: event.payload.category ?? "tool",
-                status: "completed"
+                key: key,
+                kind: status == "failed" ? "tool_failed" : "tool_finished",
+                title: title,
+                summary: summary,
+                category: category,
+                status: status
             )
             return nil
-        case "tool.failed":
-            reclaimLiveAnswerToTraceIfNeeded(
-                id: assistantMessageId,
-                for: event,
-                nextTitle: event.payload.title ?? "工具调用失败"
-            )
-            upsertTraceEvent(
-                messageId: assistantMessageId,
-                key: toolTraceKey(for: event),
-                kind: "tool_failed",
-                title: event.payload.title ?? "工具调用失败",
-                summary: event.payload.error ?? event.payload.tool ?? "",
-                category: event.payload.category ?? "tool",
-                status: "failed"
-            )
-            return nil
-        case "task.completed":
+        case let .completed(content):
             let content = preferredFinalContent(
                 id: assistantMessageId,
-                fallback: event.payload.answer
-                    ?? event.payload.summary
-                    ?? event.payload.content
-                    ?? "Task completed."
+                fallback: content ?? "Task completed."
             )
             pendingInputTaskId = nil
             pendingInputPrompt = nil
@@ -357,7 +336,7 @@ final class HomeViewModel {
             markRunFinished(id: assistantMessageId, status: "completed")
             finishMessage(id: assistantMessageId, content: content)
             return content
-        case "task.cancelled":
+        case let .cancelled(content):
             pendingInputTaskId = nil
             pendingInputPrompt = nil
             statusText = "已停止"
@@ -366,35 +345,33 @@ final class HomeViewModel {
                 id: assistantMessageId,
                 content: preferredFinalContent(
                     id: assistantMessageId,
-                    fallback: event.payload.summary
-                        ?? event.payload.content
-                        ?? "本轮任务已停止。"
+                    fallback: content ?? "本轮任务已停止。"
                 )
             )
-            return event.payload.summary ?? event.payload.content
-        case "task.failed":
+            return content
+        case let .failed(message):
             pendingInputTaskId = nil
             pendingInputPrompt = nil
             markRunFinished(id: assistantMessageId, status: "failed")
             failMessage(
                 id: assistantMessageId,
-                content: event.payload.error ?? event.payload.summary ?? "Task failed."
+                content: message ?? "Task failed."
             )
             statusText = nil
-            return event.payload.error ?? event.payload.summary
-        case "agent.run.completed":
+            return message
+        case let .runCompleted(preview):
             statusText = "正在整理回答"
             upsertTraceEvent(
                 messageId: assistantMessageId,
                 key: "run",
                 kind: "agent_run",
                 title: "Agent Run 已完成",
-                summary: event.payload.finalOutputPreview ?? "正在整理最终回答。",
+                summary: preview ?? "正在整理最终回答。",
                 category: "model",
                 status: "completed"
             )
             return nil
-        case "agent.run.started":
+        case .runStarted:
             statusText = "正在思考"
             upsertTraceEvent(
                 messageId: assistantMessageId,
@@ -406,12 +383,9 @@ final class HomeViewModel {
                 status: "running"
             )
             return nil
-        case "agent.input_requested":
-            pendingInputTaskId = event.taskId.isEmpty ? pendingInputTaskId : event.taskId
-            pendingInputPrompt = event.payload.pendingInput?.prompt
-                ?? event.payload.prompt
-                ?? event.payload.detail
-                ?? event.payload.summary
+        case let .inputRequired(taskId, prompt):
+            pendingInputTaskId = taskId ?? pendingInputTaskId
+            pendingInputPrompt = prompt
             statusText = pendingInputPrompt ?? "需要你的输入"
             setRunStatus(id: assistantMessageId, status: "input_required")
             if let prompt = pendingInputPrompt, !prompt.isEmpty {
@@ -427,7 +401,7 @@ final class HomeViewModel {
                 updateMessage(id: assistantMessageId, content: prompt)
             }
             return pendingInputPrompt
-        case "agent.input_resolved":
+        case .inputResolved:
             statusText = "已收到你的输入"
             upsertTraceEvent(
                 messageId: assistantMessageId,
@@ -439,46 +413,12 @@ final class HomeViewModel {
                 status: "completed"
             )
             return nil
-        default:
-            if event.type.hasSuffix(".started") {
-                statusText = friendlyStatus(for: event.type)
+        case let .ignored(status):
+            if let status {
+                statusText = status
             }
             return nil
         }
-    }
-
-    private func friendlyStatus(for eventType: String) -> String {
-        switch eventType {
-        case "source_intake.started": "正在整理资料"
-        case "ingest.started", "ingest_queue.process_started": "正在整理资料"
-        case "agent.run.started": "正在思考和生成"
-        case "rollback.completed", "rollback.failed": "正在回退变更"
-        default: "正在处理"
-        }
-    }
-
-    private func friendlyTraceTitle(for event: TaskEvent) -> String {
-        switch event.payload.category {
-        case "read": "正在阅读 Wiki"
-        case "write": "正在写入 Wiki"
-        case "command": "正在转换文档"
-        case "convert": "正在转换文档"
-        default: event.payload.title ?? "Agent 事件"
-        }
-    }
-
-    private func toolTraceKey(for event: TaskEvent) -> String {
-        if let toolUseId = event.payload.toolUseId, !toolUseId.isEmpty {
-            return "tool_use:\(toolUseId)"
-        }
-        let tool = event.payload.tool ?? event.payload.category ?? "tool"
-        let subject = normalizedToolSubject(for: event)
-        if !subject.isEmpty {
-            return "tool:\(tool):\(subject)"
-        }
-        let title = event.payload.title ?? friendlyTraceTitle(for: event)
-        let summary = event.payload.summary ?? event.payload.tool ?? ""
-        return "tool:\(tool):\(title):\(summary)"
     }
 
     private func updateMessage(id: String, content: String) {
@@ -593,40 +533,6 @@ final class HomeViewModel {
         }
     }
 
-    private func normalizedToolSubject(for event: TaskEvent) -> String {
-        let raw = (
-            event.payload.sourcePath
-            ?? event.payload.summary
-            ?? event.payload.detail
-            ?? event.payload.tool
-            ?? ""
-        )
-        .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !raw.isEmpty else { return "" }
-
-        if raw.contains("system/source_manifest.json") {
-            return "内部来源索引（source_manifest）"
-        }
-
-        let prefixes = ["Read：", "Read:", "Write：", "Write:", "Edit：", "Edit:", "Glob：", "Glob:", "Grep：", "Grep:"]
-        let cleaned = prefixes.reduce(raw) { partial, prefix in
-            partial.hasPrefix(prefix) ? String(partial.dropFirst(prefix.count)).trimmingCharacters(in: .whitespacesAndNewlines) : partial
-        }
-
-        for marker in ["wiki/", "raw/", "inbox/", "system/"] {
-            if let range = cleaned.range(of: marker) {
-                return String(cleaned[range.lowerBound...])
-            }
-        }
-
-        let normalizedPath = cleaned.replacingOccurrences(of: "\\", with: "/")
-        let components = normalizedPath.split(separator: "/")
-        if components.count >= 3 {
-            return components.suffix(3).joined(separator: "/")
-        }
-        return cleaned
-    }
 
     private func appendTraceEvent(
         messageId: String,

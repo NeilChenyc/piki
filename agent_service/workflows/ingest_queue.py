@@ -55,7 +55,7 @@ def process_ingest_queue(
             clear_error=True,
         )
         child_task = store.create_task(
-            task_kind=TaskKind.SOURCE_INTAKE,
+            task_kind=TaskKind.MAINTENANCE,
             risk_level=RiskLevel.LOW,
             vault_path=processing_item.vault_path,
             user_input=f"process ingest queue item {processing_item.id}",

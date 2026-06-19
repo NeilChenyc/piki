@@ -23,7 +23,7 @@ def make_vault(tmp_path: Path) -> Path:
 
 def make_client(tmp_path: Path) -> TestClient:
     store = SQLiteStore(tmp_path / "agent.sqlite3")
-    app = create_app(ServiceConfig(db_path=tmp_path / "agent.sqlite3", enable_sdk_runtime=False), store=store)
+    app = create_app(ServiceConfig(db_path=tmp_path / "agent.sqlite3", enable_agent_runtime=False), store=store)
     return TestClient(app)
 
 
@@ -95,7 +95,7 @@ def write_page(vault: Path, relative: str, content: str):
     path.write_text(content, encoding="utf-8")
 
 
-def test_lint_reports_structural_and_maintenance_issues(tmp_path: Path):
+def test_lint_reports_structural_and_maintenance_issues_via_agent_task(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     write_page(
         vault_path,
@@ -120,10 +120,20 @@ def test_lint_reports_structural_and_maintenance_issues(tmp_path: Path):
     write_page(vault_path, "wiki/concepts/无头.md", "没有 frontmatter，也没有标题。")
     client = make_client(tmp_path)
 
-    response = client.post("/lint", json={"vault_path": str(vault_path)})
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "请检查知识库健康状态。",
+            "action_context": {"action": "run_lint"},
+        },
+    )
 
     assert response.status_code == 200
-    kinds = {issue["kind"] for issue in response.json()["issues"]}
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+    issues = task["output"]["lint_result"]["issues"]
+    kinds = {issue["kind"] for issue in issues}
     assert "missing_frontmatter" in kinds
     assert "missing_heading" in kinds
     assert "broken_link" in kinds
@@ -142,7 +152,16 @@ def test_lint_fix_adds_missing_index_entries_and_journal(tmp_path: Path):
         "---\ntitle: 待索引\n---\n\n# 待索引\n\n这个页面应该被补充到索引中。\n",
     )
     client = make_client(tmp_path)
-    report = client.post("/lint", json={"vault_path": str(vault_path)}).json()
+    lint_task = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "请检查知识库健康状态。",
+            "action_context": {"action": "run_lint"},
+        },
+    )
+    assert lint_task.status_code == 200
+    report = client.get(f"/tasks/{lint_task.json()['task_id']}").json()["output"]["lint_result"]
     missing_ids = [
         issue["id"]
         for issue in report["issues"]
