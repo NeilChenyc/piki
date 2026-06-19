@@ -131,7 +131,8 @@ class PikiWikiAgentRunner:
                     permission_mode="dontAsk",
                     setting_sources=[],
                     strict_mcp_config=True,
-                    include_partial_messages=True,
+                    include_partial_messages=False,
+                    thinking={"type": "disabled"},
                     env=self._runtime_env(config),
                     cwd=str(Path.cwd()),
                 )
@@ -181,13 +182,13 @@ class PikiWikiAgentRunner:
             system_prompt=prompt,
             model=config.agent_model or None,
             cwd=str(vault.root),
-            add_dirs=[str(entry["staged_path"]) for entry in staged_files] if staged_files else [],
+            add_dirs=_runtime_add_dirs(vault_root=vault.root, staged_files=staged_files),
             allowed_tools=ALLOWED_TOOL_NAMES,
             disallowed_tools=DISALLOWED_TOOL_NAMES,
             permission_mode="acceptEdits",
             setting_sources=[],
             strict_mcp_config=True,
-            include_partial_messages=True,
+            include_partial_messages=False,
             include_hook_events=False,
             hooks=hooks,
             env=self._runtime_env(config),
@@ -195,7 +196,7 @@ class PikiWikiAgentRunner:
             continue_conversation=bool(resume_session_id),
             resume=resume_session_id,
             enable_file_checkpointing=config.enable_file_checkpointing,
-            thinking={"type": "adaptive", "display": "summarized"},
+            thinking={"type": "disabled"},
         )
         events.emit(
             task_id,
@@ -518,6 +519,14 @@ def _stage_selected_paths(staging_root: Path, task_id: str, selected_paths: list
     return staged
 
 
+def _runtime_add_dirs(*, vault_root: Path, staged_files: list[dict[str, Any]]) -> list[str]:
+    allowed_dirs = {str(vault_root.resolve())}
+    for entry in staged_files:
+        staged_path = Path(str(entry["staged_path"])).resolve()
+        allowed_dirs.add(str(staged_path if entry.get("is_dir") else staged_path.parent))
+    return sorted(allowed_dirs)
+
+
 def _validate_write_path(path: str, vault_root: Path, protected_roots: set[Path], staged_roots: set[Path]) -> tuple[bool, str]:
     target = Path(path).expanduser().resolve()
     try:
@@ -533,12 +542,8 @@ def _validate_write_path(path: str, vault_root: Path, protected_roots: set[Path]
 
 
 def _resolve_max_turns(*, config: ServiceConfig, action_context: dict[str, Any]) -> int:
-    action = str(action_context.get("action") or "").strip()
-    if action in {"run_lint", "ingest_file"}:
-        return max(1, config.agent_max_turns)
-    if config.agent_max_turns_configured:
-        return max(1, config.agent_max_turns)
-    return 12
+    _ = str(action_context.get("action") or "").strip()
+    return max(1, config.agent_max_turns)
 
 
 def _bash_writes_files(command: str) -> bool:

@@ -9,6 +9,7 @@ title: 索引
 - [[sources/测试来源-LLM Wiki 摘记]] — 关于 LLM Wiki 的轻量来源页。
 - [[sources/测试来源-孟岩近况]] — 关于孟岩与 Piki 当前工作的轻量来源页。
 - [[sources/LightAutoDS-Tab-多AutoML智能系统]] — LightAutoDS-Tab 论文核心观点，表格数据多 AutoML 智能体系统。
+- [[sources/杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案]] — 基于城投集团大模型底座的能源平台 AI 升级方案，涵盖预警自动化、智能问数、隐患识别与分发。
 
 ## concepts
 

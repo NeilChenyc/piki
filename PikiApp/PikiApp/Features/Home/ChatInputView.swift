@@ -84,9 +84,9 @@ struct ChatInputView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 16)
         .background(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 18)
                 .fill(Theme.cardBackground)
                 .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
         )

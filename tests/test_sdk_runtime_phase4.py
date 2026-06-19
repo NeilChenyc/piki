@@ -86,11 +86,11 @@ def test_claude_agent_task_uses_provider_neutral_events(tmp_path: Path, monkeypa
     assert "event: agent.run.completed" in events
 
 
-def test_default_query_max_turns_is_12(tmp_path: Path, monkeypatch):
+def test_default_query_max_turns_is_50(tmp_path: Path, monkeypatch):
     vault_path = make_runtime_vault(tmp_path)
 
     async def fake_query(*, prompt, options):
-        assert options.max_turns == 12
+        assert options.max_turns == 50
         yield SimpleNamespace(content=[SimpleNamespace(text="hello")], session_id="sess_turns_default")
         yield _result_message(session_id="sess_turns_default", result="hello")
 
@@ -111,6 +111,57 @@ def test_explicit_agent_max_turns_overrides_default_query_limit(tmp_path: Path, 
         assert options.max_turns == 45
         yield SimpleNamespace(content=[SimpleNamespace(text="hello")], session_id="sess_turns_override")
         yield _result_message(session_id="sess_turns_override", result="hello")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+
+
+def test_runtime_uses_staged_parent_dir_for_single_file_access(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+    selected_file = tmp_path / "upload.md"
+    selected_file.write_text("# 上传文档\n\n内容", encoding="utf-8")
+
+    async def fake_query(*, prompt, options):
+        allowed_dirs = {Path(path) for path in options.add_dirs}
+        assert vault_path in allowed_dirs
+        staged_only_dirs = [path for path in allowed_dirs if path != vault_path]
+        assert len(staged_only_dirs) == 1
+        allowed_dir = staged_only_dirs[0]
+        assert allowed_dir.is_dir()
+        assert allowed_dir.name.startswith("task_")
+        assert [path.name for path in allowed_dir.iterdir()] == ["00-upload.md"]
+        yield SimpleNamespace(content=[SimpleNamespace(text="已读取上传文档。")], session_id="sess_staged_dir")
+        yield _result_message(session_id="sess_staged_dir", result="已读取上传文档。")
+
+    client = make_configured_client(tmp_path, monkeypatch, fake_query)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "处理这个上传文件",
+            "selected_paths": [str(selected_file)],
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+
+
+def test_runtime_disables_partial_and_thinking_streams_for_sdk_compatibility(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+
+    async def fake_query(*, prompt, options):
+        assert options.include_partial_messages is False
+        assert getattr(options, "thinking", None) == {"type": "disabled"}
+        yield SimpleNamespace(content=[SimpleNamespace(text="稳定输出")], session_id="sess_no_thinking")
+        yield _result_message(session_id="sess_no_thinking", result="稳定输出")
 
     client = make_configured_client(tmp_path, monkeypatch, fake_query)
 
@@ -174,7 +225,7 @@ def test_run_lint_requires_helper_first_and_returns_lint_result(tmp_path: Path, 
     }
 
     async def fake_query(*, prompt, options):
-        assert options.max_turns == 30
+        assert options.max_turns == 50
         pre_hooks = [hook for matcher in options.hooks["PreToolUse"] for hook in matcher.hooks]
         post_hooks = [hook for matcher in options.hooks["PostToolUse"] for hook in matcher.hooks]
 
@@ -234,7 +285,7 @@ def test_run_lint_requires_helper_first_and_returns_lint_result(tmp_path: Path, 
     assert task["output"]["lint_result"]["issue_counts"] == {"missing_index_entry": 1}
     assert "wiki/index.md" in task["output"]["affected_files"]
     events = client.get(f"/tasks/{task_id}/events").text
-    assert '"max_turns": 30' in events
+    assert '"max_turns": 50' in events
 
 
 def test_run_lint_denies_reads_before_helper(tmp_path: Path, monkeypatch):
