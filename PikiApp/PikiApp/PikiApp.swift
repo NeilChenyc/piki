@@ -21,6 +21,9 @@ struct PikiApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var appState = AppState()
     @State private var homeViewModel = HomeViewModel()
+    @State private var wikiViewModel = WikiViewModel()
+    @State private var inboxViewModel = InboxViewModel()
+    @State private var healthViewModel = HealthViewModel()
     @State private var didStartService = false
 
     var body: some Scene {
@@ -28,6 +31,9 @@ struct PikiApp: App {
             ContentView()
                 .environment(appState)
                 .environment(homeViewModel)
+                .environment(wikiViewModel)
+                .environment(inboxViewModel)
+                .environment(healthViewModel)
                 .preferredColorScheme(.light)
                 .task {
                     guard !didStartService else { return }

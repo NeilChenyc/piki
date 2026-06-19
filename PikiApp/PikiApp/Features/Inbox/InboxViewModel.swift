@@ -9,6 +9,9 @@ final class InboxViewModel {
     var selectedItem: InboxItem?
     var errorMessage: String?
     var statusMessage: String?
+    var isLoading = false
+
+    private var loadedVaultPath: String?
 
     var filteredItems: [InboxItem] {
         switch selectedFilter {
@@ -61,12 +64,33 @@ final class InboxViewModel {
         }
     }
 
-    func loadVaultInbox(vaultURL: URL?) {
+    func loadIfNeeded(vaultURL: URL?) async {
+        let path = vaultURL?.path(percentEncoded: false)
+        guard path != loadedVaultPath else { return }
+        loadedVaultPath = path
+        await loadVaultInbox(vaultURL: vaultURL)
+    }
+
+    func loadVaultInbox(vaultURL: URL?) async {
         guard let vaultURL else {
             errorMessage = "No vault selected."
             return
         }
 
+        isLoading = true
+        let loaded = await Task.detached {
+            Self.scanDirectories(vaultURL: vaultURL)
+        }.value
+
+        items = loaded
+        if selectedItem == nil {
+            selectedItem = items.first
+        }
+        errorMessage = nil
+        isLoading = false
+    }
+
+    private nonisolated static func scanDirectories(vaultURL: URL) -> [InboxItem] {
         let fileManager = FileManager.default
         let directories = [
             vaultURL.appendingPathComponent("raw/inbox", isDirectory: true),
@@ -98,11 +122,7 @@ final class InboxViewModel {
             }
         }
 
-        items = loadedItems.sorted { $0.addedAt > $1.addedAt }
-        if selectedItem == nil {
-            selectedItem = items.first
-        }
-        errorMessage = nil
+        return loadedItems.sorted { $0.addedAt > $1.addedAt }
     }
 
     func ingest(_ item: InboxItem, appState: AppState) {
@@ -126,7 +146,7 @@ final class InboxViewModel {
                     mode: "clear-inbox-item"
                 )
                 _ = try await appState.apiClient.createTask(request)
-                loadVaultInbox(vaultURL: vaultPath)
+                await loadVaultInbox(vaultURL: vaultPath)
                 statusMessage = "Cleared"
             } catch {
                 errorMessage = "Clear failed: \(error.localizedDescription)"
@@ -154,7 +174,7 @@ final class InboxViewModel {
                     ]
                 )
                 _ = try await appState.apiClient.createTask(request)
-                loadVaultInbox(vaultURL: vaultPath)
+                await loadVaultInbox(vaultURL: vaultPath)
                 statusMessage = "Ingested"
             } catch {
                 errorMessage = "Ingest failed: \(error.localizedDescription)"
@@ -163,11 +183,11 @@ final class InboxViewModel {
         }
     }
 
-    private func isRegularFile(_ url: URL) -> Bool {
+    private nonisolated static func isRegularFile(_ url: URL) -> Bool {
         (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
     }
 
-    private func modificationDate(for url: URL) -> Date {
+    private nonisolated static func modificationDate(for url: URL) -> Date {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date()
     }
 }

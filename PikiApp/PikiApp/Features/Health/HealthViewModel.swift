@@ -80,7 +80,7 @@ final class HealthViewModel {
         }
 
         let vaultPath = vaultURL.path(percentEncoded: false)
-        refreshOverview(for: vaultURL)
+        await refreshOverview(for: vaultURL)
         setLoading(true, for: mode)
         defer { setLoading(false, for: mode) }
 
@@ -133,7 +133,7 @@ final class HealthViewModel {
             latestMaintenanceDate = entries
                 .compactMap { parseDate($0.createdAt) }
                 .max()
-            refreshOverview(for: vaultURL)
+            await refreshOverview(for: vaultURL)
         } catch {
             errorMessage = "最近维护时间读取失败，已展示其余健康数据。"
         }
@@ -142,18 +142,23 @@ final class HealthViewModel {
     private func loadLint(client: APIClient, vaultURL: URL, vaultPath: String) async {
         do {
             let result = try await client.runLint(vaultPath: vaultPath)
-            applyLintResult(result, vaultURL: vaultURL)
+            await applyLintResult(result, vaultURL: vaultURL)
         } catch {
             clearLintState()
             errorMessage = "知识库检查失败，请稍后重试。"
         }
     }
 
-    private func refreshOverview(for vaultURL: URL) {
-        overviewMetrics = buildOverview(from: vaultURL).metrics
+    private func refreshOverview(for vaultURL: URL) async {
+        let maintenanceDate = latestMaintenanceDate
+        let lintDate = latestLintDate
+        let metrics = await Task.detached {
+            Self.buildOverview(from: vaultURL, latestMaintenance: maintenanceDate, latestCheck: lintDate).metrics
+        }.value
+        overviewMetrics = metrics
     }
 
-    private func buildOverview(from vaultURL: URL) -> VaultOverview {
+    private nonisolated static func buildOverview(from vaultURL: URL, latestMaintenance: Date?, latestCheck: Date?) -> VaultOverview {
         VaultOverview(
             totalPages: countMarkdownFiles(in: vaultURL.appendingPathComponent("wiki", isDirectory: true)),
             totalSources: countRegularFiles(in: vaultURL.appendingPathComponent("raw/sources", isDirectory: true)),
@@ -162,12 +167,12 @@ final class HealthViewModel {
             entityPages: countMarkdownFiles(in: vaultURL.appendingPathComponent("wiki/entities", isDirectory: true)),
             domainPages: countMarkdownFiles(in: vaultURL.appendingPathComponent("wiki/domains", isDirectory: true)),
             synthesisPages: countMarkdownFiles(in: vaultURL.appendingPathComponent("wiki/synthesis", isDirectory: true)),
-            latestMaintenance: latestMaintenanceDate,
-            latestCheck: latestLintDate
+            latestMaintenance: latestMaintenance,
+            latestCheck: latestCheck
         )
     }
 
-    private func applyLintResult(_ result: LintResultDTO, vaultURL: URL) {
+    private func applyLintResult(_ result: LintResultDTO, vaultURL: URL) async {
         latestLintResult = result
         latestLintDate = parseDate(result.generatedAt)
         lintSummary = LintSummary(result: result)
@@ -177,7 +182,7 @@ final class HealthViewModel {
             .sorted(by: lintIssueComparator)
         affectedPages = AffectedPageSummary.fromIssues(lintIssues)
         issueBreakdown = IssueBreakdownItem.fromIssues(lintIssues)
-        refreshOverview(for: vaultURL)
+        await refreshOverview(for: vaultURL)
     }
 
     private func resetForMissingVault() {
@@ -225,7 +230,7 @@ final class HealthViewModel {
         }
     }
 
-    private func countMarkdownFiles(in directory: URL) -> Int {
+    private nonisolated static func countMarkdownFiles(in directory: URL) -> Int {
         guard let enumerator = FileManager.default.enumerator(
             at: directory,
             includingPropertiesForKeys: [.isRegularFileKey],
@@ -240,7 +245,7 @@ final class HealthViewModel {
             .count
     }
 
-    private func countRegularFiles(in directory: URL) -> Int {
+    private nonisolated static func countRegularFiles(in directory: URL) -> Int {
         guard let urls = try? FileManager.default.contentsOfDirectory(
             at: directory,
             includingPropertiesForKeys: [.isRegularFileKey],
@@ -252,7 +257,7 @@ final class HealthViewModel {
         return urls.filter(isRegularFile).count
     }
 
-    private func isRegularFile(_ url: URL) -> Bool {
+    private nonisolated static func isRegularFile(_ url: URL) -> Bool {
         (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
     }
 

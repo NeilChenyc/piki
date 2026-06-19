@@ -2,9 +2,11 @@ import SwiftUI
 
 struct WikiView: View {
     @Environment(AppState.self) private var appState
-    @State private var viewModel = WikiViewModel()
+    @Environment(WikiViewModel.self) private var viewModel
 
     var body: some View {
+        @Bindable var viewModel = viewModel
+
         HSplitView {
             // Page tree navigation
             VStack(alignment: .leading, spacing: 0) {
@@ -50,12 +52,22 @@ struct WikiView: View {
                                 .padding(12)
                         }
 
-                        ForEach(viewModel.filteredCategories) { category in
-                            WikiCategorySection(
-                                category: category,
-                                selectedPage: viewModel.selectedPage
-                            ) { page in
-                                viewModel.selectedPage = page
+                        if viewModel.isLoading && viewModel.categories.allSatisfy({ $0.pages.isEmpty }) {
+                            HStack(spacing: 8) {
+                                ProgressView().controlSize(.small)
+                                Text("Loading pages...")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Theme.textSecondary)
+                            }
+                            .padding(12)
+                        } else {
+                            ForEach(viewModel.filteredCategories) { category in
+                                WikiCategorySection(
+                                    category: category,
+                                    selectedPage: viewModel.selectedPage
+                                ) { page in
+                                    viewModel.selectedPage = page
+                                }
                             }
                         }
                     }
@@ -80,7 +92,7 @@ struct WikiView: View {
             }
         }
         .task(id: appState.vaultPath) {
-            viewModel.loadWiki(vaultURL: appState.vaultPath)
+            await viewModel.loadIfNeeded(vaultURL: appState.vaultPath)
         }
     }
 }

@@ -26,4 +26,7 @@ struct ContentView: View {
     ContentView()
         .environment(AppState())
         .environment(HomeViewModel())
+        .environment(WikiViewModel())
+        .environment(InboxViewModel())
+        .environment(HealthViewModel())
 }

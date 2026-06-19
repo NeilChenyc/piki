@@ -2,7 +2,7 @@ import SwiftUI
 
 struct HealthView: View {
     @Environment(AppState.self) private var appState
-    @State private var viewModel = HealthViewModel()
+    @Environment(HealthViewModel.self) private var viewModel
 
     private let overviewColumns = [
         GridItem(.adaptive(minimum: 160), spacing: 16, alignment: .top),
@@ -25,6 +25,14 @@ struct HealthView: View {
                             title: "尚未选择知识库",
                             message: "先在设置或首页选择一个 vault，Health 页面才会展示知识库规模和 lint 结果。"
                         )
+                    } else if viewModel.isLoading && !viewModel.hasOverview && viewModel.lintSummary == nil {
+                        HStack(spacing: 8) {
+                            ProgressView().controlSize(.small)
+                            Text("Loading health data...")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+                        .padding(24)
                     } else {
                         if viewModel.hasOverview {
                             section(title: "知识库概览", subtitle: "回答“这个 Wiki 现在长成什么样了”") {

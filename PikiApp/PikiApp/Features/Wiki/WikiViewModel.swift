@@ -7,6 +7,9 @@ final class WikiViewModel {
     var selectedPage: WikiPage?
     var searchQuery: String = ""
     var errorMessage: String?
+    var isLoading = false
+
+    private var loadedVaultPath: String?
 
     var filteredCategories: [WikiCategory] {
         let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -22,7 +25,14 @@ final class WikiViewModel {
         .filter { !$0.pages.isEmpty }
     }
 
-    func loadWiki(vaultURL: URL?) {
+    func loadIfNeeded(vaultURL: URL?) async {
+        let path = vaultURL?.path(percentEncoded: false)
+        guard path != loadedVaultPath else { return }
+        loadedVaultPath = path
+        await loadWiki(vaultURL: vaultURL)
+    }
+
+    func loadWiki(vaultURL: URL?) async {
         guard let vaultURL else {
             errorMessage = "No vault selected."
             categories = WikiCategory.defaults
@@ -30,21 +40,29 @@ final class WikiViewModel {
             return
         }
 
+        isLoading = true
         let wikiURL = vaultURL.appendingPathComponent("wiki", isDirectory: true)
-        let loadedCategories = WikiCategory.defaults.map { category in
+        let loaded = await Task.detached {
+            Self.loadAllCategories(wikiURL: wikiURL)
+        }.value
+
+        categories = loaded
+        if selectedPage == nil {
+            selectedPage = loaded.flatMap(\.pages).first
+        }
+        errorMessage = nil
+        isLoading = false
+    }
+
+    private nonisolated static func loadAllCategories(wikiURL: URL) -> [WikiCategory] {
+        WikiCategory.defaults.map { category in
             var mutable = category
             mutable.pages = loadPages(category: category, wikiURL: wikiURL)
             return mutable
         }
-
-        categories = loadedCategories
-        if selectedPage == nil {
-            selectedPage = loadedCategories.flatMap(\.pages).first
-        }
-        errorMessage = nil
     }
 
-    private func loadPages(category: WikiCategory, wikiURL: URL) -> [WikiPage] {
+    private nonisolated static func loadPages(category: WikiCategory, wikiURL: URL) -> [WikiPage] {
         let directory = wikiURL.appendingPathComponent(category.id, isDirectory: true)
         guard let urls = try? FileManager.default.contentsOfDirectory(
             at: directory,
@@ -61,7 +79,7 @@ final class WikiViewModel {
                 let content = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
                 return WikiPage(
                     id: url.path(percentEncoded: false),
-                    title: title(for: url, content: content),
+                    title: pageTitle(for: url, content: content),
                     category: category.id,
                     filePath: url.path(percentEncoded: false),
                     content: content,
@@ -71,7 +89,7 @@ final class WikiViewModel {
             }
     }
 
-    private func title(for url: URL, content: String) -> String {
+    private nonisolated static func pageTitle(for url: URL, content: String) -> String {
         if let heading = content
             .split(separator: "\n")
             .first(where: { $0.hasPrefix("# ") }) {
@@ -80,7 +98,7 @@ final class WikiViewModel {
         return url.deletingPathExtension().lastPathComponent
     }
 
-    private func extractWikiLinks(from content: String) -> [String] {
+    private nonisolated static func extractWikiLinks(from content: String) -> [String] {
         let pattern = #"\[\[([^\]]+)\]\]"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         let range = NSRange(content.startIndex..<content.endIndex, in: content)
@@ -92,11 +110,11 @@ final class WikiViewModel {
         return Array(Set(links)).sorted()
     }
 
-    private func isRegularFile(_ url: URL) -> Bool {
+    private nonisolated static func isRegularFile(_ url: URL) -> Bool {
         (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
     }
 
-    private func modificationDate(for url: URL) -> Date {
+    private nonisolated static func modificationDate(for url: URL) -> Date {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date()
     }
 }

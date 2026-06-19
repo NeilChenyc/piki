@@ -5,9 +5,10 @@ struct FilePreviewPanel: View {
     let onIngest: () -> Void
     let onClear: () -> Void
 
+    @State private var previewText: String = ""
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.fileName)
@@ -31,9 +32,8 @@ struct FilePreviewPanel: View {
 
             Divider()
 
-            // Preview content placeholder
             ScrollView {
-                Text(previewText)
+                Text(previewText.isEmpty ? "Loading..." : previewText)
                     .font(.system(size: 12))
                     .foregroundStyle(previewText.isEmpty ? Theme.textTertiary : Theme.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,7 +41,6 @@ struct FilePreviewPanel: View {
 
             Spacer()
 
-            // Action buttons
             HStack(spacing: 12) {
                 Button("Ingest", action: onIngest)
                     .buttonStyle(.borderedProminent)
@@ -52,15 +51,24 @@ struct FilePreviewPanel: View {
             }
         }
         .padding(16)
+        .task(id: item.id) {
+            await loadPreview()
+        }
     }
 
-    private var previewText: String {
+    private func loadPreview() async {
         guard let filePath = item.filePath else {
-            return "No preview available"
+            previewText = "No preview available"
+            return
         }
         guard ["md", "markdown", "txt"].contains(filePath.pathExtension.lowercased()) else {
-            return "Preview is available for Markdown and text files."
+            previewText = "Preview is available for Markdown and text files."
+            return
         }
-        return (try? String(contentsOf: filePath, encoding: .utf8)) ?? "Unable to read preview."
+        let url = filePath
+        let content = await Task.detached {
+            (try? String(contentsOf: url, encoding: .utf8)) ?? "Unable to read preview."
+        }.value
+        previewText = content
     }
 }

@@ -2,9 +2,11 @@ import SwiftUI
 
 struct InboxView: View {
     @Environment(AppState.self) private var appState
-    @State private var viewModel = InboxViewModel()
+    @Environment(InboxViewModel.self) private var viewModel
 
     var body: some View {
+        @Bindable var viewModel = viewModel
+
         HSplitView {
             // Main list area
             VStack(alignment: .leading, spacing: 0) {
@@ -52,14 +54,24 @@ struct InboxView: View {
                                 .foregroundStyle(Theme.error)
                                 .padding(16)
                         }
-                        ForEach(viewModel.filteredItems) { item in
-                            InboxFileRow(
-                                item: item,
-                                isSelected: viewModel.selectedItem?.id == item.id
-                            ) {
-                                viewModel.selectedItem = item
+                        if viewModel.isLoading && viewModel.items.isEmpty {
+                            HStack(spacing: 8) {
+                                ProgressView().controlSize(.small)
+                                Text("Loading files...")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Theme.textSecondary)
                             }
-                            Divider().padding(.leading, 56)
+                            .padding(24)
+                        } else {
+                            ForEach(viewModel.filteredItems) { item in
+                                InboxFileRow(
+                                    item: item,
+                                    isSelected: viewModel.selectedItem?.id == item.id
+                                ) {
+                                    viewModel.selectedItem = item
+                                }
+                                Divider().padding(.leading, 56)
+                            }
                         }
                     }
                 }
@@ -96,7 +108,7 @@ struct InboxView: View {
             }
         }
         .task(id: appState.vaultPath) {
-            viewModel.loadVaultInbox(vaultURL: appState.vaultPath)
+            await viewModel.loadIfNeeded(vaultURL: appState.vaultPath)
         }
     }
 }
