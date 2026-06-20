@@ -1,0 +1,40 @@
+{
+  "source": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "All pages",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 37
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search pages...",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading pages...",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select a page to view",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 87
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost.build/master.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiRuntimeHost/main.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost.build/main.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost.build/main.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost.build/main.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost.build/main.dia"
+  }
+}

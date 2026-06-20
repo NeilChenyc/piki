@@ -470,7 +470,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -euo pipefail\nHOST_PRODUCT_PATH=\"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost\"\ncp -f \"${BUILT_PRODUCTS_DIR}/PikiRuntimeHost\" \"$HOST_PRODUCT_PATH\"\nchmod +x \"$HOST_PRODUCT_PATH\"\n";
+			shellScript = "set -euo pipefail\nHOST_PRODUCT_PATH=\"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost\"\ncp -f \"${BUILT_PRODUCTS_DIR}/PikiRuntimeHost\" \"$HOST_PRODUCT_PATH\"\nchmod +x \"$HOST_PRODUCT_PATH\"\ncodesign --force --sign - --timestamp=none \"$HOST_PRODUCT_PATH\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

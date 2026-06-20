@@ -1,0 +1,64 @@
+{
+  "source": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Loading health data...",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "关键问题",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "问题筛选",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "知识库 Health",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "这里展示 Wiki 的规模、结构状态和轻量维护入口。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "问题列表",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 128
+        }
+      },
+      {
+        "comment": "",
+        "key": "受影响页面",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 160
+        }
+      }
+    ]
+  },
+  "version": 1
+}

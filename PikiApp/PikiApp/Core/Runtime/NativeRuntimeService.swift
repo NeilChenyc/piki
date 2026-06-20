@@ -41,7 +41,19 @@ final class NativeRuntimeService: RuntimeServiceProtocol {
     }
 
     func taskEvents(taskId: String) -> AsyncThrowingStream<TaskEvent, Error> {
-        connection.taskEvents(taskId: taskId)
+        let (stream, continuation) = AsyncThrowingStream.makeStream(of: TaskEvent.self, throwing: Error.self)
+        Task {
+            let inner = await connection.taskEvents(taskId: taskId)
+            do {
+                for try await event in inner {
+                    continuation.yield(event)
+                }
+                continuation.finish()
+            } catch {
+                continuation.finish(throwing: error)
+            }
+        }
+        return stream
     }
 
     func getTask(taskId: String) async throws -> TaskRecordDTO {
@@ -112,7 +124,7 @@ final class NativeRuntimeService: RuntimeServiceProtocol {
     }
 
     func stop() {
-        connection.stop()
+        Task { await connection.stop() }
     }
 
     private func decode<T: Decodable>(_ data: Data) async throws -> T {

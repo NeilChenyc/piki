@@ -1,0 +1,80 @@
+{
+  "source": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Settings/PresetFormSheet.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "新建配置",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 11
+        }
+      },
+      {
+        "comment": "",
+        "key": "编辑配置",
+        "location": {
+          "startingColumn": 68,
+          "startingLine": 11
+        }
+      },
+      {
+        "comment": "",
+        "key": "例如：Claude Sonnet 生产环境",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 17
+        }
+      },
+      {
+        "comment": "",
+        "key": "claude-sonnet-4-20250514",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 22
+        }
+      },
+      {
+        "comment": "",
+        "key": "https://api.anthropic.com",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "留空则保留原有 Key",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "sk-ant-...",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "取消",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "保存",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 46
+        }
+      }
+    ]
+  },
+  "version": 1
+}

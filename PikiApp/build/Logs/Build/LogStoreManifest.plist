@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>32625C15-1A50-4DEA-A020-BE125EBEF66E</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>32625C15-1A50-4DEA-A020-BE125EBEF66E.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>PikiApp project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>PikiApp</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project PikiApp with scheme PikiApp and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>803652733.00237405</real>
+			<key>timeStoppedRecording</key>
+			<real>803653075.22406602</real>
+			<key>title</key>
+			<string>Building project PikiApp with scheme PikiApp and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>32625C15-1A50-4DEA-A020-BE125EBEF66E</string>
+		</dict>
+		<key>95D52699-2F1D-42FF-93BD-95B128237D69</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>95D52699-2F1D-42FF-93BD-95B128237D69.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>PikiApp project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>PikiApp</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project PikiApp with scheme PikiApp and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>803652073.94777501</real>
+			<key>timeStoppedRecording</key>
+			<real>803652305.14236295</real>
+			<key>title</key>
+			<string>Building project PikiApp with scheme PikiApp and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>95D52699-2F1D-42FF-93BD-95B128237D69</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

@@ -1,0 +1,37 @@
+{
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/LocalServiceManager.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LocalServiceManager.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LocalServiceManager.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LocalServiceManager.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LocalServiceManager.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LocalServiceManager.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/JSONValue.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/JSONValue.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/JSONValue.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/JSONValue.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/JSONValue.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/LintComponents.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LintComponents.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LintComponents.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LintComponents.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LintComponents.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/LintComponents.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Inbox/InboxView.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxView.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxView.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxView.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxView.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxView.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Inbox/InboxViewModel.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxViewModel.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxViewModel.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxViewModel.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxViewModel.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/InboxViewModel.swiftdeps"
+  }
+}

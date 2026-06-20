@@ -1,0 +1,37 @@
+{
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Models/TaskRenderEvent.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/TaskRenderEvent.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/TaskRenderEvent.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/TaskRenderEvent.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/TaskRenderEvent.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/TaskRenderEvent.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Home/VaultStatusCard.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/VaultStatusCard.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/VaultStatusCard.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/VaultStatusCard.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/VaultStatusCard.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/VaultStatusCard.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Sidebar/SidebarNavRow.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarNavRow.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarNavRow.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarNavRow.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarNavRow.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarNavRow.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Sidebar/SidebarView.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarView.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarView.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarView.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarView.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/SidebarView.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Theme.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/Theme.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/Theme.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/Theme.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/Theme.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/Theme.swiftdeps"
+  }
+}

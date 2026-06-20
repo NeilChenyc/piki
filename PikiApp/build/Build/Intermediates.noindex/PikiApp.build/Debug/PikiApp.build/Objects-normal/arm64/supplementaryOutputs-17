@@ -1,0 +1,37 @@
+{
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/PresetStorage.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetStorage.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetStorage.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetStorage.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetStorage.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetStorage.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeHostConnection.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeHostConnection.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeHostConnection.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeHostConnection.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeHostConnection.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeServiceFactory.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeServiceFactory.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeServiceFactory.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeServiceFactory.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/RuntimeServiceFactory.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Home/QuickActionsView.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/QuickActionsView.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/QuickActionsView.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/QuickActionsView.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/QuickActionsView.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/QuickActionsView.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Settings/PresetFormSheet.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetFormSheet.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetFormSheet.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetFormSheet.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetFormSheet.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/PikiApp.build/Debug/PikiApp.build/Objects-normal/arm64/PresetFormSheet.swiftdeps"
+  }
+}

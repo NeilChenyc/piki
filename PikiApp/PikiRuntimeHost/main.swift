@@ -131,30 +131,51 @@ func runStdio() {
         return
     }
 
-    let forwarder = Task {
-        async let workerStdout: Void = forwardLines(from: stdoutPipe.fileHandleForReading)
-        async let workerStderr: Void = drain(stderrPipe.fileHandleForReading)
-        do {
-            for try await line in FileHandle.standardInput.bytes.lines {
-                guard let data = String(line).data(using: .utf8),
-                      let request = try? JSONDecoder().decode(HostRequest.self, from: data) else {
-                    continue
-                }
-                if let payload = try? JSONEncoder().encode(request),
-                   let text = String(data: payload, encoding: .utf8) {
-                    try? stdinPipe.fileHandleForWriting.write(contentsOf: Data((text + "\n").utf8))
-                }
-            }
-        } catch {
-            emitError(error.localizedDescription)
+    final class StderrCapture: @unchecked Sendable {
+        var data = Data()
+        var text: String { String(data: data, encoding: .utf8) ?? "" }
+    }
+    let capture = StderrCapture()
+
+    let stderrHandle = stderrPipe.fileHandleForReading
+    stderrHandle.readabilityHandler = { handle in
+        let chunk = handle.availableData
+        if chunk.isEmpty {
+            stderrHandle.readabilityHandler = nil
+        } else {
+            capture.data.append(chunk)
+            if capture.data.count > 8192 { capture.data = capture.data.suffix(4096) }
+            FileHandle.standardError.write(chunk)
         }
-        _ = await workerStdout
-        _ = await workerStderr
     }
 
-    withExtendedLifetime(forwarder) {
-        RunLoop.current.run()
+    let workerStdoutHandle = stdoutPipe.fileHandleForReading
+    workerStdoutHandle.readabilityHandler = { handle in
+        let data = handle.availableData
+        guard !data.isEmpty else {
+            workerStdoutHandle.readabilityHandler = nil
+            let detail = capture.text
+            let msg = detail.isEmpty
+                ? "Worker process exited (code \(worker.terminationStatus))."
+                : "Worker exited (code \(worker.terminationStatus)): \(String(detail.suffix(500)))"
+            emitError(msg)
+            exit(1)
+        }
+        FileHandle.standardOutput.write(data)
     }
+
+    let stdinHandle = FileHandle.standardInput
+    stdinHandle.readabilityHandler = { handle in
+        let data = handle.availableData
+        guard !data.isEmpty else {
+            stdinHandle.readabilityHandler = nil
+            stdinPipe.fileHandleForWriting.closeFile()
+            return
+        }
+        stdinPipe.fileHandleForWriting.write(data)
+    }
+
+    RunLoop.current.run()
 }
 
 private enum RuntimeHostProxy {
@@ -165,6 +186,7 @@ private enum RuntimeHostProxy {
         process.arguments = command.arguments
         var environment = ProcessInfo.processInfo.environment
         environment["PYTHONUNBUFFERED"] = "1"
+        environment["PIKI_ENABLE_AGENT_RUNTIME"] = "1"
         if let bundle = loadRuntimeBundlePaths() {
             let resourceRoot = runtimeResourcesRoot()
             let pythonHome = resourceRoot.appendingPathComponent(bundle.python)
@@ -190,7 +212,8 @@ private enum RuntimeHostProxy {
                         "-m", "agent_service.runtime.cli", "stdio",
                         "--db-path", runtimePath("agent_service.sqlite3"),
                         "--runtime-config-path", runtimePath("runtime-config.json"),
-                        "--staging-root", runtimePath("task-staging")
+                        "--staging-root", runtimePath("task-staging"),
+                        "--enable-agent-runtime"
                     ])
                 }
             }
@@ -216,27 +239,6 @@ private enum RuntimeHostProxy {
             try? FileManager.default.createDirectory(at: path.deletingLastPathComponent(), withIntermediateDirectories: true)
         }
         return path.path
-    }
-}
-
-private func forwardLines(from handle: FileHandle) async {
-    do {
-        for try await line in handle.bytes.lines {
-            print(String(line))
-            fflush(stdout)
-        }
-    } catch {
-        emitError(error.localizedDescription)
-    }
-}
-
-private func drain(_ handle: FileHandle) async {
-    do {
-        for try await _ in handle.bytes.lines {
-            continue
-        }
-    } catch {
-        return
     }
 }
 

@@ -1,0 +1,16 @@
+{
+  "source": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Home/ActivityRow.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Rollback this vault change",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 34
+        }
+      }
+    ]
+  },
+  "version": 1
+}

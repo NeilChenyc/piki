@@ -1,0 +1,51 @@
+{
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CollectionExtensions.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CollectionExtensions.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CollectionExtensions.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CollectionExtensions.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CollectionExtensions.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/StringExtensions.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/StringExtensions.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/StringExtensions.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/StringExtensions.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/StringExtensions.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupVisitor.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupVisitor.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupVisitor.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupVisitor.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupVisitor.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupWalker.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupWalker.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupWalker.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupWalker.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupWalker.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/HTMLFormatter.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/HTMLFormatter.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/HTMLFormatter.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/HTMLFormatter.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/HTMLFormatter.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupFormatter.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupFormatter.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupFormatter.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupFormatter.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupFormatter.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupTreeDumper.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupTreeDumper.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupTreeDumper.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupTreeDumper.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/MarkupTreeDumper.swiftdeps"
+  }
+}

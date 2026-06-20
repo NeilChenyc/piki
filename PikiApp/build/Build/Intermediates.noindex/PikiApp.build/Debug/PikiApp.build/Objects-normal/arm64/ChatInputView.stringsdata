@@ -1,0 +1,32 @@
+{
+  "source": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Home/ChatInputView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Choose a file",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stopping…",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop current run",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 74
+        }
+      }
+    ]
+  },
+  "version": 1
+}

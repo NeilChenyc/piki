@@ -14,13 +14,16 @@ final class LocalServiceManager {
         appState.connectionStatus = .starting
         appState.serviceErrorMessage = nil
 
-        if await probeHealth() {
-            startMonitoring()
-            return
+        for _ in 0..<5 {
+            if await probeHealth() {
+                startMonitoring()
+                return
+            }
+            try? await Task.sleep(for: .seconds(2))
         }
 
-        appState.connectionStatus = .disconnected
-        appState.serviceErrorMessage = "Piki runtime host could not be started."
+        appState.connectionStatus = .starting
+        appState.serviceErrorMessage = "Piki runtime host is preparing."
 
         startMonitoring()
     }
@@ -54,7 +57,13 @@ final class LocalServiceManager {
         }
 
         consecutiveFailures += 1
-        guard consecutiveFailures >= 2 else { return }
+        if consecutiveFailures <= 3 {
+            appState.connectionStatus = .starting
+            appState.serviceErrorMessage = "Piki runtime host is reconnecting."
+            return
+        }
+        appState.connectionStatus = .disconnected
+        appState.serviceErrorMessage = "Piki runtime host is unavailable."
     }
 
     private func probeHealth() async -> Bool {

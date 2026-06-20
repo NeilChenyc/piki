@@ -1,0 +1,51 @@
+{
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineAttributes.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineAttributes.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineAttributes.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineAttributes.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineAttributes.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Link.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Link.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Link.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Link.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Link.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strikethrough.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strikethrough.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strikethrough.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strikethrough.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strikethrough.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strong.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strong.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strong.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strong.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/Strong.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CustomInline.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CustomInline.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CustomInline.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CustomInline.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/CustomInline.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineCode.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineCode.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineCode.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineCode.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineCode.swiftdeps"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift" : {
+    "const-values" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineHTML.swiftconstvalues",
+    "dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineHTML.d",
+    "diagnostics" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineHTML.dia",
+    "object" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineHTML.o",
+    "swift-dependencies" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/Build/Intermediates.noindex/swift-markdown.build/Debug/Markdown.build/Objects-normal/arm64/InlineHTML.swiftdeps"
+  }
+}

@@ -17,6 +17,10 @@ let package = Package(
             ],
             path: "PikiApp"
         ),
+        .executableTarget(
+            name: "PikiRuntimeHost",
+            path: "PikiRuntimeHost"
+        ),
         .testTarget(
             name: "PikiAppTests",
             dependencies: ["PikiApp"],

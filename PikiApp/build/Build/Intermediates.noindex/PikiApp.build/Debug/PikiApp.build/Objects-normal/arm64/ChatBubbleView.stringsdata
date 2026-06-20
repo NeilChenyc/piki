@@ -1,0 +1,48 @@
+{
+  "source": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Home/ChatBubbleView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Agent 正在执行本轮任务…",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "本轮 Agent Run 暂无最终正文。",
+        "location": {
+          "startingColumn": 88,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "收起过程",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "展开过程",
+        "location": {
+          "startingColumn": 77,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Agent Run",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 93
+        }
+      }
+    ]
+  },
+  "version": 1
+}
