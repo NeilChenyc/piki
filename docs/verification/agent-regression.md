@@ -33,6 +33,8 @@
 | 单 case 回归 | `python3 scripts/run_agent_regression.py --service-url http://127.0.0.1:8000 --case-id 8` |
 | 结果整理表 | [agent-regression-tracker-20260606.xlsx](/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/outputs/agent-regression/agent-regression-tracker-20260606.xlsx) |
 
+> 备注：这些命令是历史兼容验证入口，不是产品主运行时真相。当前产品主路径是 app bundle 内的 `PikiRuntimeHost`。
+
 ## 最近结果
 
 | 日期 | 测试仓库 | 结果文件 | 备注 |

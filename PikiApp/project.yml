@@ -26,6 +26,8 @@ targets:
       - path: PikiApp
         excludes:
           - "Preview Content"
+          - "Core/Network"
+          - "Core/Runtime/HTTPRuntimeService.swift"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.piki.app
@@ -46,17 +48,25 @@ targets:
         product: Markdown
       - target: PikiRuntimeHost
     postBuildScripts:
+      - name: Build Runtime Bundle
+        basedOnDependencyAnalysis: false
+        outputFiles:
+          - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/Resources/runtime-paths.json"
+          - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/Resources/PikiRuntime"
+        script: |
+          set -euo pipefail
+          RUNTIME_BUILD_ROOT="${SRCROOT}/.build/runtime-bundle"
+          APP_RESOURCES="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources"
+          python3 "${SRCROOT}/../scripts/build_runtime_bundle.py"
+          mkdir -p "$APP_RESOURCES"
+          rm -rf "$APP_RESOURCES/PikiRuntime"
+          cp -R "${RUNTIME_BUILD_ROOT}/Contents/Resources/PikiRuntime" "$APP_RESOURCES/"
+          cp -f "${RUNTIME_BUILD_ROOT}/Contents/Resources/runtime-paths.json" "$APP_RESOURCES/"
       - name: Copy Runtime Host
         basedOnDependencyAnalysis: false
         outputFiles:
           - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/PikiRuntimeHost"
-          - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/PikiRuntimeHost.stamp"
         script: |
-          set -euo pipefail
-          HOST_PRODUCT_PATH="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost"
-          cp -f "${BUILT_PRODUCTS_DIR}/PikiRuntimeHost" "$HOST_PRODUCT_PATH"
-          chmod +x "$HOST_PRODUCT_PATH"
-          date > "${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost.stamp"
           set -euo pipefail
           HOST_PRODUCT_PATH="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost"
           cp -f "${BUILT_PRODUCTS_DIR}/PikiRuntimeHost" "$HOST_PRODUCT_PATH"

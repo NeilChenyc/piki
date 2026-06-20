@@ -20,7 +20,7 @@ final class LocalServiceManager {
         }
 
         appState.connectionStatus = .disconnected
-        appState.serviceErrorMessage = "Piki Runtime Host is not available."
+        appState.serviceErrorMessage = "Piki runtime host could not be started."
 
         startMonitoring()
     }

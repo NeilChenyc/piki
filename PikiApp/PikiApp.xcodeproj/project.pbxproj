@@ -26,6 +26,7 @@
 		490434767BFDD84D814A5496 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = A5A5FA886E43A892B6D56719 /* Markdown */; };
 		4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1996F0136E908523C15056A5 /* ContentView.swift */; };
 		4BFDE0D780505465530B0DD9 /* RuntimeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */; };
+		53D1620FF4C02D2B9E69C496 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA758718F558AC366FE9349B /* JSONValue.swift */; };
 		59F9C2A82DD4D6BA32E6695C /* RuntimeServiceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8560842E5C661DAF3CD9A932 /* RuntimeServiceFactory.swift */; };
 		5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A756DA17731FCFE154EADB /* ChatBubbleView.swift */; };
 		5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34DECA1A1AA8C54EE4EAD4EB /* InboxView.swift */; };
@@ -111,6 +112,7 @@
 		BEA331709E3B66786DB4834A /* ActivityRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRow.swift; sourceTree = "<group>"; };
 		C384BF71DF500A366F4A4134 /* RuntimeHostConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeHostConnection.swift; sourceTree = "<group>"; };
 		C6F43371721B468079B54395 /* LocalServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalServiceManager.swift; sourceTree = "<group>"; };
+		CA758718F558AC366FE9349B /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
 		D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxFileRow.swift; sourceTree = "<group>"; };
 		DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 			isa = PBXGroup;
 			children = (
 				7CB66741B165A1E69A2BD665 /* HTTPRuntimeService.swift */,
+				CA758718F558AC366FE9349B /* JSONValue.swift */,
 				9D9C3B785F768D9E5CA88774 /* NativeRuntimeService.swift */,
 				C384BF71DF500A366F4A4134 /* RuntimeHostConnection.swift */,
 				8560842E5C661DAF3CD9A932 /* RuntimeServiceFactory.swift */,
@@ -359,6 +362,7 @@
 				F367E3C39418C7A54BB61FE5 /* Sources */,
 				2E71C85B467E0CC5524B74DD /* Resources */,
 				8E53C344C220063B0E43FCBC /* Frameworks */,
+				1EDFFF092BA6A6B51821055A /* Build Runtime Bundle */,
 				6A6B4ACE2B546BCAD286B490 /* Copy Runtime Host */,
 			);
 			buildRules = (
@@ -427,8 +431,30 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1EDFFF092BA6A6B51821055A /* Build Runtime Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Runtime Bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/Resources/runtime-paths.json",
+				"$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/Resources/PikiRuntime",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nRUNTIME_BUILD_ROOT=\"${SRCROOT}/.build/runtime-bundle\"\nAPP_RESOURCES=\"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\npython3 \"${SRCROOT}/../scripts/build_runtime_bundle.py\"\nmkdir -p \"$APP_RESOURCES\"\nrm -rf \"$APP_RESOURCES/PikiRuntime\"\ncp -R \"${RUNTIME_BUILD_ROOT}/Contents/Resources/PikiRuntime\" \"$APP_RESOURCES/\"\ncp -f \"${RUNTIME_BUILD_ROOT}/Contents/Resources/runtime-paths.json\" \"$APP_RESOURCES/\"\n";
+		};
 		6A6B4ACE2B546BCAD286B490 /* Copy Runtime Host */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -440,6 +466,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/PikiRuntimeHost",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -482,6 +509,7 @@
 				315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */,
 				5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */,
 				C5E6688E658CD6635E6B8BDF /* InboxViewModel.swift in Sources */,
+				53D1620FF4C02D2B9E69C496 /* JSONValue.swift in Sources */,
 				F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */,
 				3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */,
 				EC28D6F133C07E1352037566 /* MarkdownTextView.swift in Sources */,

@@ -14,7 +14,7 @@ struct ServiceRuntimeSettingsSection: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        Section("Agent Service") {
+        Section("Runtime Host") {
             HStack {
                 Circle()
                     .fill(connectionColor)
@@ -23,7 +23,7 @@ struct ServiceRuntimeSettingsSection: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textSecondary)
                 Spacer()
-                Button("Test Connection") {
+                Button("Test Runtime") {
                     Task { await testConnection() }
                 }
             }

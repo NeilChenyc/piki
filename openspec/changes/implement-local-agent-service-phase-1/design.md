@@ -1,8 +1,8 @@
 ## Context
 
-Stage 0 has established the local Markdown vault protocol: `AGENTS.md`, `purpose.md`, `wiki/index.md`, `wiki/log.md`, and seed wiki pages. Stage 1 needs a local Agent Service that can run without Codex CLI and provide stable product-facing contracts for future `query`, `ingest`, and `lint` work.
+Stage 0 has established the local Markdown vault protocol: `AGENTS.md`, `purpose.md`, `wiki/index.md`, `wiki/log.md`, and seed wiki pages. Stage 1 established the local runtime foundations that now live behind `PikiRuntimeHost`, providing stable product-facing contracts for future `query`, `ingest`, and `lint` work.
 
-The service should be small but real: HTTP task creation, task status, SSE event streaming, SQLite persistence, operation routing, context assembly, vault-safe tools, and approval endpoints.
+The runtime should be small but real: task creation, task status, event bridging, SQLite persistence, operation routing, context assembly, vault-safe tools, and approval handling.
 
 ## Goals / Non-Goals
 
@@ -26,15 +26,15 @@ The service should be small but real: HTTP task creation, task status, SSE event
 
 ## Decisions
 
-### Decision: Python package plus FastAPI app
+### Decision: Python package plus native host bridge
 
-Use `agent_service/` as a Python package and expose `agent_service.app:create_app`.
+Use `agent_service/` as a Python package behind a native host bridge instead of exposing `agent_service.app:create_app`.
 
 Rationale:
 
 - Matches the OpenAI Agents SDK Python path.
 - Keeps phase 1 independently testable without a UI.
-- Gives the Mac client a simple HTTP/SSE boundary later.
+- Gives the Mac client a stable native boundary without reintroducing localhost HTTP as product truth.
 
 Alternative considered:
 

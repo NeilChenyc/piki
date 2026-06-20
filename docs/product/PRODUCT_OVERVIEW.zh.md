@@ -44,16 +44,25 @@ Piki App 不是数据本体，而是这套本地知识系统的工作台。
 Piki 现在采用：
 
 ```text
-SwiftUI App -> 本地 Agent Service(Python) -> Claude Agent SDK -> Claude built-in tools
+SwiftUI App -> PikiRuntimeHost -> internal Python worker -> Claude Agent SDK -> Claude built-in tools
 ```
 
 这次迁移后的产品原则是：
 
 - Claude Agent SDK 是唯一主 runtime
-- 服务端只保留生命周期、SSE、hooks、journal、rollback、staging 和少量确定性后处理
+- PikiRuntimeHost 负责生命周期、连接恢复、事件桥接和 bundle 内 worker 托管
+- Python worker 只保留生命周期、任务持久化、事件生成、hooks、journal、rollback、staging 和少量确定性后处理
 - 不再维护自定义 agent-visible toolset
 - 需要判断的事交给 agent
 - 需要确定性的事变成本地 CLI 或系统工作流
+
+## 5.1 当前实现形态
+
+- Swift App 通过 `RuntimeServiceProtocol` 访问运行时，不再直接面向 REST/SSE
+- `PikiRuntimeHost` 作为 app bundle 内可执行文件，负责拉起 Python worker 并转发事件
+- Python worker 通过内部 JSON 行协议提供请求/响应，并在事件写入后发出 notification
+- app 启动时自动连接 host，退出时 host 与 worker 一并结束
+- 旧的 localhost FastAPI 仅作为历史兼容与内部测试参考，不再是产品运行时真相
 
 ## 6. Agent-first 设计哲学
 

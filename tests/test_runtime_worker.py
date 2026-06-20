@@ -45,6 +45,30 @@ def test_worker_health_and_runtime_config(tmp_path: Path):
     assert worker.call("get_runtime_config", {})["api_key_source"] == "persisted"
 
 
+def test_worker_emits_event_notifications(tmp_path: Path):
+    emitted = []
+    worker = RuntimeWorker(
+        db_path=tmp_path / "agent.sqlite3",
+        runtime_config_path=tmp_path / "runtime-config.json",
+        staging_root=tmp_path / ".piki/task-staging",
+        enable_agent_runtime=False,
+        notify=emitted.append,
+    )
+    vault = make_vault(tmp_path)
+
+    worker.call(
+        "create_task",
+        {
+            "vault_path": str(vault),
+            "user_input": "hello",
+            "async_mode": False,
+        },
+    )
+
+    assert any(event.type == "task.created" for event in emitted)
+    assert any(event.type == "task.failed" for event in emitted)
+
+
 def test_worker_create_task_and_streams_existing_events(tmp_path: Path):
     worker = make_runtime_worker(tmp_path)
     vault = make_vault(tmp_path)

@@ -46,15 +46,15 @@ final class AppState {
         if serviceHealth.runnerAvailable == true {
             return "Runtime not configured"
         }
-        return "Runtime unavailable"
+        return "Runtime installed"
     }
 
     var runtimeModeDetail: String {
         guard isConnected else {
-            return serviceErrorMessage ?? "Agent Service is disconnected."
+            return serviceErrorMessage ?? "Runtime host is disconnected."
         }
         guard let serviceHealth else {
-            return "Checking Agent Service runtime..."
+            return "Checking runtime host..."
         }
         if serviceHealth.agentRuntimeConfigured == true {
             return "Claude Agent runtime is active."
@@ -62,7 +62,7 @@ final class AppState {
         if serviceHealth.runnerAvailable == true {
             return "Claude runtime is installed but not configured."
         }
-        return serviceHealth.runnerDetail ?? "Agent runtime is unavailable."
+        return serviceHealth.runnerDetail ?? "Claude runtime is installed, but the agent SDK is unavailable."
     }
 
     func refreshServiceHealth() async {
@@ -77,7 +77,7 @@ final class AppState {
     func applyServiceHealth(_ health: ServiceHealth) {
         serviceHealth = health
         connectionStatus = health.ok ? .connected : .error
-        serviceErrorMessage = health.ok ? nil : "Agent Service health check returned ok=false."
+        serviceErrorMessage = health.ok ? nil : "Runtime host health check returned ok=false."
     }
 
     func markServiceDisconnected(message: String) {

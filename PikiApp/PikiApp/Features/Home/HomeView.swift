@@ -88,7 +88,7 @@ struct HomeView: View {
     }
 
     private var inputPlaceholder: String {
-        if !appState.isConnected { return "Connect to Agent Service before chatting" }
+        if !appState.isConnected { return "Connect to the runtime host before chatting" }
         if appState.vaultPath == nil { return "Select a vault before chatting" }
         if viewModel.isStopping { return "Stopping current run..." }
         if viewModel.isSending { return "Piki is working..." }
@@ -98,7 +98,7 @@ struct HomeView: View {
 
     private var inputHint: String? {
         if !appState.isConnected {
-            return appState.serviceErrorMessage ?? "Agent Service is disconnected."
+            return appState.serviceErrorMessage ?? "Runtime host is disconnected."
         }
         if let prompt = viewModel.pendingInputPrompt, !prompt.isEmpty {
             return prompt

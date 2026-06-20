@@ -16,6 +16,10 @@ final class NativeRuntimeService: RuntimeServiceProtocol {
         return NativeRuntimeService(hostExecutableURL: hostURL)
     }
 
+    static func fallbackUnavailableService() -> NativeRuntimeService {
+        NativeRuntimeService(hostExecutableURL: URL(fileURLWithPath: "/usr/bin/false"))
+    }
+
     func health() async throws -> ServiceHealth {
         try await decode(connection.call(method: "health"))
     }
@@ -105,6 +109,10 @@ final class NativeRuntimeService: RuntimeServiceProtocol {
             "vault_path": .string(vaultPath),
             "issue_ids": .array((issueIds ?? []).map(JSONValue.string))
         ]))
+    }
+
+    func stop() {
+        connection.stop()
     }
 
     private func decode<T: Decodable>(_ data: Data) async throws -> T {

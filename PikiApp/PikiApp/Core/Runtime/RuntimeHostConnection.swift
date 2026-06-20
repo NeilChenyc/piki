@@ -1,6 +1,11 @@
 import Foundation
 
 final class RuntimeHostConnection: @unchecked Sendable {
+    private struct WorkerNotification: Decodable {
+        let kind: String
+        let event: TaskEvent
+    }
+
     private struct HostResponse: Decodable {
         let kind: String
         let id: String
@@ -12,6 +17,12 @@ final class RuntimeHostConnection: @unchecked Sendable {
         let id: String
         let method: String
         let params: JSONValue
+    }
+
+    private struct TaskEventsEnvelope: Decodable {
+        let events: [TaskEvent]
+        let cursor: String?
+        let hasMore: Bool?
     }
 
     enum ConnectionError: Error, LocalizedError {
@@ -36,10 +47,14 @@ final class RuntimeHostConnection: @unchecked Sendable {
 
     private let hostExecutableURL: URL
     private let stateQueue = DispatchQueue(label: "com.piki.runtime-host-connection")
+    private let signalQueue = DispatchQueue(label: "com.piki.runtime-host-connection.signal")
     private var process: Process?
     private var stdinHandle: FileHandle?
     private var stdoutTask: Task<Void, Never>?
     private var pendingResponses: [String: CheckedContinuation<Data, Error>] = [:]
+    private var taskEventLoops: [String: Task<Void, Never>] = [:]
+    private var taskSignals: [String: Int] = [:]
+    private var taskSignalWaiters: [String: [CheckedContinuation<Void, Never>]] = [:]
 
     init(hostExecutableURL: URL) {
         self.hostExecutableURL = hostExecutableURL
@@ -50,6 +65,7 @@ final class RuntimeHostConnection: @unchecked Sendable {
         let candidates = [
             Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("PikiRuntimeHost"),
             Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/PikiRuntimeHost"),
+            Bundle.main.resourceURL?.appendingPathComponent("PikiRuntimeHost"),
         ].compactMap { $0 }
         for url in candidates where fileManager.isExecutableFile(atPath: url.path) {
             return url
@@ -79,18 +95,25 @@ final class RuntimeHostConnection: @unchecked Sendable {
         let (stream, continuation) = AsyncThrowingStream.makeStream(of: TaskEvent.self, throwing: Error.self)
         let pollTask = Task { [weak self] in
             guard let self else { return }
-            var seenIDs = Set<String>()
+            var cursor: String?
             while !Task.isCancelled {
                 do {
+                    let params: JSONValue = cursor.map { .object(["task_id": .string(taskId), "cursor": .string($0)]) }
+                        ?? .object(["task_id": .string(taskId)])
                     let data = try await self.call(
                         method: "task_events",
-                        params: .object(["task_id": .string(taskId)])
+                        params: params
                     )
-                    let events = try JSONDecoder().decode([TaskEvent].self, from: data)
-                    for event in events where seenIDs.insert(event.id).inserted {
+                    let envelope = try JSONDecoder().decode(TaskEventsEnvelope.self, from: data)
+                    for event in envelope.events {
                         continuation.yield(event)
                     }
-                    try await Task.sleep(for: .milliseconds(200))
+                    if let newCursor = envelope.cursor {
+                        cursor = newCursor
+                    }
+                    if envelope.events.isEmpty {
+                        await self.waitForTaskSignal(taskId: taskId)
+                    }
                 } catch is CancellationError {
                     break
                 } catch {
@@ -100,7 +123,15 @@ final class RuntimeHostConnection: @unchecked Sendable {
             }
             continuation.finish()
         }
-        continuation.onTermination = { _ in pollTask.cancel() }
+        stateQueue.sync {
+            taskEventLoops[taskId] = pollTask
+        }
+        continuation.onTermination = { [weak self] _ in
+            pollTask.cancel()
+            self?.stateQueue.sync {
+                self?.taskEventLoops[taskId] = nil
+            }
+        }
         return stream
     }
 
@@ -108,6 +139,8 @@ final class RuntimeHostConnection: @unchecked Sendable {
         let responses: [CheckedContinuation<Data, Error>] = stateQueue.sync {
             stdoutTask?.cancel()
             stdoutTask = nil
+            taskEventLoops.values.forEach { $0.cancel() }
+            taskEventLoops.removeAll()
             if process?.isRunning == true {
                 process?.terminate()
             }
@@ -175,6 +208,10 @@ final class RuntimeHostConnection: @unchecked Sendable {
 
     private func handle(line: String) {
         guard let data = line.data(using: .utf8) else { return }
+        if let notification = try? JSONDecoder().decode(WorkerNotification.self, from: data), notification.kind == "event" {
+            signalTask(notification.event.taskId)
+            return
+        }
         if let response = try? JSONDecoder().decode(HostResponse.self, from: data), response.kind == "response" {
             let continuation: CheckedContinuation<Data, Error>? = stateQueue.sync {
                 pendingResponses.removeValue(forKey: response.id)
@@ -189,6 +226,39 @@ final class RuntimeHostConnection: @unchecked Sendable {
                 }
             }
             return
+        }
+    }
+
+    private func signalTask(_ taskId: String) {
+        let waiters: [CheckedContinuation<Void, Never>] = signalQueue.sync {
+            taskSignals[taskId, default: 0] += 1
+            let waiters = taskSignalWaiters.removeValue(forKey: taskId) ?? []
+            return waiters
+        }
+        waiters.forEach { $0.resume() }
+    }
+
+    private func waitForTaskSignal(taskId: String) async {
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                let shouldReturnImmediately = signalQueue.sync { () -> Bool in
+                    if let count = taskSignals[taskId], count > 0 {
+                        taskSignals[taskId] = count - 1
+                        return true
+                    }
+                    taskSignalWaiters[taskId, default: []].append(continuation)
+                    return false
+                }
+                if shouldReturnImmediately {
+                    continuation.resume()
+                }
+            }
+        } onCancel: {
+            let waiters: [CheckedContinuation<Void, Never>] = signalQueue.sync {
+                let waiters = taskSignalWaiters.removeValue(forKey: taskId) ?? []
+                return waiters
+            }
+            waiters.forEach { $0.resume() }
         }
     }
 

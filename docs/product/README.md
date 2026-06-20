@@ -1,6 +1,6 @@
 # 产品文档目录
 
-这个目录存放 Piki 当前有效的产品定义、运行时设计和路线图。Claude Agent SDK 全量迁移后，这里的文档以“agent-first + 轻服务端 + Claude built-in tools”为统一前提。
+这个目录存放 Piki 当前有效的产品定义、运行时设计和路线图。当前统一前提是“SwiftUI App -> PikiRuntimeHost -> internal Python worker -> Claude built-in tools”，localhost HTTP/SSE 只保留为历史兼容说明。
 
 ## 文档说明
 
@@ -9,7 +9,7 @@
 - `MVP_FEATURES.zh.md`
   - MVP 能力地图、任务模型、Claude runtime 与 UI 可观察性
 - `AGENT_RUNTIME_DESIGN.zh.md`
-  - Claude Agent SDK runtime 设计、hooks、安全边界、会话和 SSE 协议
+  - Claude Agent SDK runtime 设计、hooks、安全边界、会话和事件桥协议
 - `AGENT_CENTRIC_REFACTOR_PLAN.zh.md`
   - 从服务端工作流驱动迁到 agent-first 的重构原则与落地规则
 - `ROADMAP.md`
