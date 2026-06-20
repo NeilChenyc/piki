@@ -42,16 +42,15 @@ struct WikiPageContentView: View {
                         .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
 
-                    // Content placeholder
                     if page.content.isEmpty {
                         Text("No content yet")
                             .font(.system(size: 13))
                             .foregroundStyle(Theme.textTertiary)
                     } else {
-                        Text(page.content)
-                            .font(.system(size: 13))
-                            .foregroundStyle(Theme.textPrimary)
-                            .lineSpacing(4)
+                        MarkdownTextView(
+                            page.content,
+                            baseURL: URL(fileURLWithPath: page.filePath).deletingLastPathComponent()
+                        )
                     }
 
                     // Related concepts

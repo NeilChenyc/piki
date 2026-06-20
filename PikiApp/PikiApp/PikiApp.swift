@@ -24,6 +24,7 @@ struct PikiApp: App {
     @State private var wikiViewModel = WikiViewModel()
     @State private var inboxViewModel = InboxViewModel()
     @State private var healthViewModel = HealthViewModel()
+    @State private var runtimeSettingsViewModel = RuntimeSettingsViewModel()
     @State private var didStartService = false
 
     var body: some Scene {
@@ -34,6 +35,7 @@ struct PikiApp: App {
                 .environment(wikiViewModel)
                 .environment(inboxViewModel)
                 .environment(healthViewModel)
+                .environment(runtimeSettingsViewModel)
                 .preferredColorScheme(.light)
                 .task {
                     guard !didStartService else { return }
@@ -50,7 +52,6 @@ struct PikiApp: App {
         Settings {
             SettingsView()
                 .environment(appState)
-                .environment(homeViewModel)
         }
     }
 }

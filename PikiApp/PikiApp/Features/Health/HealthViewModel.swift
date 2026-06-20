@@ -81,6 +81,13 @@ final class HealthViewModel {
 
         let vaultPath = vaultURL.path(percentEncoded: false)
         await refreshOverview(for: vaultURL)
+
+        guard !Task.isCancelled else {
+            loadedVaultPath = nil
+            hasLoaded = false
+            return
+        }
+
         setLoading(true, for: mode)
         defer { setLoading(false, for: mode) }
 
@@ -90,6 +97,11 @@ final class HealthViewModel {
                 vaultURL: vaultURL,
                 vaultPath: vaultPath
             )
+            guard !Task.isCancelled else {
+                loadedVaultPath = nil
+                hasLoaded = false
+                return
+            }
             await loadLint(
                 client: appState.apiClient,
                 vaultURL: vaultURL,
@@ -130,11 +142,13 @@ final class HealthViewModel {
     private func loadRecentMaintenance(client: APIClient, vaultURL: URL, vaultPath: String) async {
         do {
             let entries = try await client.recentJournal(limit: 10, vaultPath: vaultPath)
+            guard !Task.isCancelled else { return }
             latestMaintenanceDate = entries
                 .compactMap { parseDate($0.createdAt) }
                 .max()
             await refreshOverview(for: vaultURL)
         } catch {
+            guard !Task.isCancelled else { return }
             errorMessage = "最近维护时间读取失败，已展示其余健康数据。"
         }
     }
@@ -142,8 +156,10 @@ final class HealthViewModel {
     private func loadLint(client: APIClient, vaultURL: URL, vaultPath: String) async {
         do {
             let result = try await client.runLint(vaultPath: vaultPath)
+            guard !Task.isCancelled else { return }
             await applyLintResult(result, vaultURL: vaultURL)
         } catch {
+            guard !Task.isCancelled else { return }
             clearLintState()
             errorMessage = "知识库检查失败，请稍后重试。"
         }
@@ -155,6 +171,7 @@ final class HealthViewModel {
         let metrics = await Task.detached {
             Self.buildOverview(from: vaultURL, latestMaintenance: maintenanceDate, latestCheck: lintDate).metrics
         }.value
+        guard !Task.isCancelled else { return }
         overviewMetrics = metrics
     }
 

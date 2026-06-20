@@ -27,6 +27,25 @@ def test_context_assembly_loads_baseline(vault_path: Path):
     assert "AGENTS.md" in contents
 
 
+def test_vault_read_permission_error_becomes_access_error(tmp_path: Path, monkeypatch):
+    vault_root = tmp_path / "vault"
+    vault_root.mkdir()
+    agents = vault_root / "AGENTS.md"
+    agents.write_text("# Agent 规则\n", encoding="utf-8")
+
+    original_read_bytes = Path.read_bytes
+
+    def deny_read_bytes(path: Path):
+        if path == agents:
+            raise PermissionError("Operation not permitted")
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", deny_read_bytes)
+
+    with pytest.raises(VaultAccessError, match="Cannot read vault file"):
+        Vault(vault_root).read_text("AGENTS.md")
+
+
 def test_vault_writer_and_journal_commit_changes(tmp_path: Path):
     vault_root = tmp_path / "vault"
     (vault_root / "wiki").mkdir(parents=True)

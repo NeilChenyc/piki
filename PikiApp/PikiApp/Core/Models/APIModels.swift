@@ -249,6 +249,7 @@ struct ServiceHealth: Codable {
     let runnerDetail: String?
     let provider: String?
     let anthropicAPIKeyConfigured: Bool?
+    let anthropicBaseURL: String?
     let agentModel: String?
     let agentRuntimeEnabled: Bool?
     let agentRuntimeConfigured: Bool?
@@ -260,10 +261,67 @@ struct ServiceHealth: Codable {
         case runnerDetail = "runner_detail"
         case provider
         case anthropicAPIKeyConfigured = "anthropic_api_key_configured"
+        case anthropicBaseURL = "anthropic_base_url"
         case agentModel = "agent_model"
         case agentRuntimeEnabled = "agent_runtime_enabled"
         case agentRuntimeConfigured = "agent_runtime_configured"
         case claudeConfigDir = "claude_config_dir"
+    }
+}
+
+struct RuntimeConfigDTO: Codable {
+    let provider: String?
+    let agentModel: String?
+    let anthropicBaseURL: String?
+    let apiKeyConfigured: Bool?
+    let apiKeyPreview: String?
+    let apiKeySource: String?
+    let agentRuntimeEnabled: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case provider
+        case agentModel = "agent_model"
+        case anthropicBaseURL = "anthropic_base_url"
+        case apiKeyConfigured = "api_key_configured"
+        case apiKeyPreview = "api_key_preview"
+        case apiKeySource = "api_key_source"
+        case agentRuntimeEnabled = "agent_runtime_enabled"
+    }
+}
+
+struct RuntimeConfigUpdateRequest: Codable {
+    let agentModel: String?
+    let anthropicBaseURL: String?
+    let apiKey: String?
+    let clearAPIKey: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case agentModel = "agent_model"
+        case anthropicBaseURL = "anthropic_base_url"
+        case apiKey = "api_key"
+        case clearAPIKey = "clear_api_key"
+    }
+}
+
+struct RuntimeSmokeTestResponse: Codable {
+    let ok: Bool
+    let output: String?
+    let error: String?
+    let runnerAvailable: Bool?
+    let provider: String?
+    let agentRuntimeConfigured: Bool?
+    let anthropicBaseURL: String?
+    let agentModel: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case output
+        case error
+        case runnerAvailable = "runner_available"
+        case provider
+        case agentRuntimeConfigured = "agent_runtime_configured"
+        case anthropicBaseURL = "anthropic_base_url"
+        case agentModel = "agent_model"
     }
 }
 

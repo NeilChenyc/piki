@@ -56,6 +56,7 @@ def create_app(config: ServiceConfig | None = None, store: SQLiteStore | None = 
     approval_service = ApprovalService(sqlite_store, events)
 
     app = FastAPI(title="Piki Local Agent Service")
+    app.state.config = service_config
     app.state.store = sqlite_store
     app.state.runner = runner
     app.state.events = events

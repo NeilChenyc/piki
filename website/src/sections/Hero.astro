@@ -1,0 +1,50 @@
+---
+import Button from '../components/Button.astro';
+import MockupFrame from '../components/MockupFrame.astro';
+import { Image } from 'astro:assets';
+import homepage from '../assets/mockups/homepage.png';
+---
+<section class="hero">
+  <div class="container text-center">
+    <h1 class="hero__title">你的个人知识编译器</h1>
+    <p class="hero__subtitle">
+      把散落在各处的资料、对话和判断，持续编译成一个你随时能查、能用的个人知识库。<br/>
+      本地存储，AI 驱动，完全属于你。
+    </p>
+    <div class="hero__cta">
+      <Button href="#download">免费下载 macOS 版</Button>
+    </div>
+    <div class="hero__mockup fade-in">
+      <MockupFrame>
+        <Image src={homepage} alt="Piki 主界面" />
+      </MockupFrame>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: var(--space-3xl) 0 var(--space-2xl);
+  }
+
+  .hero__title {
+    margin-bottom: var(--space-md);
+  }
+
+  .hero__subtitle {
+    font-size: 19px;
+    color: var(--color-text-secondary);
+    max-width: 640px;
+    margin: 0 auto var(--space-lg);
+    line-height: 1.7;
+  }
+
+  .hero__cta {
+    margin-bottom: var(--space-xl);
+  }
+
+  .hero__mockup {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+</style>

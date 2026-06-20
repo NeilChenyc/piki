@@ -17,5 +17,10 @@ let package = Package(
             ],
             path: "PikiApp"
         ),
+        .testTarget(
+            name: "PikiAppTests",
+            dependencies: ["PikiApp"],
+            path: "Tests/PikiAppTests"
+        ),
     ]
 )

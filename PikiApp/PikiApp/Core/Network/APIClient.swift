@@ -22,6 +22,37 @@ final class APIClient {
         try await health().ok
     }
 
+    // MARK: - Runtime Configuration
+
+    func getRuntimeConfig() async throws -> RuntimeConfigDTO {
+        let url = baseURL.appending(path: "runtime/config")
+        let (data, response) = try await URLSession.shared.data(from: url)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(RuntimeConfigDTO.self, from: data)
+    }
+
+    func updateRuntimeConfig(_ request: RuntimeConfigUpdateRequest) async throws -> RuntimeConfigDTO {
+        let url = baseURL.appending(path: "runtime/config")
+        var req = URLRequest(url: url)
+        req.httpMethod = "PUT"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(request)
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(RuntimeConfigDTO.self, from: data)
+    }
+
+    func smokeTestRuntime() async throws -> RuntimeSmokeTestResponse {
+        let url = baseURL.appending(path: "runtime/smoke-test")
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONSerialization.data(withJSONObject: [:])
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(RuntimeSmokeTestResponse.self, from: data)
+    }
+
     // MARK: - Tasks
 
     func createTask(_ request: TaskCreateRequest) async throws -> TaskCreateResponse {

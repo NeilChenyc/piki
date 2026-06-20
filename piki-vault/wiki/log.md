@@ -3,6 +3,29 @@ title: 日志
 check_after: 2027-01-01
 ---
 
+## [2026-06-20] ingest | 待摄入测试文档
+
+- 来源：`raw/inbox/next-test-source.md` — 小样本文档，用于测试文件上传、ingest、source normalization
+- 写入 `raw/sources/待摄入测试文档-75feb254.md`
+- 写入 `raw/assets/待摄入测试文档-75feb254/original.md`
+- 新建 `wiki/sources/待摄入测试文档.md`
+- 更新 `wiki/index.md`：新增 sources 索引条目
+
+## [2026-06-20] ingest | Kimi K2 Thinking 英文专业媒体评价
+
+- 来源：傅盛《Kimi K2 Thinking 模型：在海外的真实影响》（PDF）
+- 写入 `raw/sources/kimi-de6329c5.md`
+- 新建 `wiki/sources/Kimi K2 Thinking 英文专业媒体评价.md`
+- 新建 `wiki/entities/月之暗面.md` — Moonshot AI 实体页
+- 新建 `wiki/concepts/Kimi K2 模型.md` — 模型技术概念页
+- 更新 `wiki/index.md`：新增 sources、concepts、entities 索引条目
+
+## [2026-06-20] lint | 修复断裂 wikilink
+
+- 来源/任务：run_lint
+- 修改路径：`wiki/sources/杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案.md`
+- 结果：3 个断裂 wikilink（`concepts/大模型应用-能源行业`、`entities/杭州能源`、`domains/能源管理`）替换为纯文本 +（待创建）
+
 # 日志
 
 ## [2026-06-19] ingest | 杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案（重注入）

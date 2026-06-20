@@ -94,14 +94,10 @@ final class LocalServiceManager {
     private func probeHealth() async -> Bool {
         do {
             let health = try await appState.apiClient.health()
-            appState.serviceHealth = health
-            appState.connectionStatus = health.ok ? .connected : .error
-            appState.serviceErrorMessage = health.ok ? nil : "Agent Service health check returned ok=false."
+            appState.applyServiceHealth(health)
             return health.ok
         } catch {
-            appState.serviceHealth = nil
-            appState.connectionStatus = .disconnected
-            appState.serviceErrorMessage = error.localizedDescription
+            appState.markServiceDisconnected(message: error.localizedDescription)
             return false
         }
     }

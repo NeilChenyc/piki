@@ -46,7 +46,17 @@ class Vault:
         path = self.resolve_path(relative_path)
         if not path.exists() or not path.is_file():
             raise VaultAccessError(f"File not found: {relative_path}")
-        data = path.read_bytes()
+        try:
+            data = path.read_bytes()
+        except PermissionError as exc:
+            raise VaultAccessError(
+                f"Cannot read vault file: {relative_path}. "
+                "The backend process does not have permission to access this vault path. "
+                "Move the vault outside protected folders such as Downloads, or grant Full Disk Access. "
+                f"Original error: {exc}"
+            ) from exc
+        except OSError as exc:
+            raise VaultAccessError(f"Cannot read vault file: {relative_path} ({exc})") from exc
         truncated = len(data) > max_bytes
         return data[:max_bytes].decode("utf-8", errors="replace"), truncated
 

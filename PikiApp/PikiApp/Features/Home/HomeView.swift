@@ -48,12 +48,6 @@ struct HomeView: View {
                         .padding(.top, 6)
                 }
 
-                #if DEBUG
-                debugEventPanel
-                    .padding(.horizontal, 24)
-                    .padding(.top, 6)
-                #endif
-
                 // Input area
                 ChatInputView(
                     placeholder: inputPlaceholder,
@@ -117,30 +111,4 @@ struct HomeView: View {
         }
         return nil
     }
-
-
-    #if DEBUG
-    private var debugEventPanel: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Debug SSE")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Theme.textPrimary)
-            Text("count: \(viewModel.debugEventCount)  last: \(viewModel.debugLastEventType ?? "--")")
-                .font(.system(size: 11))
-                .foregroundStyle(Theme.textSecondary)
-            if !viewModel.debugRecentEvents.isEmpty {
-                ForEach(Array(viewModel.debugRecentEvents.enumerated()), id: \.offset) { _, item in
-                    Text(item)
-                        .font(.system(size: 10))
-                        .foregroundStyle(Theme.textTertiary)
-                        .lineLimit(2)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(Theme.cardBackground.opacity(0.75))
-        .clipShape(.rect(cornerRadius: 10))
-    }
-    #endif
 }

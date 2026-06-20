@@ -1,0 +1,66 @@
+---
+---
+<section class="section" id="safety">
+  <div class="container text-center">
+    <h2 class="fade-in">本地存储，你完全拥有</h2>
+    <p class="safety__subtitle text-secondary fade-in">数据从不离开你的电脑。随时可以用任何编辑器打开。</p>
+    <div class="safety__grid fade-in">
+      <div class="safety__item">
+        <div class="safety__icon">🔒</div>
+        <h3>纯本地 Markdown</h3>
+        <p>所有数据是本地文件夹里的 Markdown，不上传任何服务器。</p>
+      </div>
+      <div class="safety__item">
+        <div class="safety__icon">🛡️</div>
+        <h3>严格写入边界</h3>
+        <p>Agent 只能在知识库内写入，不能动你的其他文件和系统。</p>
+      </div>
+      <div class="safety__item">
+        <div class="safety__icon">📂</div>
+        <h3>随时可迁移</h3>
+        <p>不用 App 也能直接打开文件夹阅读。不锁定，不绑架。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .safety__subtitle {
+    font-size: 18px;
+    margin: var(--space-md) auto var(--space-xl);
+    max-width: 480px;
+  }
+
+  .safety__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+    text-align: center;
+  }
+
+  .safety__item {
+    padding: var(--space-lg);
+  }
+
+  .safety__icon {
+    font-size: 32px;
+    margin-bottom: var(--space-md);
+  }
+
+  .safety__item h3 {
+    font-size: 17px;
+    margin-bottom: var(--space-sm);
+  }
+
+  .safety__item p {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
+    .safety__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

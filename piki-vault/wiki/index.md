@@ -10,15 +10,19 @@ title: 索引
 - [[sources/测试来源-孟岩近况]] — 关于孟岩与 Piki 当前工作的轻量来源页。
 - [[sources/LightAutoDS-Tab-多AutoML智能系统]] — LightAutoDS-Tab 论文核心观点，表格数据多 AutoML 智能体系统。
 - [[sources/杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案]] — 基于城投集团大模型底座的能源平台 AI 升级方案，涵盖预警自动化、智能问数、隐患识别与分发。
+- [[sources/Kimi K2 Thinking 英文专业媒体评价]] — 傅盛筛选英文专业媒体对 Kimi K2 Thinking 的综合评价，涵盖架构、基准、安全审计。
+- [[sources/待摄入测试文档]] — 用于测试文件上传、ingest 和 source normalization 流程的小样本文档。
 
 ## concepts
 
 - [[concepts/大模型维基]] — 把原始资料编译成持久 wiki 的核心概念。
 - [[concepts/Agent 工作流]] — Piki 中标准 agent task 的工作方式。
+- [[concepts/Kimi K2 模型]] — Kimi K2 系列模型的核心架构、能力特点和战略意义。
 
 ## entities
 
 - [[entities/孟岩]] — 当前测试数据里最常用的人物页。
+- [[entities/月之暗面]] — Moonshot AI，Kimi 系列模型的开发方。
 
 ## domains
 

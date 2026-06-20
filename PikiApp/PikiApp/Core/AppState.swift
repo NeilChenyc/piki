@@ -4,14 +4,32 @@ import SwiftUI
 @MainActor
 final class AppState {
     var selectedTab: SidebarTab = .home
-    var vaultPath: URL? = AppState.defaultVaultPath()
-    var serviceBaseURL: URL = URL(string: "http://127.0.0.1:8000")!
+    var vaultPath: URL? { didSet { persistConfig() } }
+    var serviceBaseURL: URL { didSet { persistConfig() } }
     var connectionStatus: ServiceConnectionStatus = .disconnected
     var serviceErrorMessage: String?
     var serviceHealth: ServiceHealth?
 
     @ObservationIgnored let apiClient = APIClient()
     @ObservationIgnored var serviceManager: LocalServiceManager?
+    @ObservationIgnored private var appConfig: AppConfig
+
+    init() {
+        let config = AppConfigStorage.load()
+        self.appConfig = config
+        self.serviceBaseURL = URL(string: config.serviceBaseURL) ?? URL(string: "http://127.0.0.1:8000")!
+        if let path = config.vaultPath, !path.isEmpty {
+            let url = URL(fileURLWithPath: path, isDirectory: true)
+            if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
+                self.vaultPath = url
+            } else {
+                self.vaultPath = AppState.defaultVaultPath()
+            }
+        } else {
+            self.vaultPath = AppState.defaultVaultPath()
+        }
+        self.apiClient.baseURL = self.serviceBaseURL
+    }
 
     var hasVault: Bool {
         vaultPath != nil
@@ -54,6 +72,33 @@ final class AppState {
         apiClient.baseURL = url
     }
 
+    func refreshServiceHealth() async {
+        do {
+            let health = try await apiClient.health()
+            applyServiceHealth(health)
+        } catch {
+            markServiceDisconnected(message: error.localizedDescription)
+        }
+    }
+
+    func applyServiceHealth(_ health: ServiceHealth) {
+        serviceHealth = health
+        connectionStatus = health.ok ? .connected : .error
+        serviceErrorMessage = health.ok ? nil : "Agent Service health check returned ok=false."
+    }
+
+    func markServiceDisconnected(message: String) {
+        serviceHealth = nil
+        connectionStatus = .disconnected
+        serviceErrorMessage = message
+    }
+
+    private func persistConfig() {
+        appConfig.serviceBaseURL = serviceBaseURL.absoluteString
+        appConfig.vaultPath = vaultPath?.path(percentEncoded: false)
+        AppConfigStorage.save(appConfig)
+    }
+
     private static func defaultVaultPath() -> URL? {
         let fileManager = FileManager.default
         if let envPath = ProcessInfo.processInfo.environment["PIKI_DEFAULT_VAULT_PATH"], !envPath.isEmpty {
@@ -94,6 +139,7 @@ enum SidebarTab: String, CaseIterable, Identifiable {
     case inbox
     case wiki
     case health
+    case settings
 
     var id: String { rawValue }
 
@@ -103,6 +149,7 @@ enum SidebarTab: String, CaseIterable, Identifiable {
         case .inbox: "Inbox"
         case .wiki: "Wiki"
         case .health: "Health"
+        case .settings: "Settings"
         }
     }
 
@@ -112,6 +159,7 @@ enum SidebarTab: String, CaseIterable, Identifiable {
         case .inbox: "tray.fill"
         case .wiki: "book.fill"
         case .health: "heart.text.square.fill"
+        case .settings: "slider.horizontal.3"
         }
     }
 }

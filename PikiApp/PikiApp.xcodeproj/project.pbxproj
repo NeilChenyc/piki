@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift */; };
+		02A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift */; };
+		03A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift */; };
+		04A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift */; };
+		05A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift */; };
 		062700A625C072D533285AD9 /* ChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAAFD82B5611F83C120CE63 /* ChatInputView.swift */; };
 		0FC6D73FF2508B7E905E85E2 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C2D417409DE30FBF447BDF /* SidebarView.swift */; };
 		1BCD7BAEE2B773E0FF9FEC77 /* WikiPageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CF698E82FC421701D5575C /* WikiPageContentView.swift */; };
@@ -14,16 +19,15 @@
 		244F35F9F9B46A19A69360AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0364D70DD6D68CCA0968BC68 /* Assets.xcassets */; };
 		24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */; };
 		2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */; };
-		2BB197355ADDA201407ED933 /* MarkdownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77CD7E7A8F080D54BFD585F9 /* MarkdownTextView.swift */; };
 		310DD29CFA6146A6AAA27BC2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FF7EEE571B61A88771D7640 /* SettingsView.swift */; };
 		315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3368FD4E4A7B6A82A049E76F /* InboxFilterBar.swift */; };
 		35D44C853488583E0CF447A7 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A151F539885AC0A94B6BAC38 /* APIModels.swift */; };
-		35E44C853488583E0CF447A7 /* TaskRenderEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A251F539885AC0A94B6BAC38 /* TaskRenderEvent.swift */; };
 		3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F43371721B468079B54395 /* LocalServiceManager.swift */; };
 		420E59C53DC2A581E45CFB36 /* VaultStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */; };
 		443B621C0523B4FE469A9FB3 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */; };
 		490434767BFDD84D814A5496 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = A5A5FA886E43A892B6D56719 /* Markdown */; };
 		4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1996F0136E908523C15056A5 /* ContentView.swift */; };
+		4BFDE0D780505465530B0DD9 /* RuntimeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */; };
 		5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A756DA17731FCFE154EADB /* ChatBubbleView.swift */; };
 		5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34DECA1A1AA8C54EE4EAD4EB /* InboxView.swift */; };
 		667A500AE8D9048DFE319D00 /* InboxFileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */; };
@@ -41,14 +45,22 @@
 		C510D4BADEA0FDFEAEFEF495 /* FileDropZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */; };
 		C5E6688E658CD6635E6B8BDF /* InboxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */; };
 		CA0F9DB940146C27AD4B002D /* WikiViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5BF2D87FACFA4F330AE75D /* WikiViewModel.swift */; };
+		D255CD0916C7DAA1B68F129F /* RuntimeSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */; };
 		D928974A75B277134B2F9000 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAFF5590251FB2062A50EE74 /* Theme.swift */; };
 		E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940D0CDE0D10F37A3CB01678 /* SSEClient.swift */; };
+		EC28D6F133C07E1352037566 /* MarkdownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0E3DD634F5DB96D2E75F0F8 /* MarkdownTextView.swift */; };
 		F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158490133DDBD171883C03FA /* LintComponents.swift */; };
+		FAB959E12892BA18CC940E53 /* TaskRenderEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F8264E76958798161B8366 /* TaskRenderEvent.swift */; };
 		FB494BE881D6475D9E547532 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8128157562AB4210024F63 /* APIClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		019E1FB4BC4BE44A1B0EF031 /* WikiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiView.swift; sourceTree = "<group>"; };
+		11A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationPreset.swift; sourceTree = "<group>"; };
+		12A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetStorage.swift; sourceTree = "<group>"; };
+		13A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetCard.swift; sourceTree = "<group>"; };
+		14A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetFormSheet.swift; sourceTree = "<group>"; };
+		15A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigStorage.swift; sourceTree = "<group>"; };
 		03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDropZone.swift; sourceTree = "<group>"; };
 		0364D70DD6D68CCA0968BC68 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0CB4472A371809ED276CFFFE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -64,13 +76,11 @@
 		37CF698E82FC421701D5575C /* WikiPageContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageContentView.swift; sourceTree = "<group>"; };
 		44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiLogo.swift; sourceTree = "<group>"; };
-		77CD7E7A8F080D54BFD585F9 /* MarkdownTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTextView.swift; sourceTree = "<group>"; };
 		6FF7EEE571B61A88771D7640 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7249FFE507E86DAE979CD97C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		940D0CDE0D10F37A3CB01678 /* SSEClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSEClient.swift; sourceTree = "<group>"; };
 		9EA3D0A2C035EBA8527FE977 /* HealthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewModel.swift; sourceTree = "<group>"; };
 		A151F539885AC0A94B6BAC38 /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
-		A251F539885AC0A94B6BAC38 /* TaskRenderEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRenderEvent.swift; sourceTree = "<group>"; };
 		A5C2D417409DE30FBF447BDF /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		AD8128157562AB4210024F63 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B3E230560BD4556819372E7A /* WikiCategorySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiCategorySection.swift; sourceTree = "<group>"; };
@@ -81,10 +91,14 @@
 		C6F43371721B468079B54395 /* LocalServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalServiceManager.swift; sourceTree = "<group>"; };
 		CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
 		D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxFileRow.swift; sourceTree = "<group>"; };
+		DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeSettingsViewModel.swift; sourceTree = "<group>"; };
 		E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxViewModel.swift; sourceTree = "<group>"; };
 		E682A82DEC365409713B51F1 /* FilePreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePreviewPanel.swift; sourceTree = "<group>"; };
+		E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeSettingsView.swift; sourceTree = "<group>"; };
 		EAAAFD82B5611F83C120CE63 /* ChatInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputView.swift; sourceTree = "<group>"; };
 		ECB2F2D1BA49A3FF13C4F3AA /* HealthScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthScoreCard.swift; sourceTree = "<group>"; };
+		F0E3DD634F5DB96D2E75F0F8 /* MarkdownTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTextView.swift; sourceTree = "<group>"; };
+		F0F8264E76958798161B8366 /* TaskRenderEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRenderEvent.swift; sourceTree = "<group>"; };
 		F6C8C20519720DEC42158EF5 /* PikiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -114,8 +128,10 @@
 			children = (
 				7A4BB5116558407CA81B0B73 /* Models */,
 				00313DC5D94511CD99F7AFBE /* Network */,
+				15A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift */,
 				0CB4472A371809ED276CFFFE /* AppState.swift */,
 				C6F43371721B468079B54395 /* LocalServiceManager.swift */,
+				12A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -175,7 +191,8 @@
 			isa = PBXGroup;
 			children = (
 				A151F539885AC0A94B6BAC38 /* APIModels.swift */,
-				A251F539885AC0A94B6BAC38 /* TaskRenderEvent.swift */,
+				11A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift */,
+				F0F8264E76958798161B8366 /* TaskRenderEvent.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -240,6 +257,10 @@
 		EF21444027C2B972158E94CF /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				13A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift */,
+				14A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift */,
+				E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */,
+				DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */,
 				6FF7EEE571B61A88771D7640 /* SettingsView.swift */,
 			);
 			path = Settings;
@@ -249,7 +270,7 @@
 			isa = PBXGroup;
 			children = (
 				B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */,
-				77CD7E7A8F080D54BFD585F9 /* MarkdownTextView.swift */,
+				F0E3DD634F5DB96D2E75F0F8 /* MarkdownTextView.swift */,
 				66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */,
 			);
 			path = Components;
@@ -341,11 +362,12 @@
 			files = (
 				FB494BE881D6475D9E547532 /* APIClient.swift in Sources */,
 				35D44C853488583E0CF447A7 /* APIModels.swift in Sources */,
-				35E44C853488583E0CF447A7 /* TaskRenderEvent.swift in Sources */,
 				A85DD5EB96F812767B2E4DC3 /* ActivityRow.swift in Sources */,
 				A47D420AC685D113461970B9 /* AppState.swift in Sources */,
+				05A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift in Sources */,
 				5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */,
 				062700A625C072D533285AD9 /* ChatInputView.swift in Sources */,
+				01A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift in Sources */,
 				4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */,
 				C510D4BADEA0FDFEAEFEF495 /* FileDropZone.swift in Sources */,
 				ADC5A81B8B7F7523762558B4 /* FilePreviewPanel.swift in Sources */,
@@ -361,14 +383,20 @@
 				C5E6688E658CD6635E6B8BDF /* InboxViewModel.swift in Sources */,
 				F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */,
 				3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */,
+				EC28D6F133C07E1352037566 /* MarkdownTextView.swift in Sources */,
 				7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */,
 				2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */,
-				2BB197355ADDA201407ED933 /* MarkdownTextView.swift in Sources */,
+				03A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift in Sources */,
+				04A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift in Sources */,
+				02A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift in Sources */,
 				24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */,
+				4BFDE0D780505465530B0DD9 /* RuntimeSettingsView.swift in Sources */,
+				D255CD0916C7DAA1B68F129F /* RuntimeSettingsViewModel.swift in Sources */,
 				E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */,
 				310DD29CFA6146A6AAA27BC2 /* SettingsView.swift in Sources */,
 				BF91185CF60C597B804B9212 /* SidebarNavRow.swift in Sources */,
 				0FC6D73FF2508B7E905E85E2 /* SidebarView.swift in Sources */,
+				FAB959E12892BA18CC940E53 /* TaskRenderEvent.swift in Sources */,
 				D928974A75B277134B2F9000 /* Theme.swift in Sources */,
 				420E59C53DC2A581E45CFB36 /* VaultStatusCard.swift in Sources */,
 				B4395ABA570B52FAE4F2A7D4 /* WikiCategorySection.swift in Sources */,

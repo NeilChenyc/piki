@@ -208,8 +208,10 @@ final class HomeViewModel {
                 limit: 10,
                 vaultPath: vaultPath.path(percentEncoded: false)
             )
+            guard !Task.isCancelled else { return }
             recentActivity = entries.map(ActivityEntry.init(journalEntry:))
         } catch {
+            guard !Task.isCancelled else { return }
             statusText = "Unable to load Change Journal: \(error.localizedDescription)"
         }
     }

@@ -114,6 +114,10 @@ class TaskService:
     def _execute_with_cleanup(self, *, task_id: str, request: TaskCreateRequest, plan, run_control: TaskRunControl):
         try:
             self.executor.execute(task_id=task_id, request=request, plan=plan, run_control=run_control)
+        except Exception as exc:
+            error = str(exc) or exc.__class__.__name__
+            self.events.task_failed(task_id, error)
+            self.store.update_task(task_id, status=TaskStatus.FAILED, summary=error)
         finally:
             self._unregister_run_control(task_id)
 

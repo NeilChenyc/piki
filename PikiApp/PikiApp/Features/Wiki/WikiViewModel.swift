@@ -46,6 +46,12 @@ final class WikiViewModel {
             Self.loadAllCategories(wikiURL: wikiURL)
         }.value
 
+        guard !Task.isCancelled else {
+            loadedVaultPath = nil
+            isLoading = false
+            return
+        }
+
         categories = loaded
         if selectedPage == nil {
             selectedPage = loaded.flatMap(\.pages).first

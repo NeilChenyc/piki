@@ -6,6 +6,8 @@ struct FilePreviewPanel: View {
     let onClear: () -> Void
 
     @State private var previewText: String = ""
+    @State private var previewKind: PreviewKind = .plain
+    @State private var previewBaseURL: URL?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -33,10 +35,20 @@ struct FilePreviewPanel: View {
             Divider()
 
             ScrollView {
-                Text(previewText.isEmpty ? "Loading..." : previewText)
-                    .font(.system(size: 12))
-                    .foregroundStyle(previewText.isEmpty ? Theme.textTertiary : Theme.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                if previewText.isEmpty {
+                    Text("Loading...")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.textTertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else if previewKind == .markdown {
+                    MarkdownTextView(previewText, baseURL: previewBaseURL)
+                } else {
+                    Text(previewText)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineSpacing(3)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
 
             Spacer()
@@ -58,17 +70,29 @@ struct FilePreviewPanel: View {
 
     private func loadPreview() async {
         guard let filePath = item.filePath else {
+            previewKind = .plain
+            previewBaseURL = nil
             previewText = "No preview available"
             return
         }
-        guard ["md", "markdown", "txt"].contains(filePath.pathExtension.lowercased()) else {
+        let fileExtension = filePath.pathExtension.lowercased()
+        guard ["md", "markdown", "txt"].contains(fileExtension) else {
+            previewKind = .plain
+            previewBaseURL = nil
             previewText = "Preview is available for Markdown and text files."
             return
         }
+        previewKind = ["md", "markdown"].contains(fileExtension) ? .markdown : .plain
+        previewBaseURL = previewKind == .markdown ? filePath.deletingLastPathComponent() : nil
         let url = filePath
         let content = await Task.detached {
             (try? String(contentsOf: url, encoding: .utf8)) ?? "Unable to read preview."
         }.value
         previewText = content
     }
+}
+
+private enum PreviewKind {
+    case markdown
+    case plain
 }

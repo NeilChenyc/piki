@@ -1,0 +1,35 @@
+---
+import MockupFrame from '../components/MockupFrame.astro';
+import { Image } from 'astro:assets';
+import wikiPage from '../assets/mockups/wiki-page.png';
+---
+<section class="section">
+  <div class="container grid-2 fade-in">
+    <div class="feature-visual">
+      <MockupFrame>
+        <Image src={wikiPage} alt="Piki Wiki 知识页面" />
+      </MockupFrame>
+    </div>
+    <div class="feature-text">
+      <h2>不是记笔记，是编译知识</h2>
+      <p class="text-secondary">
+        每次交互后，Agent 把新信息融入你已有的知识页面——概念、实体、领域、综合分析。
+      </p>
+      <p class="text-secondary">
+        你的知识库越来越完整，而不是越来越乱。不需要手动整理，也不需要想该放在哪。
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .feature-text h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .feature-text p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: var(--space-md);
+  }
+</style>

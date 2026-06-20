@@ -16,6 +16,8 @@ struct ContentView: View {
                 WikiView()
             case .health:
                 HealthView()
+            case .settings:
+                RuntimeSettingsView()
             }
         }
         .background(Theme.surfaceBackground)
@@ -29,4 +31,5 @@ struct ContentView: View {
         .environment(WikiViewModel())
         .environment(InboxViewModel())
         .environment(HealthViewModel())
+        .environment(RuntimeSettingsViewModel())
 }

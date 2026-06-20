@@ -82,6 +82,12 @@ final class InboxViewModel {
             Self.scanDirectories(vaultURL: vaultURL)
         }.value
 
+        guard !Task.isCancelled else {
+            loadedVaultPath = nil
+            isLoading = false
+            return
+        }
+
         items = loaded
         if selectedItem == nil {
             selectedItem = items.first

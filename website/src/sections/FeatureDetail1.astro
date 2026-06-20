@@ -1,0 +1,41 @@
+---
+import MockupFrame from '../components/MockupFrame.astro';
+import { Image } from 'astro:assets';
+import homepage from '../assets/mockups/homepage.png';
+---
+<section class="section section--surface" id="features">
+  <div class="container grid-2 fade-in">
+    <div class="feature-text">
+      <h2>一切从一句话开始</h2>
+      <p class="text-secondary">
+        不区分"查询"和"写入"。直接说你要做的事——导入资料、整理判断、追问上下文——Agent 自己判断该怎么处理。
+      </p>
+      <p class="text-secondary">
+        你也可以直接拖入文件，Piki 自动识别内容类型并归入合适的位置。
+      </p>
+    </div>
+    <div class="feature-visual">
+      <MockupFrame>
+        <Image src={homepage} alt="Piki 统一输入界面" />
+      </MockupFrame>
+    </div>
+  </div>
+</section>
+
+<style>
+  .feature-text h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .feature-text p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: var(--space-md);
+  }
+
+  @media (max-width: 900px) {
+    .feature-visual {
+      order: -1;
+    }
+  }
+</style>

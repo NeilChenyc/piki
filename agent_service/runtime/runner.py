@@ -483,7 +483,7 @@ class PikiWikiAgentRunner:
         )
         if config.anthropic_base_url:
             env["ANTHROPIC_BASE_URL"] = config.anthropic_base_url
-        token = anthropic_auth_token()
+        token = anthropic_auth_token(config)
         if token:
             # Claude-compatible gateways vary between API_KEY and AUTH_TOKEN naming.
             env["ANTHROPIC_AUTH_TOKEN"] = token

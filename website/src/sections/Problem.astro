@@ -1,0 +1,48 @@
+---
+import FeatureCard from '../components/FeatureCard.astro';
+---
+<section class="section section--surface" id="problem">
+  <div class="container">
+    <h2 class="text-center problem__title fade-in">你是不是也这样？</h2>
+    <div class="problem__grid fade-in">
+      <FeatureCard
+        icon="📚"
+        title="收藏了很多，但找不到也用不上"
+        description="各种平台收藏了上百条，但真正要用的时候根本想不起来。"
+      />
+      <FeatureCard
+        icon="🔄"
+        title="每次问 AI 都要重新解释背景"
+        description="个人上下文无法延续，每次对话都像从零开始。"
+      />
+      <FeatureCard
+        icon="📝"
+        title="笔记越来越多，越来越不想打开"
+        description="笔记变成了信息的垃圾场，整理的成本比写入还高。"
+      />
+      <FeatureCard
+        icon="💬"
+        title="重要判断散落在聊天记录里"
+        description="决策的依据和结论分散在不同对话中，无法追溯和复用。"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .problem__title {
+    margin-bottom: var(--space-xl);
+  }
+
+  .problem__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 600px) {
+    .problem__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
