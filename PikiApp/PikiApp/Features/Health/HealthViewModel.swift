@@ -93,7 +93,7 @@ final class HealthViewModel {
 
         if appState.isConnected {
             await loadRecentMaintenance(
-                client: appState.apiClient,
+                client: appState.runtimeService,
                 vaultURL: vaultURL,
                 vaultPath: vaultPath
             )
@@ -103,7 +103,7 @@ final class HealthViewModel {
                 return
             }
             await loadLint(
-                client: appState.apiClient,
+                client: appState.runtimeService,
                 vaultURL: vaultURL,
                 vaultPath: vaultPath
             )
@@ -132,14 +132,14 @@ final class HealthViewModel {
         defer { isFixRunning = false }
 
         do {
-            try await appState.apiClient.fixLint(vaultPath: vaultPath, issueIds: issueIds)
+            try await appState.runtimeService.fixLint(vaultPath: vaultPath, issueIds: issueIds)
             await reload(appState: appState, mode: .afterFix)
         } catch {
             errorMessage = "低风险修复执行失败，请稍后重试。"
         }
     }
 
-    private func loadRecentMaintenance(client: APIClient, vaultURL: URL, vaultPath: String) async {
+    private func loadRecentMaintenance(client: RuntimeServiceProtocol, vaultURL: URL, vaultPath: String) async {
         do {
             let entries = try await client.recentJournal(limit: 10, vaultPath: vaultPath)
             guard !Task.isCancelled else { return }
@@ -153,7 +153,7 @@ final class HealthViewModel {
         }
     }
 
-    private func loadLint(client: APIClient, vaultURL: URL, vaultPath: String) async {
+    private func loadLint(client: RuntimeServiceProtocol, vaultURL: URL, vaultPath: String) async {
         do {
             let result = try await client.runLint(vaultPath: vaultPath)
             guard !Task.isCancelled else { return }

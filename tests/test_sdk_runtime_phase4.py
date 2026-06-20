@@ -642,6 +642,7 @@ def test_runtime_env_exports_anthropic_auth_token_alias(tmp_path: Path, monkeypa
     runner = PikiWikiAgentRunner()
     config = ServiceConfig(
         db_path=tmp_path / "agent.sqlite3",
+        runtime_config_path=tmp_path / "runtime-config.json",
         enable_agent_runtime=True,
         agent_model="claude-test",
         anthropic_base_url="https://www.packyapi.com",

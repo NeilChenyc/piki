@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Task API
 
-struct TaskCreateRequest: Codable {
+struct TaskCreateRequest: Codable, Sendable {
     let vaultPath: String
     let userInput: String
     let selectedPaths: [String]
@@ -289,7 +289,7 @@ struct RuntimeConfigDTO: Codable {
     }
 }
 
-struct RuntimeConfigUpdateRequest: Codable {
+struct RuntimeConfigUpdateRequest: Codable, Sendable {
     let agentModel: String?
     let anthropicBaseURL: String?
     let apiKey: String?

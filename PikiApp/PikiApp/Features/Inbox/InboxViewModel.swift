@@ -151,7 +151,7 @@ final class InboxViewModel {
                     selectedPaths: [filePath.path(percentEncoded: false)],
                     mode: "clear-inbox-item"
                 )
-                _ = try await appState.apiClient.createTask(request)
+                _ = try await appState.runtimeService.createTask(request)
                 await loadVaultInbox(vaultURL: vaultPath)
                 statusMessage = "Cleared"
             } catch {
@@ -179,7 +179,7 @@ final class InboxViewModel {
                         "target_path": url.path(percentEncoded: false)
                     ]
                 )
-                _ = try await appState.apiClient.createTask(request)
+                _ = try await appState.runtimeService.createTask(request)
                 await loadVaultInbox(vaultURL: vaultPath)
                 statusMessage = "Ingested"
             } catch {

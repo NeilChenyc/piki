@@ -44,3 +44,34 @@ targets:
     dependencies:
       - package: swift-markdown
         product: Markdown
+      - target: PikiRuntimeHost
+    postBuildScripts:
+      - name: Copy Runtime Host
+        basedOnDependencyAnalysis: false
+        outputFiles:
+          - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/PikiRuntimeHost"
+          - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/PikiRuntimeHost.stamp"
+        script: |
+          set -euo pipefail
+          HOST_PRODUCT_PATH="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost"
+          cp -f "${BUILT_PRODUCTS_DIR}/PikiRuntimeHost" "$HOST_PRODUCT_PATH"
+          chmod +x "$HOST_PRODUCT_PATH"
+          date > "${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost.stamp"
+          set -euo pipefail
+          HOST_PRODUCT_PATH="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost"
+          cp -f "${BUILT_PRODUCTS_DIR}/PikiRuntimeHost" "$HOST_PRODUCT_PATH"
+          chmod +x "$HOST_PRODUCT_PATH"
+  PikiRuntimeHost:
+    type: tool
+    platform: macOS
+    sources:
+      - path: PikiRuntimeHost
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.piki.runtime-host
+        PRODUCT_NAME: PikiRuntimeHost
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Automatic

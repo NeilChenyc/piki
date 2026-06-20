@@ -1,7 +1,6 @@
 import Foundation
 
 struct AppConfig: Codable, Equatable {
-    var serviceBaseURL: String = "http://127.0.0.1:8000"
     var vaultPath: String?
     var activePresetId: String?
 }

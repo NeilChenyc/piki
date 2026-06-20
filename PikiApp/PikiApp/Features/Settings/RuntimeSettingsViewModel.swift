@@ -60,7 +60,7 @@ final class RuntimeSettingsViewModel {
         presets = PresetStorage.load()
 
         do {
-            let config = try await appState.apiClient.getRuntimeConfig()
+            let config = try await appState.runtimeService.getRuntimeConfig()
             applyConfig(config)
             detectActivePreset()
         } catch {
@@ -137,7 +137,7 @@ final class RuntimeSettingsViewModel {
         )
 
         do {
-            let config = try await appState.apiClient.updateRuntimeConfig(request)
+            let config = try await appState.runtimeService.updateRuntimeConfig(request)
             applyConfig(config)
             activePresetId = preset.id
             updateLastUsed(id: preset.id)
@@ -156,7 +156,7 @@ final class RuntimeSettingsViewModel {
         defer { isRunningSmokeTest = false }
 
         do {
-            let response = try await appState.apiClient.smokeTestRuntime()
+            let response = try await appState.runtimeService.smokeTestRuntime()
             if response.ok {
                 let msg = response.output?.trimmingCharacters(in: .whitespacesAndNewlines)
                 bannerState = .success(msg?.isEmpty == false ? msg! : "Smoke test passed.")

@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from agent_service.runtime.worker import RuntimeWorker
 from agent_service.system import (
     build_source_slug,
     detect_source_format,
@@ -26,9 +27,30 @@ def main() -> int:
     extract_parser = subparsers.add_parser("extract-source")
     extract_parser.add_argument("--path", required=True)
 
+    stdio_parser = subparsers.add_parser("stdio")
+    stdio_parser.add_argument("--db-path", default=".piki/agent_service.sqlite3")
+    stdio_parser.add_argument("--runtime-config-path", default=".piki/runtime-config.json")
+    stdio_parser.add_argument("--staging-root", default=".piki/task-staging")
+    stdio_parser.add_argument("--enable-agent-runtime", action="store_true")
+
     args = parser.parse_args()
     if args.command == "lint":
         payload = _lint(args.vault)
+    elif args.command == "stdio":
+        worker = RuntimeWorker(
+            db_path=Path(args.db_path),
+            runtime_config_path=Path(args.runtime_config_path),
+            staging_root=Path(args.staging_root),
+            enable_agent_runtime=args.enable_agent_runtime,
+        )
+        for line in iter(__import__("sys").stdin.readline, ""):
+            if not line.strip():
+                continue
+            request = json.loads(line)
+            result = worker.call(request["method"], request.get("params", {}))
+            print(json.dumps({"kind": "response", "id": request["id"], "result": result, "error": None}, ensure_ascii=False))
+            __import__("sys").stdout.flush()
+        return 0
     else:
         payload = _extract_source(args.path)
     print(json.dumps(payload, ensure_ascii=False, indent=2))

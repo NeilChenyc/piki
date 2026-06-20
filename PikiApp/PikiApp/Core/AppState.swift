@@ -5,19 +5,18 @@ import SwiftUI
 final class AppState {
     var selectedTab: SidebarTab = .home
     var vaultPath: URL? { didSet { persistConfig() } }
-    var serviceBaseURL: URL { didSet { persistConfig() } }
     var connectionStatus: ServiceConnectionStatus = .disconnected
     var serviceErrorMessage: String?
     var serviceHealth: ServiceHealth?
 
-    @ObservationIgnored let apiClient = APIClient()
+    @ObservationIgnored var runtimeService: RuntimeServiceProtocol
     @ObservationIgnored var serviceManager: LocalServiceManager?
     @ObservationIgnored private var appConfig: AppConfig
 
-    init() {
+    init(runtimeService: RuntimeServiceProtocol? = nil) {
         let config = AppConfigStorage.load()
         self.appConfig = config
-        self.serviceBaseURL = URL(string: config.serviceBaseURL) ?? URL(string: "http://127.0.0.1:8000")!
+        self.runtimeService = runtimeService ?? RuntimeServiceFactory.makeDefault()
         if let path = config.vaultPath, !path.isEmpty {
             let url = URL(fileURLWithPath: path, isDirectory: true)
             if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
@@ -28,7 +27,6 @@ final class AppState {
         } else {
             self.vaultPath = AppState.defaultVaultPath()
         }
-        self.apiClient.baseURL = self.serviceBaseURL
     }
 
     var hasVault: Bool {
@@ -67,14 +65,9 @@ final class AppState {
         return serviceHealth.runnerDetail ?? "Agent runtime is unavailable."
     }
 
-    func updateServiceBaseURL(_ url: URL) {
-        serviceBaseURL = url
-        apiClient.baseURL = url
-    }
-
     func refreshServiceHealth() async {
         do {
-            let health = try await apiClient.health()
+            let health = try await runtimeService.health()
             applyServiceHealth(health)
         } catch {
             markServiceDisconnected(message: error.localizedDescription)
@@ -94,7 +87,6 @@ final class AppState {
     }
 
     private func persistConfig() {
-        appConfig.serviceBaseURL = serviceBaseURL.absoluteString
         appConfig.vaultPath = vaultPath?.path(percentEncoded: false)
         AppConfigStorage.save(appConfig)
     }

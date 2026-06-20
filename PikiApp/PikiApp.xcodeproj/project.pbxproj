@@ -7,14 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		01A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift */; };
-		02A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift */; };
-		03A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift */; };
-		04A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift */; };
-		05A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift */; };
 		062700A625C072D533285AD9 /* ChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAAFD82B5611F83C120CE63 /* ChatInputView.swift */; };
 		0FC6D73FF2508B7E905E85E2 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C2D417409DE30FBF447BDF /* SidebarView.swift */; };
+		1A46243F57D3F34F57C72FAD /* HTTPRuntimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB66741B165A1E69A2BD665 /* HTTPRuntimeService.swift */; };
 		1BCD7BAEE2B773E0FF9FEC77 /* WikiPageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CF698E82FC421701D5575C /* WikiPageContentView.swift */; };
+		20C37D70DC24B9E7CEFFF185 /* PresetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7DD8F905251BE0B6D273431 /* PresetCard.swift */; };
 		2397CE855FBD90E003163703 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */; };
 		244F35F9F9B46A19A69360AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0364D70DD6D68CCA0968BC68 /* Assets.xcassets */; };
 		24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */; };
@@ -23,13 +20,16 @@
 		315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3368FD4E4A7B6A82A049E76F /* InboxFilterBar.swift */; };
 		35D44C853488583E0CF447A7 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A151F539885AC0A94B6BAC38 /* APIModels.swift */; };
 		3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F43371721B468079B54395 /* LocalServiceManager.swift */; };
+		3DEDCCD4871867190CBCEAF5 /* PresetFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0AD373473C8B67ABD63DEC7 /* PresetFormSheet.swift */; };
 		420E59C53DC2A581E45CFB36 /* VaultStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */; };
 		443B621C0523B4FE469A9FB3 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */; };
 		490434767BFDD84D814A5496 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = A5A5FA886E43A892B6D56719 /* Markdown */; };
 		4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1996F0136E908523C15056A5 /* ContentView.swift */; };
 		4BFDE0D780505465530B0DD9 /* RuntimeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */; };
+		59F9C2A82DD4D6BA32E6695C /* RuntimeServiceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8560842E5C661DAF3CD9A932 /* RuntimeServiceFactory.swift */; };
 		5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A756DA17731FCFE154EADB /* ChatBubbleView.swift */; };
 		5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34DECA1A1AA8C54EE4EAD4EB /* InboxView.swift */; };
+		666E16697B75A8712F7CA51D /* ConfigurationPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F836D8DD14853DF881DB9E /* ConfigurationPreset.swift */; };
 		667A500AE8D9048DFE319D00 /* InboxFileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */; };
 		6AF4D9A1F1C3BBA10BC206B8 /* HealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2039447DE882C09CB87FE2A6 /* HealthView.swift */; };
 		6E28497689FB6695EC1FD09A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7249FFE507E86DAE979CD97C /* HomeView.swift */; };
@@ -37,30 +37,42 @@
 		7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C8C20519720DEC42158EF5 /* PikiApp.swift */; };
 		934DDD35050AA64D863CD91E /* HealthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA3D0A2C035EBA8527FE977 /* HealthViewModel.swift */; };
 		94EE95576C4F22F1D826DB7D /* WikiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019E1FB4BC4BE44A1B0EF031 /* WikiView.swift */; };
+		A24EB43047908C5FB0B1EF87 /* RuntimeServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F037D17D8F871F0FACF1600 /* RuntimeServiceProtocol.swift */; };
 		A47D420AC685D113461970B9 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB4472A371809ED276CFFFE /* AppState.swift */; };
 		A85DD5EB96F812767B2E4DC3 /* ActivityRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA331709E3B66786DB4834A /* ActivityRow.swift */; };
 		ADC5A81B8B7F7523762558B4 /* FilePreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E682A82DEC365409713B51F1 /* FilePreviewPanel.swift */; };
 		B4395ABA570B52FAE4F2A7D4 /* WikiCategorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E230560BD4556819372E7A /* WikiCategorySection.swift */; };
 		BF91185CF60C597B804B9212 /* SidebarNavRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADC2BA18F8E68F018CF68C6 /* SidebarNavRow.swift */; };
+		C112C2AFB7A1F300A05A0112 /* PikiRuntimeHost in Resources */ = {isa = PBXBuildFile; fileRef = 7C007134F6E4271CFB7ACCC3 /* PikiRuntimeHost */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C510D4BADEA0FDFEAEFEF495 /* FileDropZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */; };
 		C5E6688E658CD6635E6B8BDF /* InboxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */; };
 		CA0F9DB940146C27AD4B002D /* WikiViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5BF2D87FACFA4F330AE75D /* WikiViewModel.swift */; };
+		CAE0DFF29FADA0CC49C10F7D /* PresetStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEBC6DC9DE95A7F86959314 /* PresetStorage.swift */; };
 		D255CD0916C7DAA1B68F129F /* RuntimeSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */; };
 		D928974A75B277134B2F9000 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAFF5590251FB2062A50EE74 /* Theme.swift */; };
+		D97BC509ED33338215819A95 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D018275305D37AA96593F1 /* main.swift */; };
+		DA1108508920204AA1D2741D /* RuntimeHostConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C384BF71DF500A366F4A4134 /* RuntimeHostConnection.swift */; };
 		E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940D0CDE0D10F37A3CB01678 /* SSEClient.swift */; };
 		EC28D6F133C07E1352037566 /* MarkdownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0E3DD634F5DB96D2E75F0F8 /* MarkdownTextView.swift */; };
+		EF11287B495976172CDEC865 /* NativeRuntimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9C3B785F768D9E5CA88774 /* NativeRuntimeService.swift */; };
 		F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158490133DDBD171883C03FA /* LintComponents.swift */; };
+		F53AF6FE35D2CE45CB34C115 /* AppConfigStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70ED3083E38BCDA8E895F5F /* AppConfigStorage.swift */; };
 		FAB959E12892BA18CC940E53 /* TaskRenderEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F8264E76958798161B8366 /* TaskRenderEvent.swift */; };
 		FB494BE881D6475D9E547532 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8128157562AB4210024F63 /* APIClient.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DD4D23AC35621ED3E5C38F1E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9FA56F20392AE38BC704927E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 41FE485B6FF23493273C34B2;
+			remoteInfo = PikiRuntimeHost;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		019E1FB4BC4BE44A1B0EF031 /* WikiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiView.swift; sourceTree = "<group>"; };
-		11A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationPreset.swift; sourceTree = "<group>"; };
-		12A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetStorage.swift; sourceTree = "<group>"; };
-		13A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetCard.swift; sourceTree = "<group>"; };
-		14A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetFormSheet.swift; sourceTree = "<group>"; };
-		15A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigStorage.swift; sourceTree = "<group>"; };
 		03274DDF1C8CC790CFFC0B2D /* FileDropZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDropZone.swift; sourceTree = "<group>"; };
 		0364D70DD6D68CCA0968BC68 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0CB4472A371809ED276CFFFE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -75,23 +87,34 @@
 		36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultStatusCard.swift; sourceTree = "<group>"; };
 		37CF698E82FC421701D5575C /* WikiPageContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiPageContentView.swift; sourceTree = "<group>"; };
 		44DEEE42D19CCDA440896E5C /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		52D018275305D37AA96593F1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		58F836D8DD14853DF881DB9E /* ConfigurationPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationPreset.swift; sourceTree = "<group>"; };
+		5F037D17D8F871F0FACF1600 /* RuntimeServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeServiceProtocol.swift; sourceTree = "<group>"; };
 		66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiLogo.swift; sourceTree = "<group>"; };
 		6FF7EEE571B61A88771D7640 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7249FFE507E86DAE979CD97C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		7C007134F6E4271CFB7ACCC3 /* PikiRuntimeHost */ = {isa = PBXFileReference; includeInIndex = 0; path = PikiRuntimeHost; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB66741B165A1E69A2BD665 /* HTTPRuntimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRuntimeService.swift; sourceTree = "<group>"; };
+		8560842E5C661DAF3CD9A932 /* RuntimeServiceFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeServiceFactory.swift; sourceTree = "<group>"; };
 		940D0CDE0D10F37A3CB01678 /* SSEClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSEClient.swift; sourceTree = "<group>"; };
+		9D9C3B785F768D9E5CA88774 /* NativeRuntimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeRuntimeService.swift; sourceTree = "<group>"; };
 		9EA3D0A2C035EBA8527FE977 /* HealthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewModel.swift; sourceTree = "<group>"; };
 		A151F539885AC0A94B6BAC38 /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
 		A5C2D417409DE30FBF447BDF /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		A7DD8F905251BE0B6D273431 /* PresetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetCard.swift; sourceTree = "<group>"; };
 		AD8128157562AB4210024F63 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		B0AD373473C8B67ABD63DEC7 /* PresetFormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetFormSheet.swift; sourceTree = "<group>"; };
 		B3E230560BD4556819372E7A /* WikiCategorySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiCategorySection.swift; sourceTree = "<group>"; };
 		B547F3BE91A5BD4EB59856AF /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		BA5BF2D87FACFA4F330AE75D /* WikiViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiViewModel.swift; sourceTree = "<group>"; };
 		BAFF5590251FB2062A50EE74 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		BEA331709E3B66786DB4834A /* ActivityRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRow.swift; sourceTree = "<group>"; };
+		C384BF71DF500A366F4A4134 /* RuntimeHostConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeHostConnection.swift; sourceTree = "<group>"; };
 		C6F43371721B468079B54395 /* LocalServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalServiceManager.swift; sourceTree = "<group>"; };
 		CC0D3FF75E4A4EB35F050131 /* QuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
 		D7E53C3B5F34D19339DBDE0D /* InboxFileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxFileRow.swift; sourceTree = "<group>"; };
 		DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeSettingsViewModel.swift; sourceTree = "<group>"; };
+		DBEBC6DC9DE95A7F86959314 /* PresetStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetStorage.swift; sourceTree = "<group>"; };
 		E037E4983C2F8090DAFA9F46 /* InboxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxViewModel.swift; sourceTree = "<group>"; };
 		E682A82DEC365409713B51F1 /* FilePreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePreviewPanel.swift; sourceTree = "<group>"; };
 		E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeSettingsView.swift; sourceTree = "<group>"; };
@@ -100,6 +123,7 @@
 		F0E3DD634F5DB96D2E75F0F8 /* MarkdownTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTextView.swift; sourceTree = "<group>"; };
 		F0F8264E76958798161B8366 /* TaskRenderEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRenderEvent.swift; sourceTree = "<group>"; };
 		F6C8C20519720DEC42158EF5 /* PikiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiApp.swift; sourceTree = "<group>"; };
+		F70ED3083E38BCDA8E895F5F /* AppConfigStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigStorage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,10 +152,11 @@
 			children = (
 				7A4BB5116558407CA81B0B73 /* Models */,
 				00313DC5D94511CD99F7AFBE /* Network */,
-				15A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift */,
+				CFD3972A987ED01892AD4834 /* Runtime */,
+				F70ED3083E38BCDA8E895F5F /* AppConfigStorage.swift */,
 				0CB4472A371809ED276CFFFE /* AppState.swift */,
 				C6F43371721B468079B54395 /* LocalServiceManager.swift */,
-				12A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift */,
+				DBEBC6DC9DE95A7F86959314 /* PresetStorage.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -191,7 +216,7 @@
 			isa = PBXGroup;
 			children = (
 				A151F539885AC0A94B6BAC38 /* APIModels.swift */,
-				11A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift */,
+				58F836D8DD14853DF881DB9E /* ConfigurationPreset.swift */,
 				F0F8264E76958798161B8366 /* TaskRenderEvent.swift */,
 			);
 			path = Models;
@@ -234,8 +259,29 @@
 			isa = PBXGroup;
 			children = (
 				B08C061F5F39BBE62558F1A3 /* PikiApp */,
+				B87F87191526F9FC61B9C61C /* PikiRuntimeHost */,
 				E6AA76FE36CBD435FF3EDEFB /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		B87F87191526F9FC61B9C61C /* PikiRuntimeHost */ = {
+			isa = PBXGroup;
+			children = (
+				52D018275305D37AA96593F1 /* main.swift */,
+			);
+			path = PikiRuntimeHost;
+			sourceTree = "<group>";
+		};
+		CFD3972A987ED01892AD4834 /* Runtime */ = {
+			isa = PBXGroup;
+			children = (
+				7CB66741B165A1E69A2BD665 /* HTTPRuntimeService.swift */,
+				9D9C3B785F768D9E5CA88774 /* NativeRuntimeService.swift */,
+				C384BF71DF500A366F4A4134 /* RuntimeHostConnection.swift */,
+				8560842E5C661DAF3CD9A932 /* RuntimeServiceFactory.swift */,
+				5F037D17D8F871F0FACF1600 /* RuntimeServiceProtocol.swift */,
+			);
+			path = Runtime;
 			sourceTree = "<group>";
 		};
 		E661AC331844E9BDB3E4024E /* Resources */ = {
@@ -250,6 +296,7 @@
 			isa = PBXGroup;
 			children = (
 				2D7E221313C9D9DE368238DC /* PikiApp.app */,
+				7C007134F6E4271CFB7ACCC3 /* PikiRuntimeHost */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -257,8 +304,8 @@
 		EF21444027C2B972158E94CF /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				13A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift */,
-				14A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift */,
+				A7DD8F905251BE0B6D273431 /* PresetCard.swift */,
+				B0AD373473C8B67ABD63DEC7 /* PresetFormSheet.swift */,
 				E9A58DD0CDE6D25B344D55B1 /* RuntimeSettingsView.swift */,
 				DA2FA06D458A24E4D65022F5 /* RuntimeSettingsViewModel.swift */,
 				6FF7EEE571B61A88771D7640 /* SettingsView.swift */,
@@ -288,6 +335,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		41FE485B6FF23493273C34B2 /* PikiRuntimeHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79AD8E4E0B28D3B3D2DAA73C /* Build configuration list for PBXNativeTarget "PikiRuntimeHost" */;
+			buildPhases = (
+				C6B8C8CFBCDBE4787F9A2E9B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PikiRuntimeHost;
+			packageProductDependencies = (
+			);
+			productName = PikiRuntimeHost;
+			productReference = 7C007134F6E4271CFB7ACCC3 /* PikiRuntimeHost */;
+			productType = "com.apple.product-type.tool";
+		};
 		F3A273F6023F8444087A3B76 /* PikiApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E3155C49ED672DBC5C48071A /* Build configuration list for PBXNativeTarget "PikiApp" */;
@@ -295,10 +359,12 @@
 				F367E3C39418C7A54BB61FE5 /* Sources */,
 				2E71C85B467E0CC5524B74DD /* Resources */,
 				8E53C344C220063B0E43FCBC /* Frameworks */,
+				6A6B4ACE2B546BCAD286B490 /* Copy Runtime Host */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				24DB9BB6B29F25221447BFC4 /* PBXTargetDependency */,
 			);
 			name = PikiApp;
 			packageProductDependencies = (
@@ -317,6 +383,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					41FE485B6FF23493273C34B2 = {
+						ProvisioningStyle = Automatic;
+					};
 					F3A273F6023F8444087A3B76 = {
 						ProvisioningStyle = Automatic;
 					};
@@ -340,6 +409,7 @@
 			projectRoot = "";
 			targets = (
 				F3A273F6023F8444087A3B76 /* PikiApp */,
+				41FE485B6FF23493273C34B2 /* PikiRuntimeHost */,
 			);
 		};
 /* End PBXProject section */
@@ -350,12 +420,42 @@
 			buildActionMask = 2147483647;
 			files = (
 				244F35F9F9B46A19A69360AC /* Assets.xcassets in Resources */,
+				C112C2AFB7A1F300A05A0112 /* PikiRuntimeHost in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		6A6B4ACE2B546BCAD286B490 /* Copy Runtime Host */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Runtime Host";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nHOST_PRODUCT_PATH=\"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost\"\ncp -f \"${BUILT_PRODUCTS_DIR}/PikiRuntimeHost\" \"$HOST_PRODUCT_PATH\"\nchmod +x \"$HOST_PRODUCT_PATH\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		C6B8C8CFBCDBE4787F9A2E9B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D97BC509ED33338215819A95 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F367E3C39418C7A54BB61FE5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -363,15 +463,16 @@
 				FB494BE881D6475D9E547532 /* APIClient.swift in Sources */,
 				35D44C853488583E0CF447A7 /* APIModels.swift in Sources */,
 				A85DD5EB96F812767B2E4DC3 /* ActivityRow.swift in Sources */,
+				F53AF6FE35D2CE45CB34C115 /* AppConfigStorage.swift in Sources */,
 				A47D420AC685D113461970B9 /* AppState.swift in Sources */,
-				05A1B2C3D4E5F6A7B8C9D0E1 /* AppConfigStorage.swift in Sources */,
 				5D15B618F34A80B6F81B76D2 /* ChatBubbleView.swift in Sources */,
 				062700A625C072D533285AD9 /* ChatInputView.swift in Sources */,
-				01A1B2C3D4E5F6A7B8C9D0E1 /* ConfigurationPreset.swift in Sources */,
+				666E16697B75A8712F7CA51D /* ConfigurationPreset.swift in Sources */,
 				4A655CB9038289F87ECDF8EC /* ContentView.swift in Sources */,
 				C510D4BADEA0FDFEAEFEF495 /* FileDropZone.swift in Sources */,
 				ADC5A81B8B7F7523762558B4 /* FilePreviewPanel.swift in Sources */,
 				443B621C0523B4FE469A9FB3 /* FlowLayout.swift in Sources */,
+				1A46243F57D3F34F57C72FAD /* HTTPRuntimeService.swift in Sources */,
 				71D3880185003E3C1DFBAA97 /* HealthScoreCard.swift in Sources */,
 				6AF4D9A1F1C3BBA10BC206B8 /* HealthView.swift in Sources */,
 				934DDD35050AA64D863CD91E /* HealthViewModel.swift in Sources */,
@@ -384,12 +485,16 @@
 				F355C491AB99CEC5D4AEFB32 /* LintComponents.swift in Sources */,
 				3D3B8DF0769D7DB3B82D01CD /* LocalServiceManager.swift in Sources */,
 				EC28D6F133C07E1352037566 /* MarkdownTextView.swift in Sources */,
+				EF11287B495976172CDEC865 /* NativeRuntimeService.swift in Sources */,
 				7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */,
 				2AA197355ADDA201407ED922 /* PikiLogo.swift in Sources */,
-				03A1B2C3D4E5F6A7B8C9D0E1 /* PresetCard.swift in Sources */,
-				04A1B2C3D4E5F6A7B8C9D0E1 /* PresetFormSheet.swift in Sources */,
-				02A1B2C3D4E5F6A7B8C9D0E1 /* PresetStorage.swift in Sources */,
+				20C37D70DC24B9E7CEFFF185 /* PresetCard.swift in Sources */,
+				3DEDCCD4871867190CBCEAF5 /* PresetFormSheet.swift in Sources */,
+				CAE0DFF29FADA0CC49C10F7D /* PresetStorage.swift in Sources */,
 				24DE5EA73E1E861115E605C4 /* QuickActionsView.swift in Sources */,
+				DA1108508920204AA1D2741D /* RuntimeHostConnection.swift in Sources */,
+				59F9C2A82DD4D6BA32E6695C /* RuntimeServiceFactory.swift in Sources */,
+				A24EB43047908C5FB0B1EF87 /* RuntimeServiceProtocol.swift in Sources */,
 				4BFDE0D780505465530B0DD9 /* RuntimeSettingsView.swift in Sources */,
 				D255CD0916C7DAA1B68F129F /* RuntimeSettingsViewModel.swift in Sources */,
 				E5B67E03C4F6EFF83AB662AA /* SSEClient.swift in Sources */,
@@ -408,7 +513,34 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		24DB9BB6B29F25221447BFC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 41FE485B6FF23493273C34B2 /* PikiRuntimeHost */;
+			targetProxy = DD4D23AC35621ED3E5C38F1E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		1A82D7C5672871FF8241B9B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.piki.runtime-host";
+				PRODUCT_NAME = PikiRuntimeHost;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 		40FF55483095359932937D77 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -496,6 +628,25 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Debug;
+		};
+		B6D863F1CC5EC2EE831E178F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.piki.runtime-host";
+				PRODUCT_NAME = PikiRuntimeHost;
+				SDKROOT = macosx;
+			};
+			name = Release;
 		};
 		CF58ED5248D64C50F40363FA /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -586,6 +737,15 @@
 			buildConfigurations = (
 				40FF55483095359932937D77 /* Debug */,
 				E62D1E7F528CD62AB2E0C2BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		79AD8E4E0B28D3B3D2DAA73C /* Build configuration list for PBXNativeTarget "PikiRuntimeHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A82D7C5672871FF8241B9B1 /* Debug */,
+				B6D863F1CC5EC2EE831E178F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

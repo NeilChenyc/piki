@@ -3,22 +3,18 @@ import SwiftUI
 struct SettingsView: View {
     var body: some View {
         Form {
-            ServiceURLSettingsSection()
+            ServiceRuntimeSettingsSection()
         }
-        .frame(width: 400, height: 180)
+        .frame(width: 400, height: 120)
         .padding()
     }
 }
 
-struct ServiceURLSettingsSection: View {
+struct ServiceRuntimeSettingsSection: View {
     @Environment(AppState.self) private var appState
-    @State private var urlString = "http://127.0.0.1:8000"
 
     var body: some View {
         Section("Agent Service") {
-            TextField("Service URL", text: $urlString)
-                .textFieldStyle(.roundedBorder)
-
             HStack {
                 Circle()
                     .fill(connectionColor)
@@ -38,9 +34,6 @@ struct ServiceURLSettingsSection: View {
                     .foregroundStyle(Theme.error)
             }
         }
-        .onAppear {
-            urlString = appState.serviceBaseURL.absoluteString
-        }
     }
 
     private var connectionColor: Color {
@@ -53,9 +46,6 @@ struct ServiceURLSettingsSection: View {
     }
 
     private func testConnection() async {
-        if let url = URL(string: urlString) {
-            appState.updateServiceBaseURL(url)
-        }
         await appState.serviceManager?.testConnection()
     }
 }

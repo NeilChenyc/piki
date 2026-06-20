@@ -102,7 +102,7 @@ final class HomeViewModel {
 
         Task {
             do {
-                let task = try await appState.apiClient.cancelTask(taskId: taskId)
+                let task = try await appState.runtimeService.cancelTask(taskId: taskId)
                 logger.log("Task cancellation acknowledged by backend for \(taskId, privacy: .public).")
                 finalizeStoppedRun(summary: task.summary ?? "本轮任务已停止。")
             } catch {
@@ -142,7 +142,7 @@ final class HomeViewModel {
             let response: TaskCreateResponse
             if let pendingTaskId = pendingInputTaskId {
                 response = TaskCreateResponse(taskId: pendingTaskId, status: "running")
-                _ = try await appState.apiClient.submitTaskInput(taskId: pendingTaskId, message: effectiveText)
+                _ = try await appState.runtimeService.submitTaskInput(taskId: pendingTaskId, message: effectiveText)
                 pendingInputTaskId = nil
                 pendingInputPrompt = nil
             } else {
@@ -153,13 +153,13 @@ final class HomeViewModel {
                     conversationId: conversationId,
                     asyncMode: true
                 )
-                response = try await appState.apiClient.createTask(request)
+                response = try await appState.runtimeService.createTask(request)
             }
             activeTaskId = response.taskId
             statusText = "正在理解请求"
 
             var finalEventContent: String?
-            for try await event in appState.apiClient.taskEvents(taskId: response.taskId) {
+            for try await event in appState.runtimeService.taskEvents(taskId: response.taskId) {
                 try Task.checkCancellation()
                 recordDebugEvent(event)
                 if let content = handle(event, assistantMessageId: assistantMessageId) {
@@ -168,7 +168,7 @@ final class HomeViewModel {
             }
 
             try Task.checkCancellation()
-            let task = try await appState.apiClient.getTask(taskId: response.taskId)
+            let task = try await appState.runtimeService.getTask(taskId: response.taskId)
             let content = preferredFinalContent(
                 id: assistantMessageId,
                 fallback: task.output?.answer
@@ -204,7 +204,7 @@ final class HomeViewModel {
     func loadRecentJournal(appState: AppState) async {
         guard appState.isConnected, let vaultPath = appState.vaultPath else { return }
         do {
-            let entries = try await appState.apiClient.recentJournal(
+            let entries = try await appState.runtimeService.recentJournal(
                 limit: 10,
                 vaultPath: vaultPath.path(percentEncoded: false)
             )
@@ -221,7 +221,7 @@ final class HomeViewModel {
         Task {
             do {
                 statusText = "正在回退变更"
-                try await appState.apiClient.rollback(entryId: journalId)
+                try await appState.runtimeService.rollback(entryId: journalId)
                 await loadRecentJournal(appState: appState)
                 statusText = nil
             } catch {
@@ -509,7 +509,7 @@ final class HomeViewModel {
         statusText = "正在上传附件"
         var bufferedPaths: [String] = []
         for fileURL in selectedFiles {
-            let uploaded = try await appState.apiClient.uploadFile(fileURL)
+            let uploaded = try await appState.runtimeService.uploadFile(fileURL)
             bufferedPaths.append(uploaded.bufferedPath)
         }
         return bufferedPaths

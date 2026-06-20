@@ -1016,6 +1016,30 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/HTTPRuntimeService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/NativeRuntimeService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceProtocol.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthScoreCard.swift"
         },
         {
@@ -1173,6 +1197,12 @@
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/APIClient.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/SSEClient.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/PresetStorage.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HTTPRuntimeService.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceFactory.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceProtocol.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HealthScoreCard.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HealthView.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HealthViewModel.swift.o",
@@ -1324,6 +1354,30 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HTTPRuntimeService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceFactory.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceProtocol.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HealthScoreCard.swift.o"
         },
         {
@@ -1471,6 +1525,12 @@
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Network/APIClient.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Network/SSEClient.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/PresetStorage.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/HTTPRuntimeService.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/NativeRuntimeService.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceProtocol.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthScoreCard.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthView.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthViewModel.swift",
@@ -1634,6 +1694,10 @@
       "inputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/VaultInitializationTests.swift"
         },
         {
@@ -1653,6 +1717,7 @@
       "moduleName" : "PikiAppTests",
       "moduleOutputPath" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Modules/PikiAppTests.swiftmodule",
       "objects" : [
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RuntimeMigrationTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.swift.o"
       ],
       "otherArguments" : [
@@ -1731,6 +1796,10 @@
       "outputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RuntimeMigrationTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.swift.o"
         },
         {
@@ -1740,6 +1809,7 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/VaultInitializationTests.swift"
       ],
       "tempsPath" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build",
@@ -1923,6 +1993,12 @@
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Network/APIClient.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Network/SSEClient.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/PresetStorage.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/HTTPRuntimeService.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/NativeRuntimeService.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceProtocol.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthScoreCard.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthView.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthViewModel.swift",
@@ -2123,6 +2199,7 @@
       "-package-name",
       "pikiapp",
       "-c",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/VaultInitializationTests.swift",
       "-I",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Modules",
@@ -2620,6 +2697,30 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/HTTPRuntimeService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/NativeRuntimeService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceProtocol.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthScoreCard.swift"
         },
         {
@@ -3094,6 +3195,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HTTPRuntimeService.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HealthScoreCard.swift.o"
         },
         {
@@ -3130,6 +3235,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/LintComponents.swift.o"
         },
         {
@@ -3139,6 +3248,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownTextView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.swift.o"
         },
         {
           "kind" : "file",
@@ -3163,6 +3276,18 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/QuickActionsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceFactory.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceProtocol.swift.o"
         },
         {
           "kind" : "file",
@@ -3710,6 +3835,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HTTPRuntimeService.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HealthScoreCard.swift.o"
         },
         {
@@ -3746,6 +3875,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/LintComponents.swift.o"
         },
         {
@@ -3755,6 +3888,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownTextView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.swift.o"
         },
         {
           "kind" : "file",
@@ -3779,6 +3916,18 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/QuickActionsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceFactory.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceProtocol.swift.o"
         },
         {
           "kind" : "file",
@@ -3835,6 +3984,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RuntimeMigrationTests.swift.o"
         },
         {
           "kind" : "file",
@@ -3985,6 +4138,10 @@
         {
           "kind" : "virtual",
           "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift"
         },
         {
           "kind" : "file",
