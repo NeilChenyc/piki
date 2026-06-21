@@ -1,6 +1,6 @@
 # 产品文档目录
 
-这个目录存放 Piki 当前有效的产品定义、运行时设计和路线图。当前统一前提是“SwiftUI App -> PikiRuntimeHost -> internal Python worker -> Claude built-in tools”，localhost HTTP/SSE 只保留为历史兼容说明。
+这个目录存放 Piki 当前有效的产品定义、运行时设计和路线图。当前统一前提是”SwiftUI App -> HTTP+SSE (localhost:8782) -> FastAPI/uvicorn -> Claude Agent SDK -> Claude built-in tools”。
 
 ## 文档说明
 

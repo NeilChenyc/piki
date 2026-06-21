@@ -29,9 +29,10 @@ See `.claude/AGENTS-swift.md` for detailed Swift/SwiftUI coding rules. Key point
 - `.claude/commands/swiftui-pro/` — SwiftUI best practices and review
 - `.claude/commands/swift-architecture-skill/` — Architecture selection and patterns
 
-## Agent Service API (localhost:8000)
+## Agent Service API (localhost:8782)
 
-The client connects to a local FastAPI service. Key endpoints:
+The client connects to a local FastAPI service (auto-launched by the app via uvicorn). Key endpoints:
+- `GET /health` — service health check
 - `POST /tasks` — create agent task (query, ingest, etc.)
 - `GET /tasks/{id}/events` — SSE event stream
 - `GET /ingest-queue` — list queued items

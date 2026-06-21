@@ -11,7 +11,7 @@ Piki 的 runtime 目标不是“自研一整套 agent 框架”，而是：
 当前收敛后的目标架构是：
 
 ```text
-SwiftUI App -> PikiRuntimeHost -> internal Python worker -> Claude Agent SDK -> Claude built-in tools
+SwiftUI App -> HTTP+SSE (localhost:8782) -> FastAPI/uvicorn -> Claude Agent SDK -> Claude built-in tools
 ```
 
 ## 2. 为什么选 Claude Agent SDK
@@ -31,9 +31,9 @@ Claude Agent SDK 已经提供 Piki 真正需要的运行时要素：
 
 ### 3.1 Claude 是唯一主 runtime
 
-- Python worker 继续保留
+- Python Agent Service 通过 HTTP+SSE 与 App 通信
 - 产品主路径不再依赖 `openai-agents`
-- 不再使用 localhost HTTP/SSE 作为产品协议
+- App 通过 `LocalServiceManager` 自动管理 uvicorn 进程生命周期
 
 ### 3.2 不再维护自定义 agent-visible toolset
 
@@ -171,13 +171,7 @@ Claude partial streaming 映射：
 - `content_block_start(tool_use)` -> `tool.started`
 - `content_block_stop(tool_use)` / `PostToolUse` -> `tool.finished`
 
-Swift host 当前通过 worker 的增量 task event envelope 做长轮询桥接；协议层保持这些事件语义稳定，后续若替换成更直接的 push bridge，UI 不需要改语义。
-
-当前实现已经补上 worker 事件通知信号：
-
-- worker 在事件写入 SQLite 时，会顺手输出一条轻量 notification
-- host 仍保留 cursor 回放与超时轮询，作为断线/重连兜底
-- UI 看到的是稳定 task event 流，不耦合底层传输形态
+Swift 端通过 SSE (`GET /tasks/{id}/events`) 接收实时事件流，协议层保持这些事件语义稳定。
 
 ## 9. Journal 与回退
 
