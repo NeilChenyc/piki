@@ -136,4 +136,16 @@ struct DocumentMarkdownBlockBuilderTests {
             }
         )
     }
+
+    @MainActor
+    @Test
+    func documentViewAcceptsPreviewScaleInput() {
+        let view = DocumentMarkdownView(
+            "# Title\n\nBody",
+            presentationMode: .documentPage(displayTitle: "Title"),
+            textScale: 1.3
+        )
+
+        #expect(view.textScale == 1.3)
+    }
 }

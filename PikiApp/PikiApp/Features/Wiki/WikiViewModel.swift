@@ -3,13 +3,51 @@ import SwiftUI
 @Observable
 @MainActor
 final class WikiViewModel {
+    private struct WikiPageDraftState {
+        var text: String
+        var isDirty: Bool
+    }
+
+    private enum PreviewScale {
+        static let `default`: CGFloat = 1.0
+        static let minimum: CGFloat = 0.85
+        static let maximum: CGFloat = 1.3
+        static let step: CGFloat = 0.1
+    }
+
     var categories: [WikiCategory] = WikiCategory.defaults
     var selectedPage: WikiPage?
     var searchQuery: String = ""
     var errorMessage: String?
     var isLoading = false
+    var previewTextScale: CGFloat = PreviewScale.default
+
+    private(set) var editingPageID: String?
+    private var draftStates: [String: WikiPageDraftState] = [:]
 
     private var loadedVaultPath: String?
+
+    var isEditingSelectedPage: Bool {
+        editingPageID == selectedPage?.id
+    }
+
+    var editingText: String? {
+        guard let selectedPage else { return nil }
+        return draftStates[selectedPage.id]?.text
+    }
+
+    var selectedPageHasUnsavedDraft: Bool {
+        guard let selectedPage else { return false }
+        return draftStates[selectedPage.id]?.isDirty ?? false
+    }
+
+    var canIncreasePreviewTextScale: Bool {
+        previewTextScale < PreviewScale.maximum - 0.001
+    }
+
+    var canDecreasePreviewTextScale: Bool {
+        previewTextScale > PreviewScale.minimum + 0.001
+    }
 
     var filteredCategories: [WikiCategory] {
         let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -63,6 +101,7 @@ final class WikiViewModel {
     @discardableResult
     func selectPage(for target: WikiLinkTarget) -> Bool {
         guard let page = page(for: target) else { return false }
+        stopEditingSelectedPagePreservingDraft()
         selectedPage = page
         return true
     }
@@ -71,6 +110,70 @@ final class WikiViewModel {
         categories
             .flatMap(\.pages)
             .first { $0.selectionKey == target.selectionKey }
+    }
+
+    func startEditingSelectedPage() {
+        guard let selectedPage else { return }
+        let existingDraft = draftStates[selectedPage.id]
+        draftStates[selectedPage.id] = WikiPageDraftState(
+            text: existingDraft?.text ?? selectedPage.content,
+            isDirty: existingDraft?.isDirty ?? false
+        )
+        editingPageID = selectedPage.id
+    }
+
+    func updateDraftForSelectedPage(_ text: String) {
+        guard let selectedPage else { return }
+        let baseline = selectedPage.content
+        draftStates[selectedPage.id] = WikiPageDraftState(
+            text: text,
+            isDirty: text != baseline
+        )
+    }
+
+    func stopEditingSelectedPagePreservingDraft() {
+        editingPageID = nil
+    }
+
+    func cancelEditingSelectedPage() {
+        guard let selectedPage else { return }
+        draftStates.removeValue(forKey: selectedPage.id)
+        editingPageID = nil
+    }
+
+    func saveEditingSelectedPage() throws {
+        guard let selectedPage,
+              let draft = draftStates[selectedPage.id] else { return }
+
+        let fileURL = URL(fileURLWithPath: selectedPage.filePath)
+        try draft.text.write(to: fileURL, atomically: true, encoding: .utf8)
+
+        let refreshed = Self.refresh(page: selectedPage, content: draft.text)
+        replace(page: refreshed)
+        self.selectedPage = refreshed
+        draftStates.removeValue(forKey: selectedPage.id)
+        editingPageID = nil
+    }
+
+    func increasePreviewTextScale() {
+        previewTextScale = min(PreviewScale.maximum, roundedScale(previewTextScale + PreviewScale.step))
+    }
+
+    func decreasePreviewTextScale() {
+        previewTextScale = max(PreviewScale.minimum, roundedScale(previewTextScale - PreviewScale.step))
+    }
+
+    private func replace(page updatedPage: WikiPage) {
+        for categoryIndex in categories.indices {
+            if let pageIndex = categories[categoryIndex].pages.firstIndex(where: { $0.id == updatedPage.id }) {
+                categories[categoryIndex].pages[pageIndex] = updatedPage
+                return
+            }
+        }
+    }
+
+    private func roundedScale(_ value: CGFloat) -> CGFloat {
+        (value * 100).rounded() / 100
     }
 
     private nonisolated static func loadAllCategories(wikiURL: URL) -> [WikiCategory] {
@@ -96,16 +199,33 @@ final class WikiViewModel {
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
             .map { url in
                 let content = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-                return WikiPage(
-                    id: url.path(percentEncoded: false),
-                    title: pageTitle(for: url, content: content),
-                    category: category.id,
-                    filePath: url.path(percentEncoded: false),
-                    content: content,
-                    relatedConcepts: extractWikiLinks(from: content),
-                    lastModified: modificationDate(for: url)
-                )
+                return makePage(categoryID: category.id, url: url, content: content)
             }
+    }
+
+    private nonisolated static func makePage(categoryID: String, url: URL, content: String) -> WikiPage {
+        WikiPage(
+            id: url.path(percentEncoded: false),
+            title: pageTitle(for: url, content: content),
+            category: categoryID,
+            filePath: url.path(percentEncoded: false),
+            content: content,
+            relatedConcepts: extractWikiLinks(from: content),
+            lastModified: modificationDate(for: url)
+        )
+    }
+
+    private nonisolated static func refresh(page: WikiPage, content: String) -> WikiPage {
+        let fileURL = URL(fileURLWithPath: page.filePath)
+        return WikiPage(
+            id: page.id,
+            title: pageTitle(for: fileURL, content: content),
+            category: page.category,
+            filePath: page.filePath,
+            content: content,
+            relatedConcepts: extractWikiLinks(from: content),
+            lastModified: modificationDate(for: fileURL)
+        )
     }
 
     private nonisolated static func pageTitle(for url: URL, content: String) -> String {

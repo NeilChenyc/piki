@@ -51,6 +51,13 @@
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.swiftdeps",
     "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.dia"
   },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/WikiEditingTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiEditingTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiEditingTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiEditingTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiEditingTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiEditingTests.dia"
+  },
   "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/WikiLinkRenderingTests.swift": {
     "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests.d",
     "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests.swift.o",

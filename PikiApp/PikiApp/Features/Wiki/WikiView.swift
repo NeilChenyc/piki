@@ -66,6 +66,7 @@ struct WikiView: View {
                                     category: category,
                                     selectedPage: viewModel.selectedPage
                                 ) { page in
+                                    viewModel.stopEditingSelectedPagePreservingDraft()
                                     viewModel.selectedPage = page
                                 }
                             }

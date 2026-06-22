@@ -6,6 +6,7 @@ struct DocumentMarkdownView: View {
     let presentationMode: MarkdownDocumentPresentation.Mode
     let content: String
     let baseURL: URL?
+    let textScale: CGFloat
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
     private var preparedDocument: MarkdownDocumentPresentation.PreparedDocument {
@@ -23,35 +24,40 @@ struct DocumentMarkdownView: View {
         _ content: String,
         presentationMode: MarkdownDocumentPresentation.Mode = .plain,
         baseURL: URL? = nil,
+        textScale: CGFloat = 1.0,
         onOpenWikiLink: ((WikiLinkTarget) -> Void)? = nil
     ) {
         self.content = content
         self.presentationMode = presentationMode
         self.baseURL = baseURL
+        self.textScale = textScale
         self.onOpenWikiLink = onOpenWikiLink
     }
 
     var body: some View {
+        let style = DocumentMarkdownStyle(scale: textScale)
+
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(blocks.enumerated()), id: \.offset) { index, block in
                     DocumentMarkdownBlockView(
                         block: block,
+                        style: style,
                         baseURL: baseURL,
                         onOpenWikiLink: onOpenWikiLink
                     )
 
                     if let spacing = block.spacingAfter {
                         Color.clear
-                            .frame(height: spacing)
+                            .frame(height: style.scaled(spacing))
                     } else if index < blocks.count - 1 {
                         Color.clear
-                            .frame(height: 12)
+                            .frame(height: style.scaled(12))
                     }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.bottom, 8)
+            .padding(.bottom, style.scaled(8))
         }
         .scrollIndicators(.visible)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -92,34 +98,37 @@ struct MessageMarkdownView: View {
 
 private struct DocumentMarkdownBlockView: View {
     let block: DocumentMarkdownBlock
+    let style: DocumentMarkdownStyle
     let baseURL: URL?
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
     var body: some View {
         switch block.kind {
         case .metadata(let items):
-            DocumentMetadataStrip(items: items)
+            DocumentMetadataStrip(items: items, style: style)
 
         case .heading(let payload):
-            DocumentHeadingView(payload: payload)
+            DocumentHeadingView(payload: payload, style: style)
 
         case .text(let payload):
             DocumentTextBlockView(
                 payload: payload,
+                style: style,
                 onOpenWikiLink: onOpenWikiLink
             )
 
         case .table(let payload):
             DocumentTableBlockView(
                 payload: payload,
+                style: style,
                 onOpenWikiLink: onOpenWikiLink
             )
 
         case .codeBlock(let payload):
-            DocumentCodeBlockView(payload: payload)
+            DocumentCodeBlockView(payload: payload, style: style)
 
         case .image(let image):
-            DocumentImageBlockView(image: image)
+            DocumentImageBlockView(image: image, style: style)
 
         case .divider:
             Divider()
@@ -130,18 +139,19 @@ private struct DocumentMarkdownBlockView: View {
 
 private struct DocumentMetadataStrip: View {
     let items: [MarkdownDocumentPresentation.MetadataItem]
+    let style: DocumentMarkdownStyle
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: style.scaled(8)) {
             ForEach(items, id: \.key) { item in
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                HStack(alignment: .firstTextBaseline, spacing: style.scaled(12)) {
                     Text(item.key)
-                        .font(.system(size: 10.5, weight: .medium, design: .monospaced))
+                        .font(.system(size: style.metadataFontSize, weight: .medium, design: .monospaced))
                         .foregroundStyle(Theme.textTertiary)
-                        .frame(width: 78, alignment: .leading)
+                        .frame(width: style.scaled(78), alignment: .leading)
 
                     Text(item.value)
-                        .font(.system(size: 10.5))
+                        .font(.system(size: style.metadataFontSize))
                         .foregroundStyle(Theme.textSecondary)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -153,12 +163,13 @@ private struct DocumentMetadataStrip: View {
 
 private struct DocumentHeadingView: View {
     let payload: DocumentHeadingPayload
+    let style: DocumentMarkdownStyle
 
     var body: some View {
         Text(payload.text)
             .font(font)
             .foregroundStyle(Theme.textPrimary)
-            .lineSpacing(payload.lineSpacing)
+            .lineSpacing(style.scaled(payload.lineSpacing))
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -166,37 +177,38 @@ private struct DocumentHeadingView: View {
     private var font: Font {
         switch payload.level {
         case 1:
-            return .system(size: 24, weight: .bold)
+            return .system(size: style.h1FontSize, weight: .bold)
         case 2:
-            return .system(size: 20, weight: .semibold)
+            return .system(size: style.h2FontSize, weight: .semibold)
         case 3:
-            return .system(size: 16, weight: .semibold)
+            return .system(size: style.h3FontSize, weight: .semibold)
         default:
-            return .system(size: 14, weight: .semibold)
+            return .system(size: style.bodyFontSize + style.scaled(1), weight: .semibold)
         }
     }
 }
 
 private struct DocumentTextBlockView: View {
     let payload: DocumentTextBlockPayload
+    let style: DocumentMarkdownStyle
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
     var body: some View {
         switch payload.style {
         case .blockquote:
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .top, spacing: style.scaled(10)) {
                 RoundedRectangle(cornerRadius: 1)
                     .fill(Theme.border)
-                    .frame(width: 3)
+                    .frame(width: style.scaled(3))
                 MarkdownSelectableTextView(
-                    attributedText: payload.attributedText,
+                    attributedText: style.scaled(payload.attributedText, baseFontSize: 13),
                     onOpenWikiLink: onOpenWikiLink
                 )
             }
 
         case .body:
             MarkdownSelectableTextView(
-                attributedText: payload.attributedText,
+                attributedText: style.scaled(payload.attributedText, baseFontSize: 13),
                 onOpenWikiLink: onOpenWikiLink
             )
         }
@@ -205,6 +217,7 @@ private struct DocumentTextBlockView: View {
 
 private struct DocumentTableBlockView: View {
     let payload: DocumentTableBlockPayload
+    let style: DocumentMarkdownStyle
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
     var body: some View {
@@ -237,12 +250,12 @@ private struct DocumentTableBlockView: View {
 
     private func tableCell(_ attributed: NSAttributedString, isHeader: Bool) -> some View {
         MarkdownSelectableTextView(
-            attributedText: attributed,
+            attributedText: style.scaled(attributed, baseFontSize: 13),
             onOpenWikiLink: onOpenWikiLink
         )
-        .frame(minWidth: 140, maxWidth: 300, alignment: .leading)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .frame(minWidth: style.scaled(140), maxWidth: style.scaled(300), alignment: .leading)
+        .padding(.horizontal, style.scaled(12))
+        .padding(.vertical, style.scaled(10))
         .background(isHeader ? Theme.surfaceSecondary : Theme.cardBackground)
         .overlay(alignment: .trailing) {
             Rectangle()
@@ -259,24 +272,25 @@ private struct DocumentTableBlockView: View {
 
 private struct DocumentCodeBlockView: View {
     let payload: DocumentCodeBlockPayload
+    let style: DocumentMarkdownStyle
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let language = payload.language, !language.isEmpty {
                 Text(language.uppercased())
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.system(size: style.metadataFontSize, weight: .semibold))
                     .foregroundStyle(Theme.textTertiary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, style.scaled(12))
+                    .padding(.vertical, style.scaled(7))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Theme.surfaceSecondary)
             }
 
             ScrollView(.horizontal, showsIndicators: true) {
                 Text(payload.code)
-                    .font(.system(size: 12, design: .monospaced))
+                    .font(.system(size: style.codeFontSize, design: .monospaced))
                     .foregroundStyle(Theme.textPrimary)
-                    .padding(12)
+                    .padding(style.scaled(12))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
             }
@@ -292,6 +306,7 @@ private struct DocumentCodeBlockView: View {
 
 private struct DocumentImageBlockView: View {
     let image: MarkdownImage
+    let style: DocumentMarkdownStyle
 
     var body: some View {
         if let url = image.resolvedURL {
@@ -334,25 +349,25 @@ private struct DocumentImageBlockView: View {
     }
 
     private var placeholder: some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: style.scaled(10)) {
             Image(systemName: "photo")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.system(size: style.scaled(15), weight: .semibold))
                 .foregroundStyle(Theme.textTertiary)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(image.alt.isEmpty ? "Image" : image.alt)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: style.bodyFontSize, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
 
                 if !image.source.isEmpty {
                     Text(image.source)
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(.system(size: style.scaled(11), design: .monospaced))
                         .foregroundStyle(Theme.textTertiary)
                         .lineLimit(2)
                 }
             }
         }
-        .padding(12)
+        .padding(style.scaled(12))
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.surfaceSecondary)
         .overlay(
@@ -360,6 +375,111 @@ private struct DocumentImageBlockView: View {
                 .stroke(Theme.border, lineWidth: 0.7)
         )
         .clipShape(.rect(cornerRadius: 8))
+    }
+}
+
+struct WikiMarkdownEditorView: NSViewRepresentable {
+    @Binding var text: String
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(text: $text)
+    }
+
+    func makeNSView(context: Context) -> NSScrollView {
+        let scrollView = NSScrollView()
+        scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = false
+        scrollView.drawsBackground = false
+        scrollView.borderType = .noBorder
+
+        let textView = NSTextView(frame: .zero)
+        textView.isEditable = true
+        textView.isSelectable = true
+        textView.isRichText = false
+        textView.importsGraphics = false
+        textView.allowsUndo = true
+        textView.usesFindPanel = true
+        textView.drawsBackground = true
+        textView.backgroundColor = NSColor.windowBackgroundColor
+        textView.textColor = NSColor.labelColor
+        textView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
+        textView.textContainerInset = NSSize(width: 14, height: 14)
+        textView.isHorizontallyResizable = false
+        textView.isVerticallyResizable = true
+        textView.autoresizingMask = [.width]
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.heightTracksTextView = false
+        textView.textContainer?.lineFragmentPadding = 0
+        textView.delegate = context.coordinator
+        textView.string = text
+
+        scrollView.documentView = textView
+        context.coordinator.textView = textView
+        return scrollView
+    }
+
+    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        guard let textView = scrollView.documentView as? NSTextView else { return }
+        context.coordinator.textView = textView
+
+        if textView.string != text {
+            textView.string = text
+        }
+    }
+
+    final class Coordinator: NSObject, NSTextViewDelegate {
+        @Binding var text: String
+        weak var textView: NSTextView?
+
+        init(text: Binding<String>) {
+            self._text = text
+        }
+
+        func textDidChange(_ notification: Notification) {
+            guard let textView else { return }
+            text = textView.string
+        }
+    }
+}
+
+private struct DocumentMarkdownStyle {
+    let scale: CGFloat
+
+    init(scale: CGFloat) {
+        self.scale = max(0.85, min(1.3, scale))
+    }
+
+    var h1FontSize: CGFloat { scaled(24) }
+    var h2FontSize: CGFloat { scaled(20) }
+    var h3FontSize: CGFloat { scaled(16) }
+    var bodyFontSize: CGFloat { scaled(13) }
+    var metadataFontSize: CGFloat { scaled(10.5) }
+    var codeFontSize: CGFloat { scaled(12) }
+
+    func scaled(_ value: CGFloat) -> CGFloat {
+        value * scale
+    }
+
+    func scaled(_ attributedText: NSAttributedString, baseFontSize: CGFloat) -> NSAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: attributedText)
+        let fullRange = NSRange(location: 0, length: mutable.length)
+
+        mutable.enumerateAttribute(.font, in: fullRange) { value, range, _ in
+            guard let font = value as? NSFont else {
+                mutable.addAttribute(
+                    .font,
+                    value: NSFont.systemFont(ofSize: scaled(baseFontSize)),
+                    range: range
+                )
+                return
+            }
+
+            let descriptor = font.fontDescriptor
+            let scaledFont = NSFont(descriptor: descriptor, size: scaled(font.pointSize)) ?? font
+            mutable.addAttribute(.font, value: scaledFont, range: range)
+        }
+
+        return mutable
     }
 }
 
