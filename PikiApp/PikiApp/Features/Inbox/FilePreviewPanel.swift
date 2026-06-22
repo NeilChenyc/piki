@@ -34,22 +34,30 @@ struct FilePreviewPanel: View {
 
             Divider()
 
-            ScrollView {
+            Group {
                 if previewText.isEmpty {
                     Text("Loading...")
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.textTertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else if previewKind == .markdown {
-                    MarkdownTextView(previewText, baseURL: previewBaseURL)
+                    DocumentMarkdownView(
+                        previewText,
+                        presentationMode: .documentPage(displayTitle: nil),
+                        baseURL: previewBaseURL
+                    )
                 } else {
-                    Text(previewText)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.textPrimary)
-                        .lineSpacing(3)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    ScrollView {
+                        Text(previewText)
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.textPrimary)
+                            .lineSpacing(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 
             Spacer()
 

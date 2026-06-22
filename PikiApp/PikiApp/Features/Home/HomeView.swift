@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @Environment(HomeViewModel.self) private var viewModel
+    @Environment(WikiViewModel.self) private var wikiViewModel
 
     var body: some View {
         HStack(spacing: 0) {
@@ -16,6 +17,13 @@ struct HomeView: View {
                                 message: message,
                                 onToggleTrace: {
                                     viewModel.toggleTrace(messageId: message.id)
+                                },
+                                onWikiLinkTap: { target in
+                                    Task { @MainActor in
+                                        await wikiViewModel.loadIfNeeded(vaultURL: appState.vaultPath)
+                                        guard wikiViewModel.selectPage(for: target) else { return }
+                                        appState.selectedTab = .wiki
+                                    }
                                 }
                             )
                         }

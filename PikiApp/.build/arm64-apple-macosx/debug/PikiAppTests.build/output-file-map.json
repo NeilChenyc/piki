@@ -2,6 +2,41 @@
   "": {
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/master.swiftdeps"
   },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownDocumentPresentationTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownInlineTextStylerTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownInlineTextStylerTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownInlineTextStylerTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownInlineTextStylerTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownInlineTextStylerTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownInlineTextStylerTests.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownSelectableTextViewTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RowInteractionTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RowInteractionTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RowInteractionTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RowInteractionTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RowInteractionTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RowInteractionTests.dia"
+  },
   "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift": {
     "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RuntimeMigrationTests.d",
     "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RuntimeMigrationTests.swift.o",
@@ -15,5 +50,12 @@
     "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests~partial.swiftmodule",
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.swiftdeps",
     "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/WikiLinkRenderingTests.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/WikiLinkRenderingTests.dia"
   }
 }

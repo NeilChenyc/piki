@@ -9,9 +9,6 @@
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Network/SSEClient.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/PresetStorage.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/HTTPRuntimeService.swift
-/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift
-/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/NativeRuntimeService.swift
-/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceProtocol.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Health/HealthScoreCard.swift
@@ -39,11 +36,16 @@
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Sidebar/SidebarNavRow.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Sidebar/SidebarView.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiCategorySection.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiLinkSupport.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiPageContentView.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiView.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiViewModel.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/PikiApp.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/FlowLayout.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownDocumentPresentation.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownInlineTextStyler.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownSelectableTextView.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownTextView.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/PikiLogo.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/WikiLinkCapsule.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Theme.swift

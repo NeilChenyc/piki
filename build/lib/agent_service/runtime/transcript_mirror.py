@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from agent_service.diagnostics import runtime_log
 from claude_agent_sdk._internal.sessions import project_key_for_directory  # type: ignore
 
 from agent_service.application.events import EventPublisher
@@ -119,12 +120,14 @@ class ClaudeTranscriptMirror:
     _tool_inputs_by_use_id: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     async def run(self, stop_event: asyncio.Event) -> None:
+        runtime_log("transcript", "run_start", extra={"task_id": self.task_id, "cwd": self.cwd})
         while not stop_event.is_set():
             self._discover_transcript_if_needed()
             self._drain_transcript()
             await asyncio.sleep(self.poll_interval_seconds)
         self._discover_transcript_if_needed()
         self._drain_transcript()
+        runtime_log("transcript", "run_stop", extra={"task_id": self.task_id})
 
     def _discover_transcript_if_needed(self) -> None:
         if self.transcript_path is not None:
@@ -134,10 +137,12 @@ class ClaudeTranscriptMirror:
         project_dir = self._project_dir()
         if not project_dir.exists():
             return
+        runtime_log("transcript", "discover_project_dir", extra={"task_id": self.task_id, "project_dir": project_dir})
         if self.resume_session_id:
             candidate = project_dir / f"{self.resume_session_id}.jsonl"
             if candidate.exists():
                 self.transcript_path = candidate
+                runtime_log("transcript", "discovered_resume_transcript", extra={"task_id": self.task_id, "path": candidate})
                 return
         candidates = sorted(
             project_dir.glob("*.jsonl"),
@@ -150,6 +155,7 @@ class ClaudeTranscriptMirror:
                 continue
             if self._matches_prompt(candidate):
                 self.transcript_path = candidate
+                runtime_log("transcript", "discovered_transcript", extra={"task_id": self.task_id, "path": candidate})
                 return
 
     def _project_dir(self) -> Path:
@@ -178,6 +184,7 @@ class ClaudeTranscriptMirror:
         path = self.transcript_path
         if path is None or not path.exists():
             return
+        runtime_log("transcript", "drain_start", extra={"task_id": self.task_id, "path": path, "offset": self._offset})
         try:
             with path.open("r", encoding="utf-8", errors="replace") as handle:
                 handle.seek(self._offset)
@@ -186,6 +193,7 @@ class ClaudeTranscriptMirror:
                 self._offset = handle.tell()
         except OSError:
             return
+        runtime_log("transcript", "drain_finish", extra={"task_id": self.task_id, "offset": self._offset})
 
     def _process_line(self, line: str) -> None:
         try:
@@ -223,6 +231,7 @@ class ClaudeTranscriptMirror:
                         self.emit_trace_snapshot(thinking)
                     else:
                         self.events.trace_delta(self.task_id, delta=thinking, content=thinking)
+                    runtime_log("transcript", "assistant_thinking", extra={"task_id": self.task_id})
                     self.active = True
             elif block_type == "text":
                 text = str(block.get("text") or "")
@@ -237,6 +246,7 @@ class ClaudeTranscriptMirror:
                     self.emit_message_snapshot(text)
                 else:
                     self.events.message_delta(self.task_id, delta=text, content=text)
+                runtime_log("transcript", "assistant_text", extra={"task_id": self.task_id})
                 self.active = True
             elif block_type == "tool_use":
                 tool_name = str(block.get("name") or "")
@@ -256,6 +266,7 @@ class ClaudeTranscriptMirror:
                     "status": "running",
                 }
                 self.events.tool_started(self.task_id, tool_name, payload)
+                runtime_log("transcript", "tool_started", extra={"task_id": self.task_id, "tool": tool_name})
                 self.active = True
 
     def _emit_tool_result_record(self, record: dict[str, Any]) -> None:
@@ -283,4 +294,9 @@ class ClaudeTranscriptMirror:
                 self.events.tool_failed(self.task_id, tool_name, payload["summary"], payload)
             else:
                 self.events.tool_finished(self.task_id, tool_name, payload)
+            runtime_log(
+                "transcript",
+                "tool_result",
+                extra={"task_id": self.task_id, "tool": tool_name, "status": "failed" if is_error else "completed"},
+            )
             self.active = True

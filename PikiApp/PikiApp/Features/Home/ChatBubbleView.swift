@@ -3,6 +3,7 @@ import SwiftUI
 struct ChatBubbleView: View {
     let message: ChatMessage
     let onToggleTrace: () -> Void
+    let onWikiLinkTap: (WikiLinkTarget) -> Void
 
     var body: some View {
         HStack {
@@ -20,7 +21,7 @@ struct ChatBubbleView: View {
 
                     if !displayContent.isEmpty {
                         if message.role == .assistant {
-                            MarkdownTextView(displayContent)
+                            MessageMarkdownView(displayContent, onOpenWikiLink: onWikiLinkTap)
                         } else {
                             Text(displayContent)
                                 .font(.system(size: 13))

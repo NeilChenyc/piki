@@ -35,9 +35,12 @@ struct InboxFileRow: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? Theme.selection : .clear)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

@@ -79,27 +79,6 @@
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HTTPRuntimeService.swiftdeps",
     "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/HTTPRuntimeService.dia"
   },
-  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/JSONValue.swift": {
-    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.d",
-    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.swift.o",
-    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue~partial.swiftmodule",
-    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.swiftdeps",
-    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/JSONValue.dia"
-  },
-  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/NativeRuntimeService.swift": {
-    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.d",
-    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.swift.o",
-    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService~partial.swiftmodule",
-    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.swiftdeps",
-    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/NativeRuntimeService.dia"
-  },
-  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeHostConnection.swift": {
-    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.d",
-    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.swift.o",
-    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection~partial.swiftmodule",
-    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.swiftdeps",
-    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeHostConnection.dia"
-  },
   "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Core/Runtime/RuntimeServiceFactory.swift": {
     "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceFactory.d",
     "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/RuntimeServiceFactory.swift.o",
@@ -289,6 +268,13 @@
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiCategorySection.swiftdeps",
     "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiCategorySection.dia"
   },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiLinkSupport.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkSupport.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkSupport.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkSupport~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkSupport.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkSupport.dia"
+  },
   "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/Features/Wiki/WikiPageContentView.swift": {
     "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiPageContentView.d",
     "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiPageContentView.swift.o",
@@ -324,6 +310,27 @@
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/FlowLayout.swiftdeps",
     "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/FlowLayout.dia"
   },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownDocumentPresentation.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownDocumentPresentation.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownDocumentPresentation.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownDocumentPresentation~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownDocumentPresentation.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownDocumentPresentation.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownInlineTextStyler.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownInlineTextStyler.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownInlineTextStyler.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownInlineTextStyler~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownInlineTextStyler.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownInlineTextStyler.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownSelectableTextView.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownSelectableTextView.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownSelectableTextView.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownSelectableTextView~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownSelectableTextView.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownSelectableTextView.dia"
+  },
   "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/MarkdownTextView.swift": {
     "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownTextView.d",
     "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/MarkdownTextView.swift.o",
@@ -337,6 +344,13 @@
     "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/PikiLogo~partial.swiftmodule",
     "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/PikiLogo.swiftdeps",
     "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/PikiLogo.dia"
+  },
+  "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Components/WikiLinkCapsule.swift": {
+    "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkCapsule.d",
+    "object": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkCapsule.swift.o",
+    "swiftmodule": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkCapsule~partial.swiftmodule",
+    "swift-dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkCapsule.swiftdeps",
+    "diagnostics": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/WikiLinkCapsule.dia"
   },
   "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/PikiApp/SharedUI/Theme.swift": {
     "dependencies": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiApp.build/Theme.d",

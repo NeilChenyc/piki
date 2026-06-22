@@ -40,24 +40,27 @@ struct WikiCategorySection: View {
                     Button {
                         onSelect(page)
                     } label: {
-                        Text(page.title)
-                            .font(.system(size: 12))
-                            .foregroundStyle(
-                                selectedPage?.id == page.id
-                                    ? Theme.textPrimary
-                                    : Theme.textPrimary
-                            )
-                            .padding(.leading, 36)
-                            .padding(.vertical, 4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                selectedPage?.id == page.id
-                                    ? Theme.selection
-                                    : .clear
-                            )
-                            .clipShape(.rect(cornerRadius: 4))
+                        HStack(spacing: 0) {
+                            Text(page.title)
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.textPrimary)
+                                .lineLimit(1)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.leading, 36)
+                        .padding(.trailing, 8)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            selectedPage?.id == page.id
+                                ? Theme.selection
+                                : .clear
+                        )
+                        .clipShape(.rect(cornerRadius: 4))
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }

@@ -4,6 +4,7 @@ import difflib
 import hashlib
 from pathlib import Path
 
+from agent_service.diagnostics import runtime_log
 from agent_service.application.events import EventPublisher
 from agent_service.application.task_control import TaskRunControl
 from agent_service.application.task_router import TaskPlan
@@ -32,6 +33,7 @@ class TaskExecutor:
         self.system_actions = DeterministicActionExecutor(store=store, events=events)
 
     def execute(self, *, task_id: str, request: TaskCreateRequest, plan: TaskPlan, run_control: TaskRunControl | None = None):
+        runtime_log("task_executor", "execute_start", extra={"task_id": task_id, "mode": request.mode, "async_mode": request.async_mode})
         vault = Vault(request.vault_path)
         try:
             vault.validate()
@@ -51,6 +53,7 @@ class TaskExecutor:
             self._execute_source_clear(task_id=task_id, request=request, vault=vault)
             return
         if not self.runner.can_run(self.config) and self.system_actions.execute(task_id=task_id, request=request):
+            runtime_log("task_executor", "system_actions_handled", extra={"task_id": task_id})
             return
         self._execute_agent(
             task_id=task_id,
@@ -70,6 +73,7 @@ class TaskExecutor:
         run_control: TaskRunControl | None,
     ):
         conversation_id = request.conversation_id or task_id
+        runtime_log("task_executor", "execute_agent_start", extra={"task_id": task_id, "conversation_id": conversation_id})
         conversation_messages = self.store.get_conversation_messages(conversation_id, limit=10)
         task_input = assemble_agent_task_input(
             request=request,
@@ -101,6 +105,7 @@ class TaskExecutor:
         except Exception as exc:
             self.events.task_failed(task_id, str(exc))
             self.store.update_task(task_id, status=TaskStatus.FAILED, summary=str(exc))
+            runtime_log("task_executor", "execute_agent_failed", extra={"task_id": task_id, "error": str(exc)})
             return
 
         if _should_keep_task_cancelled(store=self.store, task_id=task_id, run_control=run_control):
@@ -149,9 +154,11 @@ class TaskExecutor:
             output=output,
         )
         if agent_result.status == TaskStatus.INPUT_REQUIRED:
+            runtime_log("task_executor", "execute_agent_input_required", extra={"task_id": task_id})
             return
         if agent_result.status == TaskStatus.FAILED:
             self.events.task_failed(task_id, agent_result.summary)
+            runtime_log("task_executor", "execute_agent_failed_result", extra={"task_id": task_id, "summary": agent_result.summary})
             return
         self.events.task_completed(
             task_id,
@@ -171,8 +178,10 @@ class TaskExecutor:
             },
         )
         self.events.progress(task_id, "completed", "已完成")
+        runtime_log("task_executor", "execute_agent_finish", extra={"task_id": task_id, "status": agent_result.status})
 
     def _execute_source_clear(self, *, task_id: str, request: TaskCreateRequest, vault: Vault):
+        runtime_log("task_executor", "execute_source_clear_start", extra={"task_id": task_id})
         self.events.progress(task_id, "clearing_source", "正在清理文件", "正在清理单个 inbox 文件。")
         try:
             if len(request.selected_paths) != 1:
@@ -221,8 +230,10 @@ class TaskExecutor:
         )
         self.events.task_completed(task_id, summary=summary, answer=summary, journal_entry_id=journal_entry.id)
         self.events.progress(task_id, "completed", "已完成")
+        runtime_log("task_executor", "execute_source_clear_finish", extra={"task_id": task_id})
 
     def resume_input(self, *, task_id: str, message: str, run_control: TaskRunControl | None = None):
+        runtime_log("task_executor", "resume_input_start", extra={"task_id": task_id})
         task = self.store.get_task(task_id)
         if task.status != TaskStatus.INPUT_REQUIRED:
             raise ValueError(f"Task is not waiting for input: {task.status}")
@@ -310,6 +321,7 @@ class TaskExecutor:
             metadata={"agent_session_id": agent_result.session_id, "continued_task_id": task_id},
         )
         self.events.progress(task_id, "completed", "已完成")
+        runtime_log("task_executor", "resume_input_finish", extra={"task_id": task_id})
 
     def _append_conversation_messages(
         self,

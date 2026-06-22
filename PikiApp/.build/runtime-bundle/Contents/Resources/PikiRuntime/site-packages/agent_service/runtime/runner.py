@@ -9,6 +9,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+from agent_service.diagnostics import runtime_log
 from agent_service.agents.prompts import build_piki_instructions
 from agent_service.application.events import EventPublisher
 from agent_service.application.task_control import TaskRunControl
@@ -74,6 +75,7 @@ class PikiWikiAgentRunner:
             self._sdk_query_impl = query
             self._query_impl = query
             self.status = RunnerStatus(True, "Claude Agent SDK available")
+        runtime_log("runner", "init", extra={"available": self.status.available, "detail": self.status.detail})
 
     def build_instructions(self, *, context_contents: dict[str, str]) -> str:
         return build_piki_instructions(context_contents=context_contents)
@@ -100,6 +102,17 @@ class PikiWikiAgentRunner:
     ) -> AgentResult:
         if not self.can_run(config):
             raise RuntimeError("Claude Agent runtime is not configured.")
+        runtime_log(
+            "runner",
+            "run_task_start",
+            extra={
+                "task_id": task_id,
+                "conversation_id": conversation_id,
+                "user_input_preview": user_input[:80],
+                "selected_paths": len(selected_paths or []),
+                "resume_session_id": resume_session_id or "<none>",
+            },
+        )
         return asyncio.run(
             self._run_task_async(
                 config=config,
@@ -121,6 +134,7 @@ class PikiWikiAgentRunner:
     def smoke_test(self, *, config: ServiceConfig) -> SmokeTestResult:
         if not self.can_run(config):
             return SmokeTestResult(ok=False, error="Claude Agent runtime is not configured.")
+        runtime_log("runner", "smoke_test_start", extra={"model": config.agent_model or "<unset>"})
 
         async def _smoke() -> SmokeTestResult:
             try:
@@ -138,8 +152,10 @@ class PikiWikiAgentRunner:
                 )
                 messages = [message async for message in self._query_impl(prompt="请返回：Piki Claude smoke test ok.", options=options)]
             except Exception as exc:
+                runtime_log("runner", "smoke_test_failed", extra={"error": str(exc)})
                 return SmokeTestResult(ok=False, error=str(exc))
             output, _, _ = _collect_outputs(messages)
+            runtime_log("runner", "smoke_test_finish", extra={"ok": True, "output_preview": output[:120]})
             return SmokeTestResult(ok=True, output=output)
 
         return asyncio.run(_smoke())
@@ -259,8 +275,10 @@ class PikiWikiAgentRunner:
         run_task = asyncio.current_task()
         if run_control is not None and run_task is not None:
             run_control.bind_async_task(asyncio.get_running_loop(), run_task)
+        runtime_log("runner", "task_async_begin", extra={"task_id": task_id, "conversation_id": conversation_id})
         try:
             if self._client_cls is not None and self._query_impl is self._sdk_query_impl:
+                runtime_log("runner", "sdk_client_connect", extra={"task_id": task_id})
                 client = self._client_cls(options=options)
                 await client.connect(user_input)
                 try:
@@ -280,14 +298,18 @@ class PikiWikiAgentRunner:
                             emit_thinking_delta=emit_thinking_delta,
                         )
                         if _is_terminal_result_message(message):
+                            runtime_log("runner", "sdk_terminal_result", extra={"task_id": task_id})
                             break
                         if _is_stopped_task_notification(message):
                             if run_control is not None:
                                 run_control.request_cancel()
+                            runtime_log("runner", "sdk_stopped_notification", extra={"task_id": task_id})
                             raise asyncio.CancelledError
                 finally:
+                    runtime_log("runner", "sdk_client_disconnect", extra={"task_id": task_id})
                     await client.disconnect()
             else:
+                runtime_log("runner", "query_stream_begin", extra={"task_id": task_id})
                 async for message in self._query_impl(prompt=user_input, options=options):
                     if run_control is not None and run_control.cancel_requested:
                         raise asyncio.CancelledError
@@ -303,17 +325,25 @@ class PikiWikiAgentRunner:
                         emit_thinking_delta=emit_thinking_delta,
                     )
         except asyncio.CancelledError:
+            runtime_log("runner", "task_async_cancelled", extra={"task_id": task_id})
             transcript_stop.set()
             await transcript_task
             return AgentResult(status=TaskStatus.CANCELLED, summary="任务已停止。", answer=streamed_text.strip() or None)
         except Exception as exc:
+            runtime_log("runner", "task_async_failed", extra={"task_id": task_id, "error": str(exc)})
             transcript_stop.set()
             await transcript_task
             return AgentResult(status=TaskStatus.FAILED, summary=str(exc), answer=str(exc))
         transcript_stop.set()
         await transcript_task
+        runtime_log("runner", "task_async_transcript_done", extra={"task_id": task_id})
 
         final_output, result_message, session_id = _collect_outputs(messages)
+        runtime_log(
+            "runner",
+            "task_async_collected",
+            extra={"task_id": task_id, "output_preview": final_output[:120], "session_id": session_id or "<none>"},
+        )
         if run_control is not None and run_control.cancel_requested:
             return AgentResult(status=TaskStatus.CANCELLED, summary="任务已停止。", answer=streamed_text.strip() or final_output or None)
         pending_input = _pending_input_payload(result_message)

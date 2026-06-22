@@ -60,6 +60,19 @@ final class WikiViewModel {
         isLoading = false
     }
 
+    @discardableResult
+    func selectPage(for target: WikiLinkTarget) -> Bool {
+        guard let page = page(for: target) else { return false }
+        selectedPage = page
+        return true
+    }
+
+    func page(for target: WikiLinkTarget) -> WikiPage? {
+        categories
+            .flatMap(\.pages)
+            .first { $0.selectionKey == target.selectionKey }
+    }
+
     private nonisolated static func loadAllCategories(wikiURL: URL) -> [WikiCategory] {
         WikiCategory.defaults.map { category in
             var mutable = category
@@ -96,6 +109,9 @@ final class WikiViewModel {
     }
 
     private nonisolated static func pageTitle(for url: URL, content: String) -> String {
+        if let frontmatterTitle = frontmatterTitle(in: content) {
+            return frontmatterTitle
+        }
         if let heading = content
             .split(separator: "\n")
             .first(where: { $0.hasPrefix("# ") }) {
@@ -104,16 +120,8 @@ final class WikiViewModel {
         return url.deletingPathExtension().lastPathComponent
     }
 
-    private nonisolated static func extractWikiLinks(from content: String) -> [String] {
-        let pattern = #"\[\[([^\]]+)\]\]"#
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
-        let range = NSRange(content.startIndex..<content.endIndex, in: content)
-        let matches = regex.matches(in: content, range: range)
-        let links = matches.compactMap { match -> String? in
-            guard let linkRange = Range(match.range(at: 1), in: content) else { return nil }
-            return String(content[linkRange]).components(separatedBy: "|").first
-        }
-        return Array(Set(links)).sorted()
+    private nonisolated static func extractWikiLinks(from content: String) -> [WikiLinkTarget] {
+        WikiLinkParser.extractUniqueTargets(from: content)
     }
 
     private nonisolated static func isRegularFile(_ url: URL) -> Bool {
@@ -122,6 +130,23 @@ final class WikiViewModel {
 
     private nonisolated static func modificationDate(for url: URL) -> Date {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date()
+    }
+
+    private nonisolated static func frontmatterTitle(in content: String) -> String? {
+        guard content.hasPrefix("---\n") else { return nil }
+        guard let closingRange = content.range(of: "\n---\n") else { return nil }
+
+        let frontmatter = content[content.index(content.startIndex, offsetBy: 4)..<closingRange.lowerBound]
+        for line in frontmatter.split(separator: "\n", omittingEmptySubsequences: false) {
+            let text = line.trimmingCharacters(in: .whitespaces)
+            guard text.lowercased().hasPrefix("title:") else { continue }
+            let value = text.dropFirst("title:".count).trimmingCharacters(in: .whitespacesAndNewlines)
+            if !value.isEmpty {
+                return value.trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+            }
+        }
+
+        return nil
     }
 }
 
@@ -147,6 +172,11 @@ struct WikiPage: Identifiable {
     let category: String
     let filePath: String
     var content: String = ""
-    var relatedConcepts: [String] = []
+    var relatedConcepts: [WikiLinkTarget] = []
     var lastModified: Date = Date()
+
+    var selectionKey: String {
+        let slug = URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent
+        return "\(category)/\(slug)"
+    }
 }

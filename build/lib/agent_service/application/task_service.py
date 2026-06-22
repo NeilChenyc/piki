@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 
+from agent_service.diagnostics import runtime_log
 from agent_service.application.events import EventPublisher
 from agent_service.application.task_control import TaskRunControl
 from agent_service.application.task_executor import TaskExecutor
@@ -30,6 +31,15 @@ class TaskService:
         self._run_controls_lock = threading.Lock()
 
     def create_task(self, request: TaskCreateRequest) -> TaskCreateResponse:
+        runtime_log(
+            "task_service",
+            "create_task_start",
+            extra={
+                "vault_path": request.vault_path,
+                "async_mode": request.async_mode,
+                "mode": request.mode,
+            },
+        )
         vault = Vault(request.vault_path)
         vault.validate()
         plan = self.router.plan(request)
@@ -78,6 +88,11 @@ class TaskService:
         else:
             self._execute_with_cleanup(task_id=task.id, request=request, plan=plan, run_control=run_control)
 
+        runtime_log(
+            "task_service",
+            "create_task_finish",
+            extra={"task_id": task.id, "status": self.store.get_task(task.id).status},
+        )
         return TaskCreateResponse(
             task_id=task.id,
             status=self.store.get_task(task.id).status,
@@ -88,6 +103,7 @@ class TaskService:
         return self.store.get_task(task_id)
 
     def submit_task_input(self, task_id: str, request: TaskInputRequest):
+        runtime_log("task_service", "submit_task_input_start", extra={"task_id": task_id})
         task = self.store.get_task(task_id)
         if task.status != TaskStatus.INPUT_REQUIRED:
             raise ValueError(f"Task is not waiting for input: {task.status}")
@@ -97,9 +113,11 @@ class TaskService:
             self.executor.resume_input(task_id=task_id, message=request.message, run_control=run_control)
         finally:
             self._unregister_run_control(task_id)
+        runtime_log("task_service", "submit_task_input_finish", extra={"task_id": task_id})
         return self.store.get_task(task_id)
 
     def cancel_task(self, task_id: str):
+        runtime_log("task_service", "cancel_task_start", extra={"task_id": task_id})
         task = self.store.get_task(task_id)
         if task.status != TaskStatus.RUNNING:
             raise ValueError(f"Task is not running: {task.status}")
@@ -109,6 +127,7 @@ class TaskService:
         run_control.request_cancel()
         self.store.update_task(task_id, status=TaskStatus.CANCELLED, summary="任务已停止。")
         self.events.task_cancelled(task_id, "任务已停止。")
+        runtime_log("task_service", "cancel_task_finish", extra={"task_id": task_id})
         return self.store.get_task(task_id)
 
     def _execute_with_cleanup(self, *, task_id: str, request: TaskCreateRequest, plan, run_control: TaskRunControl):

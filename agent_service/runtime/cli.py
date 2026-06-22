@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import threading
+import traceback
 from pathlib import Path
 
+from agent_service.diagnostics import runtime_log
 from agent_service.runtime.worker import RuntimeWorker
 from agent_service.system import (
     build_source_slug,
@@ -38,6 +40,7 @@ def main() -> int:
     if args.command == "lint":
         payload = _lint(args.vault)
     elif args.command == "stdio":
+        runtime_log("cli", "stdio_start", extra={"db_path": args.db_path, "runtime_config_path": args.runtime_config_path})
         stdout_lock = threading.Lock()
 
         def emit_line(payload: dict) -> None:
@@ -59,9 +62,18 @@ def main() -> int:
         for line in iter(sys.stdin.readline, ""):
             if not line.strip():
                 continue
-            request = json.loads(line)
-            result = worker.call(request["method"], request.get("params", {}))
-            emit_line({"kind": "response", "id": request["id"], "result": result, "error": None})
+            request_id = "<decode-error>"
+            try:
+                request = json.loads(line)
+                request_id = str(request.get("id") or "<missing-id>")
+                runtime_log("cli", "request_received", extra={"request_id": request_id, "method": request.get("method")})
+                result = worker.call(request["method"], request.get("params", {}))
+                emit_line({"kind": "response", "id": request_id, "result": result, "error": None})
+                runtime_log("cli", "response_sent", extra={"request_id": request_id, "method": request.get("method")})
+            except Exception as exc:
+                runtime_log("cli", "request_failed", extra={"request_id": request_id, "error": str(exc) or exc.__class__.__name__})
+                runtime_log("cli", "request_traceback", extra={"request_id": request_id, "traceback": traceback.format_exc().strip().replace("\n", " | ")})
+                emit_line({"kind": "response", "id": request_id, "result": None, "error": str(exc) or exc.__class__.__name__})
         return 0
     else:
         payload = _extract_source(args.path)

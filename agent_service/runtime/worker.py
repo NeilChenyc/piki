@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import base64
-import json
 from dataclasses import dataclass
 import threading
 from pathlib import Path
 from typing import Any, Callable
 
+from agent_service.diagnostics import runtime_log
 from agent_service.application.event_stream import EventStreamService
 from agent_service.application.events import EventPublisher
 from agent_service.application.maintenance import ApprovalService, IngestQueueService, JournalService, LintService, SourceService
@@ -34,6 +34,16 @@ class RuntimeWorker:
 
     def __post_init__(self) -> None:
         load_environment()
+        runtime_log(
+            "worker",
+            "init",
+            extra={
+                "db_path": self.db_path,
+                "runtime_config_path": self.runtime_config_path,
+                "staging_root": self.staging_root,
+                "enable_agent_runtime": self.enable_agent_runtime,
+            },
+        )
         self._events_condition = threading.Condition()
         self.config = ServiceConfig(
             db_path=self.db_path,
@@ -57,10 +67,32 @@ class RuntimeWorker:
         self.ingest_queue_service = IngestQueueService(self.store, self._events)
         self.lint_service = LintService(self.store, self._events)
         self.approval_service = ApprovalService(self.store, self._events)
+        runtime_log(
+            "worker",
+            "ready",
+            extra={
+                "runner_available": self.runner.status.available,
+                "agent_runtime_configured": self.config.agent_runtime_configured,
+                "model": self.config.agent_model or "<unset>",
+                "base_url": self.config.anthropic_base_url or "<unset>",
+            },
+        )
 
     def call(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
+        runtime_log("worker", "call_start", extra={"method": method, "params": sorted(params.keys())})
         if method == "health":
-            return self._health()
+            result = self._health()
+            runtime_log(
+                "worker",
+                "call_finish",
+                extra={
+                    "method": "health",
+                    "ok": result.get("ok"),
+                    "runner_available": result.get("runner_available"),
+                    "agent_runtime_configured": result.get("agent_runtime_configured"),
+                },
+            )
+            return result
         if method == "get_runtime_config":
             return self.config.runtime_config_response()
         if method == "update_runtime_config":
@@ -75,6 +107,16 @@ class RuntimeWorker:
         if method == "create_task":
             request = TaskCreateRequest.model_validate(params)
             result = self.task_service.create_task(request)
+            runtime_log(
+                "worker",
+                "call_finish",
+                extra={
+                    "method": "create_task",
+                    "task_id": result.task_id,
+                    "status": result.status,
+                    "async_mode": request.async_mode,
+                },
+            )
             return result.model_dump(mode="json")
         if method == "get_task":
             return self.task_service.get_task(params["task_id"]).model_dump(mode="json")
@@ -93,7 +135,17 @@ class RuntimeWorker:
         if method == "rollback":
             return self.journal_service.rollback(params["entry_id"], None).model_dump(mode="json")
         if method == "task_events":
-            return self.task_events(params["task_id"], params.get("cursor"))
+            result = self.task_events(params["task_id"], params.get("cursor"))
+            runtime_log(
+                "worker",
+                "call_finish",
+                extra={
+                    "method": "task_events",
+                    "task_id": params["task_id"],
+                    "events": len(result.get("events", [])),
+                },
+            )
+            return result
         if method == "list_ingest_queue":
             return self.ingest_queue_service.list(
                 status=params.get("status"),
@@ -138,10 +190,21 @@ class RuntimeWorker:
     def task_events(self, task_id: str, cursor: str | None = None) -> dict[str, Any]:
         cursor_key = self._decode_cursor(cursor)
         events = self._events_after(task_id, cursor_key)
+        runtime_log(
+            "worker",
+            "task_events_poll",
+            extra={"task_id": task_id, "cursor": cursor or "<none>", "events_before_wait": len(events)},
+        )
         if not events:
+            runtime_log("worker", "task_events_wait", extra={"task_id": task_id, "timeout_s": 0.8})
             with self._events_condition:
                 self._events_condition.wait(timeout=0.8)
             events = self._events_after(task_id, cursor_key)
+            runtime_log(
+                "worker",
+                "task_events_resume",
+                extra={"task_id": task_id, "events_after_wait": len(events)},
+            )
         return {
             "events": [event.model_dump(mode="json") for event in events],
             "cursor": json.dumps(
@@ -231,6 +294,11 @@ class RuntimeWorker:
         target = target_root / safe_name
         content = base64.b64decode(params["content_base64"])
         target.write_bytes(content)
+        runtime_log(
+            "worker",
+            "upload_file",
+            extra={"filename": safe_name, "buffered_path": str(target), "size_bytes": target.stat().st_size},
+        )
         return {
             "filename": safe_name,
             "buffered_path": str(target),
@@ -243,30 +311,7 @@ class RuntimeWorker:
             self._events_condition.notify_all()
 
     def _emit_notification(self, event: TaskEvent) -> None:
+        runtime_log("worker", "event_emitted", extra={"task_id": event.task_id, "type": event.type})
+        self._notify_events()
         if self.notify is not None:
             self.notify(event)
-
-def run_stdio() -> int:
-    import sys
-    import threading
-
-    worker = RuntimeWorker(
-        db_path=Path(".piki/agent_service.sqlite3"),
-        runtime_config_path=Path(".piki/runtime-config.json"),
-        staging_root=Path(".piki/task-staging"),
-    )
-    stdout_lock = threading.Lock()
-
-    def emit_line(payload: dict[str, Any]) -> None:
-        with stdout_lock:
-            print(json.dumps(payload, ensure_ascii=False))
-            sys.stdout.flush()
-
-    worker.notify = lambda event: emit_line({"kind": "event", "event": event.model_dump(mode="json")})
-    for line in iter(sys.stdin.readline, ""):
-        if not line.strip():
-            continue
-        request = json.loads(line)
-        result = worker.call(request["method"], request.get("params", {}))
-        emit_line({"kind": "response", "id": request["id"], "result": result, "error": None})
-    return 0
