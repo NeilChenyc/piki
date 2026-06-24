@@ -1,6 +1,6 @@
 ---
 title: 杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案
-type: wiki-source
+type: source
 raw_source: raw/sources/杭州能源大脑驾驶舱及隐患排查平台ai升级建设方案-b3a939e1.md
 captured_at: 2026-06-17
 ---

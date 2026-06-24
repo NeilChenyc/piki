@@ -1,6 +1,11 @@
 import SwiftUI
 import OSLog
 
+enum HomeTemplateAction {
+    case inboxIngest(fileURL: URL, fileName: String)
+    case runLintAndFix
+}
+
 @Observable
 @MainActor
 final class HomeViewModel {
@@ -129,6 +134,30 @@ final class HomeViewModel {
         }
     }
 
+    func submitTemplateAction(_ action: HomeTemplateAction, appState: AppState) {
+        appState.selectedTab = .home
+
+        guard !isSending else {
+            appendSystemMessage("当前已有进行中的任务，完成后再试。")
+            return
+        }
+
+        switch action {
+        case .inboxIngest(let fileURL, _):
+            sendMessage(
+                "请帮我 ingest 这个文件，并整理进知识库。请在需要时创建或更新合适的 wiki 页面、补充必要链接，并在完成后告诉我结果。",
+                appState: appState,
+                selectedFiles: [fileURL]
+            )
+
+        case .runLintAndFix:
+            sendMessage(
+                "请对当前 vault 运行 lint，尽量直接修复低风险问题，并汇报主要问题、修复内容和剩余风险。",
+                appState: appState
+            )
+        }
+    }
+
     private func runTask(
         _ text: String,
         selectedFiles: [URL],
@@ -169,6 +198,9 @@ final class HomeViewModel {
 
             try Task.checkCancellation()
             let task = try await appState.runtimeService.getTask(taskId: response.taskId)
+            if let lintResult = task.output?.lintResult {
+                appState.cacheLintResult(lintResult)
+            }
             let content = preferredFinalContent(
                 id: assistantMessageId,
                 fallback: task.output?.answer

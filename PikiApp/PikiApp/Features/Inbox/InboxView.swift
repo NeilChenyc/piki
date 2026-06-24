@@ -2,6 +2,7 @@ import SwiftUI
 
 struct InboxView: View {
     @Environment(AppState.self) private var appState
+    @Environment(HomeViewModel.self) private var homeViewModel
     @Environment(InboxViewModel.self) private var viewModel
 
     var body: some View {
@@ -98,7 +99,11 @@ struct InboxView: View {
                 FilePreviewPanel(
                     item: item,
                     onIngest: {
-                        viewModel.ingest(item, appState: appState)
+                        guard let fileURL = item.filePath else { return }
+                        homeViewModel.submitTemplateAction(
+                            .inboxIngest(fileURL: fileURL, fileName: item.fileName),
+                            appState: appState
+                        )
                     },
                     onClear: {
                         viewModel.clear(item, appState: appState)

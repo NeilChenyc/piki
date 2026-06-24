@@ -15,7 +15,10 @@ let package = Package(
             dependencies: [
                 .product(name: "Markdown", package: "swift-markdown"),
             ],
-            path: "PikiApp"
+            path: "PikiApp",
+            resources: [
+                .process("Resources/Assets.xcassets")
+            ]
         ),
         .testTarget(
             name: "PikiAppTests",

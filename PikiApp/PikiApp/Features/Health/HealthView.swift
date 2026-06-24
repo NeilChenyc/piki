@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HealthView: View {
     @Environment(AppState.self) private var appState
+    @Environment(HomeViewModel.self) private var homeViewModel
     @Environment(HealthViewModel.self) private var viewModel
 
     private let overviewColumns = [
@@ -65,7 +66,7 @@ struct HealthView: View {
                             isFixRunning: viewModel.isFixRunning,
                             canApplyFixes: viewModel.canApplyFixes,
                             onRunLint: {
-                                viewModel.rerunLint(appState: appState)
+                                homeViewModel.submitTemplateAction(.runLintAndFix, appState: appState)
                             },
                             onApplyFixes: {
                                 viewModel.applyFixes(appState: appState)

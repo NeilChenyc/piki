@@ -35,7 +35,8 @@ final class InboxViewModel {
 
     func handleFileDrop(_ urls: [URL], appState: AppState) {
         guard let first = urls.first else { return }
-        ingestPath(first, appState: appState)
+        addDroppedItems([first])
+        selectedItem = items.last
     }
 
     func chooseFiles(appState: AppState) {
@@ -45,7 +46,8 @@ final class InboxViewModel {
         panel.allowsMultipleSelection = false
         panel.allowedContentTypes = [.pdf, .plainText, .init(filenameExtension: "md")!, .init(filenameExtension: "markdown")!, .init(filenameExtension: "docx")!]
         if panel.runModal() == .OK, let url = panel.url {
-            ingestPath(url, appState: appState)
+            addDroppedItems([url])
+            selectedItem = items.last
         }
     }
 
@@ -131,11 +133,6 @@ final class InboxViewModel {
         return loadedItems.sorted { $0.addedAt > $1.addedAt }
     }
 
-    func ingest(_ item: InboxItem, appState: AppState) {
-        guard let filePath = item.filePath else { return }
-        ingestPath(filePath, appState: appState)
-    }
-
     func clear(_ item: InboxItem, appState: AppState) {
         guard let vaultPath = appState.vaultPath,
               let filePath = item.filePath else {
@@ -156,34 +153,6 @@ final class InboxViewModel {
                 statusMessage = "Cleared"
             } catch {
                 errorMessage = "Clear failed: \(error.localizedDescription)"
-                statusMessage = nil
-            }
-        }
-    }
-
-    private func ingestPath(_ url: URL, appState: AppState) {
-        guard let vaultPath = appState.vaultPath else {
-            errorMessage = "No vault selected."
-            return
-        }
-        addDroppedItems([url])
-        Task {
-            do {
-                statusMessage = "Ingesting..."
-                let request = TaskCreateRequest(
-                    vaultPath: vaultPath.path(percentEncoded: false),
-                    userInput: "请摄入这个文件。",
-                    selectedPaths: [url.path(percentEncoded: false)],
-                    actionContext: [
-                        "action": "ingest_file",
-                        "target_path": url.path(percentEncoded: false)
-                    ]
-                )
-                _ = try await appState.runtimeService.createTask(request)
-                await loadVaultInbox(vaultURL: vaultPath)
-                statusMessage = "Ingested"
-            } catch {
-                errorMessage = "Ingest failed: \(error.localizedDescription)"
                 statusMessage = nil
             }
         }

@@ -102,11 +102,7 @@ final class HealthViewModel {
                 hasLoaded = false
                 return
             }
-            await loadLint(
-                client: appState.runtimeService,
-                vaultURL: vaultURL,
-                vaultPath: vaultPath
-            )
+            await applyCachedLintResult(from: appState, vaultURL: vaultURL)
         } else {
             clearLintState()
             errorMessage = "当前仅展示本地知识库概览；lint 暂时不可用。"
@@ -153,16 +149,12 @@ final class HealthViewModel {
         }
     }
 
-    private func loadLint(client: RuntimeServiceProtocol, vaultURL: URL, vaultPath: String) async {
-        do {
-            let result = try await client.runLint(vaultPath: vaultPath)
-            guard !Task.isCancelled else { return }
-            await applyLintResult(result, vaultURL: vaultURL)
-        } catch {
-            guard !Task.isCancelled else { return }
+    private func applyCachedLintResult(from appState: AppState, vaultURL: URL) async {
+        guard let cached = appState.cachedLintResult else {
             clearLintState()
-            errorMessage = "知识库检查失败，请稍后重试。"
+            return
         }
+        await applyLintResult(cached.result, vaultURL: vaultURL)
     }
 
     private func refreshOverview(for vaultURL: URL) async {

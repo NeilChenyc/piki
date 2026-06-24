@@ -1,7 +1,7 @@
 ---
 title: "LightAutoDS-Tab：面向表格数据的多 AutoML 智能体系统"
-type: wiki-source
-source_ref: "raw/sources/about-the-dataset-93a85bfa.md"
+type: source
+raw_source: raw/sources/about-the-dataset-93a85bfa.md
 tags: [AutoML, LLM-Agent, 表格数据, 数据科学自动化]
 created: 2026-06-17
 ---

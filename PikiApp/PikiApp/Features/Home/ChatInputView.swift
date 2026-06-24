@@ -1,6 +1,11 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+enum ChatInputStyle {
+    case hero
+    case docked
+}
+
 struct ChatInputView: View {
     @State private var text: String = ""
     @State private var selectedFiles: [URL] = []
@@ -9,64 +14,82 @@ struct ChatInputView: View {
     let isDisabled: Bool
     let showsStopButton: Bool
     let isStopping: Bool
+    let style: ChatInputStyle
+    let helperText: String?
+    let autofocus: Bool
     let onSend: (String, [URL]) -> Void
     let onStop: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: style == .hero ? 14 : 8) {
             if !selectedFiles.isEmpty {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     ForEach(selectedFiles, id: \.path) { file in
                         HStack(spacing: 4) {
                             Image(systemName: "paperclip")
-                                .font(.system(size: 10))
+                                .font(.system(size: chipIconSize))
                             Text(file.lastPathComponent)
-                                .font(.system(size: 11))
+                                .font(.system(size: chipTextSize))
                                 .lineLimit(1)
                             Button {
                                 selectedFiles.removeAll { $0 == file }
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
-                                    .font(.system(size: 10))
+                                    .font(.system(size: chipIconSize))
                             }
                             .buttonStyle(.plain)
                         }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, chipHorizontalPadding)
+                        .padding(.vertical, chipVerticalPadding)
                         .background(Theme.surfaceSecondary)
                         .clipShape(.rect(cornerRadius: 8))
                     }
                 }
             }
 
-            HStack(spacing: 12) {
+            TextField(placeholder, text: $text, axis: .vertical)
+                .textFieldStyle(.plain)
+                .font(.system(size: textSize))
+                .lineLimit(style == .hero ? 1...8 : 1...12)
+                .focused($isFocused)
+                .onSubmit {
+                    if showsStopButton {
+                        onStop()
+                    } else {
+                        sendIfNotEmpty()
+                    }
+                }
+                .disabled(isDisabled)
+
+            if let helperText, !helperText.isEmpty {
+                Text(helperText)
+                    .font(.system(size: helperTextSize))
+                    .foregroundStyle(Theme.textSecondary)
+                    .lineLimit(2)
+                    .padding(.top, style == .hero ? 2 : 0)
+            }
+
+            HStack(spacing: style == .hero ? 14 : 12) {
                 Button(action: chooseFile) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(isDisabled ? Theme.textTertiary : Theme.accent)
+                    Image(systemName: style == .hero ? "paperclip" : "plus.circle.fill")
+                        .font(.system(size: attachmentIconSize, weight: style == .hero ? .semibold : .regular))
+                        .foregroundStyle(attachmentTint)
+                        .frame(width: actionButtonSize, height: actionButtonSize)
+                        .background(
+                            Circle()
+                                .fill(attachmentBackground)
+                        )
                 }
                 .disabled(isDisabled)
                 .buttonStyle(.plain)
                 .help("Choose a file")
 
-                TextField(placeholder, text: $text, axis: .vertical)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 13))
-                    .lineLimit(1...12)
-                    .focused($isFocused)
-                    .onSubmit {
-                        if showsStopButton {
-                            onStop()
-                        } else {
-                            sendIfNotEmpty()
-                        }
-                    }
-                    .disabled(isDisabled)
+                Spacer(minLength: 0)
 
                 if showsStopButton {
                     Button(action: onStop) {
                         Image(systemName: isStopping ? "stop.circle" : "stop.circle.fill")
-                            .font(.system(size: 24))
+                            .font(.system(size: sendIconSize))
                             .foregroundStyle(isStopping ? Theme.textTertiary : Theme.error)
                     }
                     .buttonStyle(.plain)
@@ -74,24 +97,34 @@ struct ChatInputView: View {
                     .help(isStopping ? "Stopping…" : "Stop current run")
                 } else {
                     Button(action: sendIfNotEmpty) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 24))
-                            .foregroundStyle(!canSend ? Theme.textTertiary : Theme.accent)
+                        Image(systemName: style == .hero ? "paperplane.fill" : "arrow.up.circle.fill")
+                            .font(.system(size: sendIconSize))
+                            .foregroundStyle(sendIconTint)
+                            .frame(width: actionButtonSize, height: actionButtonSize)
+                            .background(
+                                Circle()
+                                    .fill(sendButtonBackground)
+                            )
                     }
                     .buttonStyle(.plain)
                     .disabled(!canSend)
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
+        .padding(.horizontal, horizontalPadding)
+        .padding(.vertical, verticalPadding)
+        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
         .background(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(Theme.cardBackground)
-                .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(style == .hero ? Theme.border.opacity(0.8) : Theme.border.opacity(0.35), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(style == .hero ? 0.08 : 0.06), radius: style == .hero ? 16 : 4, x: 0, y: style == .hero ? 8 : 2)
         )
         .onAppear {
-            isFocused = true
+            isFocused = autofocus
         }
         .onPasteCommand(of: [.fileURL]) { providers in
             Task {
@@ -103,6 +136,80 @@ struct ChatInputView: View {
     private var canSend: Bool {
         guard !isDisabled else { return false }
         return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !selectedFiles.isEmpty
+    }
+
+    private var minHeight: CGFloat {
+        style == .hero ? 232 : 0
+    }
+
+    private var horizontalPadding: CGFloat {
+        style == .hero ? 24 : 16
+    }
+
+    private var verticalPadding: CGFloat {
+        style == .hero ? 22 : 16
+    }
+
+    private var cornerRadius: CGFloat {
+        style == .hero ? 28 : 18
+    }
+
+    private var textSize: CGFloat {
+        style == .hero ? 21 : 13
+    }
+
+    private var helperTextSize: CGFloat {
+        style == .hero ? 12 : 11
+    }
+
+    private var chipTextSize: CGFloat {
+        style == .hero ? 13 : 11
+    }
+
+    private var chipIconSize: CGFloat {
+        style == .hero ? 11 : 10
+    }
+
+    private var chipHorizontalPadding: CGFloat {
+        style == .hero ? 10 : 8
+    }
+
+    private var chipVerticalPadding: CGFloat {
+        style == .hero ? 5 : 4
+    }
+
+    private var actionButtonSize: CGFloat {
+        style == .hero ? 42 : 28
+    }
+
+    private var attachmentIconSize: CGFloat {
+        style == .hero ? 22 : 20
+    }
+
+    private var sendIconSize: CGFloat {
+        style == .hero ? 18 : 24
+    }
+
+    private var attachmentTint: Color {
+        isDisabled ? Theme.textTertiary : Theme.textPrimary
+    }
+
+    private var attachmentBackground: Color {
+        style == .hero ? Theme.surfaceSecondary : .clear
+    }
+
+    private var sendButtonBackground: Color {
+        if showsStopButton {
+            return .clear
+        }
+        return canSend ? Theme.accent : Theme.selection
+    }
+
+    private var sendIconTint: Color {
+        if style == .hero {
+            return canSend ? .white : Theme.textTertiary
+        }
+        return !canSend ? Theme.textTertiary : Theme.accent
     }
 
     private func sendIfNotEmpty() {

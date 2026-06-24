@@ -3,11 +3,17 @@ import SwiftUI
 @Observable
 @MainActor
 final class AppState {
+    struct CachedLintResult {
+        let result: LintResultDTO
+        let receivedAt: Date
+    }
+
     var selectedTab: SidebarTab = .home
     var vaultPath: URL? { didSet { persistConfig() } }
     var connectionStatus: ServiceConnectionStatus = .disconnected
     var serviceErrorMessage: String?
     var serviceHealth: ServiceHealth?
+    var cachedLintResult: CachedLintResult?
 
     @ObservationIgnored var runtimeService: RuntimeServiceProtocol
     @ObservationIgnored var serviceManager: LocalServiceManager?
@@ -84,6 +90,10 @@ final class AppState {
         serviceHealth = nil
         connectionStatus = .disconnected
         serviceErrorMessage = message
+    }
+
+    func cacheLintResult(_ result: LintResultDTO, receivedAt: Date = Date()) {
+        cachedLintResult = CachedLintResult(result: result, receivedAt: receivedAt)
     }
 
     private func persistConfig() {

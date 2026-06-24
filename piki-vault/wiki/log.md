@@ -3,6 +3,24 @@ title: 日志
 check_after: 2027-01-01
 ---
 
+# 日志
+
+## [2026-06-23] lint | 修复 source 类型字段不一致
+
+- 来源/任务：run_lint + 手工分析
+- 修改路径：
+  - `wiki/sources/杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案.md` — `type: wiki-source` → `type: source`
+  - `wiki/sources/LightAutoDS-Tab-多AutoML智能系统.md` — `type: wiki-source` → `type: source`，`source_ref` → `raw_source`（与其他来源页字段名统一）
+- 结果：修复 3 处 frontmatter 不一致；lint 工具仍报 0 issues
+
+## [2026-06-23] lint | 修复复选框过期与 log.md 标题错位
+
+- 来源/任务：run_lint
+- 修改路径：`wiki/sources/待摄入测试文档.md`、`wiki/log.md`
+- 结果：修复 2 个问题——
+  1. `wiki/sources/待摄入测试文档.md` 中 index/log 状态复选框从 `[ ]` 更新为 `[x]`
+  2. `wiki/log.md` 中缺失的 `# 日志` 标题放回文件顶部，新旧条目不再被居中标题分割
+
 ## [2026-06-20] ingest | 待摄入测试文档
 
 - 来源：`raw/inbox/next-test-source.md` — 小样本文档，用于测试文件上传、ingest、source normalization
@@ -25,8 +43,6 @@ check_after: 2027-01-01
 - 来源/任务：run_lint
 - 修改路径：`wiki/sources/杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案.md`
 - 结果：3 个断裂 wikilink（`concepts/大模型应用-能源行业`、`entities/杭州能源`、`domains/能源管理`）替换为纯文本 +（待创建）
-
-# 日志
 
 ## [2026-06-19] ingest | 杭州能源大脑驾驶舱及隐患排查平台AI升级建设方案（重注入）
 

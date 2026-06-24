@@ -8,18 +8,14 @@ struct SidebarView: View {
 
         VStack(spacing: 0) {
             // Logo area
-            HStack(spacing: 10) {
+            HStack {
                 PikiLogo()
-                    .frame(width: 28, height: 28)
-                Text("Piki")
-                    .font(.title2)
-                    .bold()
-                    .foregroundStyle(Theme.textPrimary)
+                    .frame(width: 104, height: 36, alignment: .leading)
                 Spacer()
             }
             .padding(.horizontal, 16)
             .padding(.top, 20)
-            .padding(.bottom, 24)
+            .padding(.bottom, 28)
 
             // Navigation items
             VStack(spacing: 4) {
