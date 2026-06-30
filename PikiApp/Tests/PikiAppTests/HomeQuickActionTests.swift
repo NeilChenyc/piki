@@ -37,6 +37,17 @@ struct HomeQuickActionTests {
         #expect(viewModel.messages.isEmpty)
     }
 
+    @Test
+    func podcastPromptGuidesUserToReplacePlaceholderLinkBeforeSending() {
+        let viewModel = HomeViewModel()
+
+        viewModel.preparePodcastPrompt()
+
+        #expect(viewModel.inputText.contains("播客链接："))
+        #expect(viewModel.inputText.contains("请把这里替换为单集链接后再发送"))
+        #expect(viewModel.inputText.contains("先完成完整转录，再整理进知识库"))
+    }
+
     private func makeTemporaryDirectory() -> URL {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

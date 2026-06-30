@@ -6,9 +6,11 @@ struct HomeViewDisplayState {
     let inputPlaceholder: String
     let inputHint: String?
     let emptyStateHint: String?
+    let shouldAnimateStatusText: Bool
 
     init(appState: AppState, viewModel: HomeViewModel) {
         self.isEmptyState = viewModel.messages.isEmpty
+        self.shouldAnimateStatusText = viewModel.isSending && viewModel.statusText != nil
 
         if isEmptyState {
             if viewModel.pendingInputTaskId != nil {
@@ -70,6 +72,7 @@ struct HomeView: View {
                     .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .bottom)), removal: .opacity))
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.spring(response: 0.42, dampingFraction: 0.9), value: isEmptyState)
         .task(id: appState.vaultPath) {
             await viewModel.loadRecentJournal(appState: appState)
@@ -113,9 +116,12 @@ struct HomeView: View {
                 }
 
                 if let statusText = viewModel.statusText {
-                    Text(statusText)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.textTertiary)
+                    RunningStatusText(
+                        text: statusText,
+                        isActive: displayState.shouldAnimateStatusText,
+                        font: .system(size: 12),
+                        color: Theme.textTertiary
+                    )
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                         .padding(.top, 6)
@@ -149,6 +155,7 @@ struct HomeView: View {
                 .padding(16)
             }
             .background(Theme.primaryPanelBackground)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             VStack(alignment: .leading, spacing: 16) {
                 VaultStatusCard(status: appState.connectionStatus, vaultURL: appState.vaultPath)
@@ -163,9 +170,11 @@ struct HomeView: View {
             .padding(.horizontal, 16)
             .padding(.top, 16)
             .padding(.bottom, 16)
-            .frame(width: 280)
+            .frame(width: DetailLayoutGuide.homeAuxiliaryWidth)
+            .frame(maxHeight: .infinity, alignment: .topLeading)
             .background(Theme.primaryPanelBackground)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.primaryPanelBackground)
     }
 
@@ -211,6 +220,7 @@ struct HomeView: View {
 
             Spacer(minLength: 96)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.primaryPanelBackground)
     }
 

@@ -69,6 +69,8 @@ def test_claude_agent_task_uses_provider_neutral_events(tmp_path: Path, monkeypa
         assert prompt[0]["role"] == "user"
         assert "conversation_context" in prompt[0]["content"]
         assert "<runtime_contract>" in options.system_prompt
+        assert "<user_response_style>" in options.system_prompt
+        assert options.system_prompt.index("<runtime_contract>") < options.system_prompt.index("<user_response_style>")
         assert "<agent_规则>" in options.system_prompt
         yield SimpleNamespace(
             event={"type": "content_block_delta", "delta": {"text": "hello "}},

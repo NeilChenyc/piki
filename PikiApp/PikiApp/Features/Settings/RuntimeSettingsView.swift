@@ -21,6 +21,7 @@ struct RuntimeSettingsView: View {
             .padding(24)
             .padding(.top, 16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Theme.primaryPanelBackground)
         .task {
             await viewModel.load(appState: appState)

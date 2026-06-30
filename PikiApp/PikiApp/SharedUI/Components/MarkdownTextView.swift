@@ -13,13 +13,6 @@ struct DocumentMarkdownView: View {
         MarkdownDocumentPresentation.prepare(source: content, mode: presentationMode)
     }
 
-    private var segments: [MarkdownDisplaySegment] {
-        DocumentMarkdownSegmentBuilder.make(
-            document: preparedDocument,
-            baseURL: baseURL
-        )
-    }
-
     init(
         _ content: String,
         presentationMode: MarkdownDocumentPresentation.Mode = .plain,
@@ -36,63 +29,17 @@ struct DocumentMarkdownView: View {
 
     var body: some View {
         let style = DocumentMarkdownStyle(scale: textScale)
+        let renderedDocument = UnifiedMarkdownDocumentBuilder.makeDocument(
+            preparedDocument: preparedDocument,
+            baseURL: baseURL,
+            configuration: .document(style: style)
+        )
 
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
-                    DocumentMarkdownSegmentView(
-                        segment: segment,
-                        style: style,
-                        onOpenWikiLink: onOpenWikiLink
-                    )
-
-                    if let spacing = segment.spacingAfter {
-                        Color.clear
-                            .frame(height: style.scaled(spacing))
-                    } else if index < segments.count - 1 {
-                        Color.clear
-                            .frame(height: style.scaled(12))
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.bottom, style.scaled(8))
-        }
-        .scrollIndicators(.visible)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-}
-
-private struct DocumentMarkdownSegmentView: View {
-    let segment: MarkdownDisplaySegment
-    let style: DocumentMarkdownStyle
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        switch segment.kind {
-        case .textCluster(let cluster):
-            MarkdownSelectableTextView(
-                attributedText: style.scaled(cluster.attributedText, baseFontSize: 13),
-                onOpenWikiLink: onOpenWikiLink
-            )
-
-        case .specialBlock(let specialBlock):
-            switch specialBlock.kind {
-            case .table(let payload):
-                DocumentTableBlockView(
-                    payload: payload,
-                    style: style,
-                    onOpenWikiLink: onOpenWikiLink
-                )
-
-            case .image(let image):
-                DocumentImageBlockView(image: image, style: style)
-
-            case .divider:
-                Divider()
-                    .overlay(Theme.border)
-            }
-        }
+        MarkdownSelectableTextView(
+            attributedText: renderedDocument.attributedText,
+            onOpenWikiLink: onOpenWikiLink
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -112,9 +59,14 @@ struct MessageMarkdownView: View {
     }
 
     var body: some View {
-        MessageMarkdownBlocksView(
-            content: content,
-            foregroundColor: foregroundColor,
+        let renderedDocument = UnifiedMarkdownDocumentBuilder.makeDocument(
+            preparedDocument: MarkdownDocumentPresentation.prepare(source: content, mode: .plain),
+            baseURL: nil,
+            configuration: .message(foregroundColor: foregroundColor)
+        )
+
+        MarkdownSelectableTextView(
+            attributedText: renderedDocument.attributedText,
             onOpenWikiLink: onOpenWikiLink
         )
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -125,135 +77,6 @@ struct MessageMarkdownView: View {
             onOpenWikiLink(target)
             return .handled
         })
-    }
-}
-
-private struct DocumentTableBlockView: View {
-    let payload: DocumentTableBlockPayload
-    let style: DocumentMarkdownStyle
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: true) {
-            Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 0) {
-                if !payload.headers.isEmpty {
-                    GridRow {
-                        ForEach(payload.headers.indices, id: \.self) { index in
-                            tableCell(payload.headers[index], isHeader: true)
-                        }
-                    }
-                }
-
-                ForEach(payload.rows.indices, id: \.self) { rowIndex in
-                    GridRow {
-                        ForEach(payload.rows[rowIndex].indices, id: \.self) { columnIndex in
-                            tableCell(payload.rows[rowIndex][columnIndex], isHeader: false)
-                        }
-                    }
-                }
-            }
-            .background(Theme.cardBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Theme.border, lineWidth: 0.7)
-            )
-            .clipShape(.rect(cornerRadius: 8))
-        }
-    }
-
-    private func tableCell(_ attributed: NSAttributedString, isHeader: Bool) -> some View {
-        MarkdownSelectableTextView(
-            attributedText: style.scaled(attributed, baseFontSize: 13),
-            onOpenWikiLink: onOpenWikiLink
-        )
-        .frame(minWidth: style.scaled(140), maxWidth: style.scaled(300), alignment: .leading)
-        .padding(.horizontal, style.scaled(12))
-        .padding(.vertical, style.scaled(10))
-        .background(isHeader ? Theme.surfaceSecondary : Theme.cardBackground)
-        .overlay(alignment: .trailing) {
-            Rectangle()
-                .fill(Theme.border)
-                .frame(width: 0.7)
-        }
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Theme.border)
-                .frame(height: 0.7)
-        }
-    }
-}
-
-private struct DocumentImageBlockView: View {
-    let image: MarkdownImage
-    let style: DocumentMarkdownStyle
-
-    var body: some View {
-        if let url = image.resolvedURL {
-            if url.isFileURL, let nsImage = NSImage(contentsOf: url) {
-                renderedImage(Image(nsImage: nsImage))
-            } else if !url.isFileURL {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let loadedImage):
-                        renderedImage(loadedImage)
-                    case .failure:
-                        placeholder
-                    case .empty:
-                        ProgressView()
-                            .controlSize(.small)
-                            .frame(maxWidth: .infinity, minHeight: 80)
-                    @unknown default:
-                        placeholder
-                    }
-                }
-            } else {
-                placeholder
-            }
-        } else {
-            placeholder
-        }
-    }
-
-    private func renderedImage(_ image: SwiftUI.Image) -> some View {
-        image
-            .resizable()
-            .scaledToFit()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .clipShape(.rect(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Theme.border, lineWidth: 0.7)
-            )
-            .accessibilityLabel(self.image.alt.isEmpty ? "Markdown image" : self.image.alt)
-    }
-
-    private var placeholder: some View {
-        HStack(alignment: .top, spacing: style.scaled(10)) {
-            Image(systemName: "photo")
-                .font(.system(size: style.scaled(15), weight: .semibold))
-                .foregroundStyle(Theme.textTertiary)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(image.alt.isEmpty ? "Image" : image.alt)
-                    .font(.system(size: style.bodyFontSize, weight: .semibold))
-                    .foregroundStyle(Theme.textSecondary)
-
-                if !image.source.isEmpty {
-                    Text(image.source)
-                        .font(.system(size: style.scaled(11), design: .monospaced))
-                        .foregroundStyle(Theme.textTertiary)
-                        .lineLimit(2)
-                }
-            }
-        }
-        .padding(style.scaled(12))
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.surfaceSecondary)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Theme.border, lineWidth: 0.7)
-        )
-        .clipShape(.rect(cornerRadius: 8))
     }
 }
 
@@ -338,106 +161,193 @@ private struct DocumentMarkdownStyle {
     func scaled(_ value: CGFloat) -> CGFloat {
         value * scale
     }
-
-    func scaled(_ attributedText: NSAttributedString, baseFontSize: CGFloat) -> NSAttributedString {
-        let mutable = NSMutableAttributedString(attributedString: attributedText)
-        let fullRange = NSRange(location: 0, length: mutable.length)
-
-        mutable.enumerateAttribute(.font, in: fullRange) { value, range, _ in
-            guard let font = value as? NSFont else {
-                mutable.addAttribute(
-                    .font,
-                    value: NSFont.systemFont(ofSize: scaled(baseFontSize)),
-                    range: range
-                )
-                return
-            }
-
-            let descriptor = font.fontDescriptor
-            let scaledFont = NSFont(descriptor: descriptor, size: scaled(font.pointSize)) ?? font
-            mutable.addAttribute(.font, value: scaledFont, range: range)
-        }
-
-        return mutable
-    }
 }
 
-struct MarkdownDisplaySegment: Equatable {
-    let kind: Kind
-    let spacingAfter: CGFloat?
-
-    enum Kind: Equatable {
-        case textCluster(MarkdownTextCluster)
-        case specialBlock(MarkdownSpecialBlock)
-    }
-}
-
-struct MarkdownTextCluster: Equatable {
+struct MarkdownRenderedDocument: Equatable {
     let attributedText: NSAttributedString
+    let tableCount: Int
+    let imageAttachmentCount: Int
 
-    static func == (lhs: MarkdownTextCluster, rhs: MarkdownTextCluster) -> Bool {
-        lhs.attributedText.isEqual(to: rhs.attributedText)
+    static func == (lhs: MarkdownRenderedDocument, rhs: MarkdownRenderedDocument) -> Bool {
+        lhs.tableCount == rhs.tableCount
+            && lhs.imageAttachmentCount == rhs.imageAttachmentCount
+            && lhs.attributedText.isEqual(to: rhs.attributedText)
     }
 }
 
-struct MarkdownSpecialBlock: Equatable {
-    let kind: Kind
+private enum UnifiedMarkdownDocumentBuilder {
+    struct Configuration {
+        let foregroundColor: Color
+        let bodyFontSize: CGFloat
+        let codeFontSize: CGFloat
+        let metadataFontSize: CGFloat?
+        let displayTitle: String?
+        let shouldRenderTitleInsideDocument: Bool
+        let isMessage: Bool
 
-    enum Kind: Equatable {
-        case table(DocumentTableBlockPayload)
-        case image(MarkdownImage)
-        case divider
-    }
-}
-
-private struct MarkdownSegmentAccumulator {
-    private(set) var segments: [MarkdownDisplaySegment] = []
-    private var pendingText = NSMutableAttributedString()
-    private var pendingSpacingAfter: CGFloat?
-
-    mutating func appendText(_ attributedText: NSAttributedString, spacingAfter: CGFloat) {
-        guard attributedText.length > 0 else { return }
-        if pendingText.length > 0 {
-            pendingText.append(NSAttributedString(string: "\n\n"))
+        static func document(style: DocumentMarkdownStyle) -> Configuration {
+            Configuration(
+                foregroundColor: Theme.textPrimary,
+                bodyFontSize: style.bodyFontSize,
+                codeFontSize: style.codeFontSize,
+                metadataFontSize: style.metadataFontSize,
+                displayTitle: nil,
+                shouldRenderTitleInsideDocument: false,
+                isMessage: false
+            )
         }
-        pendingText.append(attributedText)
-        pendingSpacingAfter = spacingAfter
-    }
 
-    mutating func appendSpecial(_ kind: MarkdownSpecialBlock.Kind, spacingAfter: CGFloat?) {
-        flushTextCluster()
-        segments.append(
-            MarkdownDisplaySegment(
-                kind: .specialBlock(MarkdownSpecialBlock(kind: kind)),
-                spacingAfter: spacingAfter
+        static func message(foregroundColor: Color) -> Configuration {
+            Configuration(
+                foregroundColor: foregroundColor,
+                bodyFontSize: 13,
+                codeFontSize: 12,
+                metadataFontSize: nil,
+                displayTitle: nil,
+                shouldRenderTitleInsideDocument: false,
+                isMessage: true
             )
+        }
+    }
+
+    struct BuildState {
+        var attributedText = NSMutableAttributedString()
+        var tableCount = 0
+        var imageAttachmentCount = 0
+    }
+
+    @MainActor
+    static func makeDocument(
+        preparedDocument: MarkdownDocumentPresentation.PreparedDocument,
+        baseURL: URL?,
+        configuration: Configuration
+    ) -> MarkdownRenderedDocument {
+        let effectiveConfiguration = Configuration(
+            foregroundColor: configuration.foregroundColor,
+            bodyFontSize: configuration.bodyFontSize,
+            codeFontSize: configuration.codeFontSize,
+            metadataFontSize: configuration.metadataFontSize,
+            displayTitle: preparedDocument.resolvedDisplayTitle,
+            shouldRenderTitleInsideDocument: preparedDocument.shouldRenderTitleInsideDocument,
+            isMessage: configuration.isMessage
         )
-    }
 
-    mutating func finish() -> [MarkdownDisplaySegment] {
-        flushTextCluster()
-        return segments
-    }
+        let blocks = MarkdownDocumentRenderer.parse(preparedDocument.bodyMarkdown, baseURL: baseURL)
+        var state = BuildState()
 
-    private mutating func flushTextCluster() {
-        guard pendingText.length > 0 else { return }
-        segments.append(
-            MarkdownDisplaySegment(
-                kind: .textCluster(
-                    MarkdownTextCluster(
-                        attributedText: NSAttributedString(attributedString: pendingText)
-                    )
+        if let metadataFontSize = effectiveConfiguration.metadataFontSize, !preparedDocument.metadata.isEmpty {
+            appendBlock(
+                MarkdownAttributedTextFactory.metadata(preparedDocument.metadata, fontSize: metadataFontSize),
+                to: &state.attributedText
+            )
+        }
+
+        if effectiveConfiguration.shouldRenderTitleInsideDocument, let title = effectiveConfiguration.displayTitle {
+            appendBlock(
+                MarkdownAttributedTextFactory.heading(
+                    title,
+                    level: 1,
+                    color: NSColor.labelColor,
+                    isMessage: effectiveConfiguration.isMessage
                 ),
-                spacingAfter: pendingSpacingAfter
+                to: &state.attributedText
             )
+        }
+
+        for block in blocks {
+            append(
+                block,
+                to: &state,
+                configuration: effectiveConfiguration
+            )
+        }
+
+        return MarkdownRenderedDocument(
+            attributedText: NSAttributedString(attributedString: state.attributedText),
+            tableCount: state.tableCount,
+            imageAttachmentCount: state.imageAttachmentCount
         )
-        pendingText = NSMutableAttributedString()
-        pendingSpacingAfter = nil
+    }
+
+    private static func append(
+        _ block: RenderedMarkdownBlock,
+        to state: inout BuildState,
+        configuration: Configuration
+    ) {
+        let content: NSAttributedString
+
+        switch block.kind {
+        case .heading(let level, let text):
+            content = MarkdownAttributedTextFactory.heading(
+                text,
+                level: level,
+                color: NSColor.labelColor,
+                isMessage: configuration.isMessage
+            )
+        case .paragraph(let text):
+            content = MarkdownAttributedTextFactory.body(
+                text,
+                fontSize: configuration.bodyFontSize,
+                foregroundColor: configuration.foregroundColor
+            )
+        case .blockquote(let blocks):
+            content = MarkdownAttributedTextFactory.quote(
+                blocks,
+                fontSize: configuration.bodyFontSize
+            )
+        case .list(let items):
+            content = MarkdownAttributedTextFactory.list(
+                items,
+                fontSize: configuration.bodyFontSize,
+                foregroundColor: configuration.foregroundColor
+            )
+        case .codeBlock(let language, let code):
+            content = MarkdownAttributedTextFactory.codeBlock(
+                language: language,
+                code: code,
+                fontSize: configuration.codeFontSize
+            )
+        case .html(let html):
+            content = MarkdownAttributedTextFactory.htmlBlock(
+                html,
+                fontSize: configuration.codeFontSize
+            )
+        case .table(let table):
+            state.tableCount += 1
+            content = MarkdownAttributedTextFactory.table(
+                table,
+                fontSize: configuration.bodyFontSize,
+                foregroundColor: configuration.foregroundColor
+            )
+        case .thematicBreak:
+            content = MarkdownAttributedTextFactory.divider()
+        case .image(let image):
+            if image.resolvedURL != nil {
+                state.imageAttachmentCount += 1
+            }
+            content = MarkdownAttributedTextFactory.image(
+                image,
+                fontSize: configuration.bodyFontSize
+            )
+        }
+
+        appendBlock(content, to: &state.attributedText)
+    }
+
+    private static func appendBlock(_ block: NSAttributedString, to text: inout NSMutableAttributedString) {
+        guard block.length > 0 else { return }
+        if text.length > 0 {
+            text.append(NSAttributedString(string: "\n\n"))
+        }
+        text.append(block)
     }
 }
 
 private enum MarkdownAttributedTextFactory {
-    static func metadata(_ items: [MarkdownDocumentPresentation.MetadataItem]) -> NSAttributedString {
+    static func metadata(
+        _ items: [MarkdownDocumentPresentation.MetadataItem],
+        fontSize: CGFloat
+    ) -> NSAttributedString {
         let text = NSMutableAttributedString()
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 5
@@ -454,7 +364,7 @@ private enum MarkdownAttributedTextFactory {
                 NSAttributedString(
                     string: "\(item.key)\t",
                     attributes: [
-                        .font: NSFont.monospacedSystemFont(ofSize: 10.5, weight: .medium),
+                        .font: NSFont.monospacedSystemFont(ofSize: fontSize, weight: .medium),
                         .foregroundColor: NSColor.secondaryLabelColor,
                         .paragraphStyle: paragraphStyle,
                     ]
@@ -464,7 +374,7 @@ private enum MarkdownAttributedTextFactory {
                 NSAttributedString(
                     string: item.value,
                     attributes: [
-                        .font: NSFont.systemFont(ofSize: 10.5),
+                        .font: NSFont.systemFont(ofSize: fontSize),
                         .foregroundColor: NSColor.tertiaryLabelColor,
                         .paragraphStyle: paragraphStyle,
                     ]
@@ -496,6 +406,7 @@ private enum MarkdownAttributedTextFactory {
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = level == 1 ? 2 : 3
+        paragraphStyle.paragraphSpacing = level == 1 ? 6 : 4
         return NSAttributedString(
             string: text,
             attributes: [
@@ -507,19 +418,62 @@ private enum MarkdownAttributedTextFactory {
     }
 
     static func body(_ source: String, fontSize: CGFloat, foregroundColor: Color) -> NSAttributedString {
-        inlineMarkdownText(
+        return inlineMarkdownText(
             source,
             font: .system(size: fontSize),
             foregroundColor: foregroundColor
         )
+        .withParagraphStyle(makeBodyParagraphStyle())
     }
 
     static func list(_ items: [MarkdownListItem], fontSize: CGFloat, foregroundColor: Color) -> NSAttributedString {
-        body(
-            items.map(markdownListItemText).joined(separator: "\n"),
-            fontSize: fontSize,
-            foregroundColor: foregroundColor
-        )
+        let result = NSMutableAttributedString()
+
+        for (index, item) in items.enumerated() {
+            if index > 0 {
+                result.append(NSAttributedString(string: "\n"))
+            }
+
+            let paragraphStyle = NSMutableParagraphStyle()
+            let indent = CGFloat(item.level) * 18
+            paragraphStyle.firstLineHeadIndent = indent
+            paragraphStyle.headIndent = indent + 18
+            paragraphStyle.lineSpacing = 3
+            paragraphStyle.paragraphSpacing = 3
+
+            let marker: String
+            if let checkbox = item.checkbox {
+                marker = checkbox == .checked ? "[x]" : "[ ]"
+            } else {
+                marker = item.isOrdered ? item.marker : "•"
+            }
+
+            let line = NSMutableAttributedString(
+                string: "\(marker) ",
+                attributes: [
+                    .font: NSFont.systemFont(ofSize: fontSize, weight: .semibold),
+                    .foregroundColor: NSColor(foregroundColor),
+                    .paragraphStyle: paragraphStyle,
+                ]
+            )
+            let content = inlineMarkdownText(
+                item.text,
+                font: .system(size: fontSize),
+                foregroundColor: foregroundColor
+            )
+            let mutableContent = NSMutableAttributedString(attributedString: content)
+            mutableContent.addAttributes(
+                [
+                    .paragraphStyle: paragraphStyle,
+                    .foregroundColor: NSColor(foregroundColor),
+                ],
+                range: NSRange(location: 0, length: mutableContent.length)
+            )
+            line.append(mutableContent)
+            result.append(line)
+        }
+
+        return result
     }
 
     static func quote(_ blocks: [RenderedMarkdownBlock], fontSize: CGFloat) -> NSAttributedString {
@@ -531,6 +485,7 @@ private enum MarkdownAttributedTextFactory {
         paragraphStyle.firstLineHeadIndent = 16
         paragraphStyle.headIndent = 16
         paragraphStyle.lineSpacing = 3
+        paragraphStyle.paragraphSpacing = 4
 
         let mutable = NSMutableAttributedString(
             string: "│ ",
@@ -552,7 +507,9 @@ private enum MarkdownAttributedTextFactory {
     static func codeBlock(language: String?, code: String, fontSize: CGFloat) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 3
-        paragraphStyle.paragraphSpacing = 2
+        paragraphStyle.paragraphSpacing = 4
+        paragraphStyle.headIndent = 12
+        paragraphStyle.firstLineHeadIndent = 12
 
         let mutable = NSMutableAttributedString()
         if let language, !language.isEmpty {
@@ -574,7 +531,7 @@ private enum MarkdownAttributedTextFactory {
                 attributes: [
                     .font: NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular),
                     .foregroundColor: NSColor.labelColor,
-                    .backgroundColor: NSColor.controlBackgroundColor,
+                    .backgroundColor: NSColor(Color(nsColor: .controlBackgroundColor)),
                     .paragraphStyle: paragraphStyle,
                 ]
             )
@@ -586,25 +543,109 @@ private enum MarkdownAttributedTextFactory {
         codeBlock(language: "html", code: html, fontSize: fontSize)
     }
 
-    static func tablePayload(_ table: MarkdownTable, foregroundColor: Color) -> DocumentTableBlockPayload {
-        DocumentTableBlockPayload(
-            headers: table.headers.map {
-                inlineMarkdownText(
-                    $0,
-                    font: .system(size: 12, weight: .semibold),
-                    foregroundColor: Theme.textPrimary
+    static func table(_ table: MarkdownTable, fontSize: CGFloat, foregroundColor: Color) -> NSAttributedString {
+        let rendered = NSMutableAttributedString()
+        let textTable = NSTextTable()
+        textTable.numberOfColumns = max(table.headers.count, 1)
+        textTable.layoutAlgorithm = .fixedLayoutAlgorithm
+        textTable.collapsesBorders = true
+        textTable.hidesEmptyCells = false
+        textTable.setBorderColor(NSColor(Theme.border))
+        textTable.setWidth(0.7, type: .absoluteValueType, for: .border)
+        textTable.setWidth(8, type: .absoluteValueType, for: .padding)
+        textTable.setWidth(0, type: .absoluteValueType, for: .margin)
+
+        let headerColor = NSColor(Theme.surfaceSecondary)
+        let bodyColor = NSColor(Theme.cardBackground)
+        let borderColor = NSColor(Theme.border)
+        let rows = [table.headers] + table.rows
+
+        for (rowIndex, row) in rows.enumerated() {
+            for columnIndex in 0..<textTable.numberOfColumns {
+                let text = columnIndex < row.count ? row[columnIndex] : ""
+                let block = NSTextTableBlock(
+                    table: textTable,
+                    startingRow: rowIndex,
+                    rowSpan: 1,
+                    startingColumn: columnIndex,
+                    columnSpan: 1
                 )
-            },
-            rows: table.rows.map { row in
-                row.map {
-                    inlineMarkdownText(
-                        $0,
-                        font: .system(size: 12),
-                        foregroundColor: foregroundColor
-                    )
-                }
+                block.setValue(100 / CGFloat(textTable.numberOfColumns), type: .percentageValueType, for: .width)
+                block.setWidth(0.7, type: .absoluteValueType, for: .border)
+                block.setWidth(8, type: .absoluteValueType, for: .padding)
+                block.setWidth(0, type: .absoluteValueType, for: .margin)
+                block.backgroundColor = rowIndex == 0 ? headerColor : bodyColor
+                block.setBorderColor(borderColor)
+
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.textBlocks = [block]
+                paragraphStyle.lineSpacing = 3
+                paragraphStyle.paragraphSpacing = 2
+
+                let content = NSMutableAttributedString(attributedString: inlineMarkdownText(
+                    text,
+                    font: .system(size: fontSize, weight: rowIndex == 0 ? .semibold : .regular),
+                    foregroundColor: foregroundColor
+                ))
+                content.addAttributes(
+                    [
+                        .paragraphStyle: paragraphStyle,
+                        .foregroundColor: NSColor(foregroundColor),
+                    ],
+                    range: NSRange(location: 0, length: content.length)
+                )
+                rendered.append(content)
+                rendered.append(NSAttributedString(string: "\n"))
             }
+        }
+
+        return rendered.trimmingTrailingNewlines()
+    }
+
+    static func divider() -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        paragraphStyle.paragraphSpacing = 2
+        return NSAttributedString(
+            string: "────────────────────────",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 10, weight: .regular),
+                .foregroundColor: NSColor.separatorColor,
+                .paragraphStyle: paragraphStyle,
+            ]
         )
+    }
+
+    static func image(_ image: MarkdownImage, fontSize: CGFloat) -> NSAttributedString {
+        guard let attachment = makeImageAttachment(for: image) else {
+            return imagePlaceholder(image, fontSize: fontSize)
+        }
+
+        let attachmentString = NSMutableAttributedString(attachment: attachment)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .left
+        paragraphStyle.paragraphSpacing = 4
+        attachmentString.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: NSRange(location: 0, length: attachmentString.length)
+        )
+
+        if !image.alt.isEmpty {
+            attachmentString.append(NSAttributedString(string: "\n"))
+            attachmentString.append(
+                NSAttributedString(
+                    string: image.alt,
+                    attributes: [
+                        .font: NSFont.systemFont(ofSize: max(fontSize - 1, 11), weight: .medium),
+                        .foregroundColor: NSColor.secondaryLabelColor,
+                        .paragraphStyle: paragraphStyle,
+                    ]
+                )
+            )
+        }
+
+        return attachmentString
     }
 
     static func inlineMarkdownText(_ source: String, font: Font, foregroundColor: Color) -> NSAttributedString {
@@ -621,19 +662,8 @@ private enum MarkdownAttributedTextFactory {
         )
     }
 
-    static func markdownListItemText(_ item: MarkdownListItem) -> String {
-        let indent = String(repeating: "    ", count: item.level)
-        let marker: String
-        if let checkbox = item.checkbox {
-            marker = checkbox == .checked ? "[x]" : "[ ]"
-        } else {
-            marker = item.isOrdered ? item.marker : "•"
-        }
-        return "\(indent)\(marker) \(item.text)"
-    }
-
     static func flattenBlockquoteText(_ block: RenderedMarkdownBlock) -> String? {
-        switch block {
+        switch block.kind {
         case .paragraph(let text):
             return text
         case .heading(_, let text):
@@ -657,383 +687,92 @@ private enum MarkdownAttributedTextFactory {
             return image.alt.isEmpty ? image.source : image.alt
         }
     }
-}
 
-@MainActor
-private enum DocumentMarkdownSegmentBuilder {
-    static func make(
-        document: MarkdownDocumentPresentation.PreparedDocument,
-        baseURL: URL?
-    ) -> [MarkdownDisplaySegment] {
-        var accumulator = MarkdownSegmentAccumulator()
-
-        if !document.metadata.isEmpty {
-            accumulator.appendText(MarkdownAttributedTextFactory.metadata(document.metadata), spacingAfter: 28)
-        }
-
-        if document.shouldRenderTitleInsideDocument, let title = document.resolvedDisplayTitle {
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.heading(
-                    title,
-                    level: 1,
-                    color: NSColor.labelColor,
-                    isMessage: false
-                ),
-                spacingAfter: 22
-            )
-        }
-
-        let blocks = MarkdownDocumentRenderer.parse(document.bodyMarkdown, baseURL: baseURL)
-        for block in blocks {
-            append(block, to: &accumulator)
-        }
-
-        return accumulator.finish()
-    }
-
-    private static func append(_ block: RenderedMarkdownBlock, to accumulator: inout MarkdownSegmentAccumulator) {
-        switch block {
-        case .heading(let level, let text):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.heading(
-                    text,
-                    level: level,
-                    color: NSColor.labelColor,
-                    isMessage: false
-                ),
-                spacingAfter: headingSpacingAfter(level)
-            )
-        case .paragraph(let text):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.body(text, fontSize: 13, foregroundColor: Theme.textPrimary),
-                spacingAfter: 14
-            )
-        case .blockquote(let blocks):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.quote(blocks, fontSize: 13),
-                spacingAfter: 16
-            )
-        case .list(let items):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.list(items, fontSize: 13, foregroundColor: Theme.textPrimary),
-                spacingAfter: 14
-            )
-        case .codeBlock(let language, let code):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.codeBlock(language: language, code: code, fontSize: 12),
-                spacingAfter: 18
-            )
-        case .html(let html):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.htmlBlock(html, fontSize: 12),
-                spacingAfter: 18
-            )
-        case .table(let table):
-            accumulator.appendSpecial(
-                .table(MarkdownAttributedTextFactory.tablePayload(table, foregroundColor: Theme.textSecondary)),
-                spacingAfter: 18
-            )
-        case .thematicBreak:
-            accumulator.appendSpecial(.divider, spacingAfter: 18)
-        case .image(let image):
-            accumulator.appendSpecial(.image(image), spacingAfter: 18)
-        }
-    }
-
-    private static func headingSpacingAfter(_ level: Int) -> CGFloat {
-        switch level {
-        case 1:
-            return 20
-        case 2:
-            return 14
-        case 3:
-            return 10
-        default:
-            return 8
-        }
-    }
-}
-
-@MainActor
-private enum MessageMarkdownSegmentBuilder {
-    static func make(content: String, foregroundColor: Color) -> [MarkdownDisplaySegment] {
-        var accumulator = MarkdownSegmentAccumulator()
-        let blocks = MarkdownDocumentRenderer.parse(content, baseURL: nil)
-        for block in blocks {
-            append(block, foregroundColor: foregroundColor, to: &accumulator)
-        }
-        return accumulator.finish()
-    }
-
-    private static func append(
-        _ block: RenderedMarkdownBlock,
-        foregroundColor: Color,
-        to accumulator: inout MarkdownSegmentAccumulator
-    ) {
-        switch block {
-        case .heading(let level, let text):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.heading(
-                    text,
-                    level: level,
-                    color: NSColor.labelColor,
-                    isMessage: true
-                ),
-                spacingAfter: level <= 2 ? 10 : 6
-            )
-        case .paragraph(let text):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.body(text, fontSize: 13, foregroundColor: foregroundColor),
-                spacingAfter: 10
-            )
-        case .blockquote(let blocks):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.quote(blocks, fontSize: 13),
-                spacingAfter: 12
-            )
-        case .list(let items):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.list(items, fontSize: 13, foregroundColor: foregroundColor),
-                spacingAfter: 10
-            )
-        case .codeBlock(let language, let code):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.codeBlock(language: language, code: code, fontSize: 12),
-                spacingAfter: 12
-            )
-        case .html(let html):
-            accumulator.appendText(
-                MarkdownAttributedTextFactory.htmlBlock(html, fontSize: 12),
-                spacingAfter: 12
-            )
-        case .table(let table):
-            accumulator.appendSpecial(
-                .table(MarkdownAttributedTextFactory.tablePayload(table, foregroundColor: Theme.textSecondary)),
-                spacingAfter: 12
-            )
-        case .thematicBreak:
-            accumulator.appendSpecial(.divider, spacingAfter: 8)
-        case .image(let image):
-            accumulator.appendSpecial(.image(image), spacingAfter: 12)
-        }
-    }
-}
-
-private struct MessageMarkdownBlocksView: View {
-    let content: String
-    let foregroundColor: Color
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    private var segments: [MarkdownDisplaySegment] {
-        MessageMarkdownSegmentBuilder.make(
-            content: content,
-            foregroundColor: foregroundColor
-        )
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
-                MessageMarkdownSegmentView(
-                    segment: segment,
-                    onOpenWikiLink: onOpenWikiLink
-                )
-
-                if let spacing = segment.spacingAfter {
-                    Color.clear
-                        .frame(height: spacing)
-                } else if index < segments.count - 1 {
-                    Color.clear
-                        .frame(height: 10)
-                }
-            }
-        }
-    }
-}
-
-private struct MessageMarkdownSegmentView: View {
-    let segment: MarkdownDisplaySegment
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        switch segment.kind {
-        case .textCluster(let cluster):
-            MarkdownSelectableTextView(
-                attributedText: cluster.attributedText,
-                onOpenWikiLink: onOpenWikiLink
-            )
-
-        case .specialBlock(let specialBlock):
-            switch specialBlock.kind {
-            case .table(let payload):
-                MessageMarkdownTableView(
-                    payload: payload,
-                    onOpenWikiLink: onOpenWikiLink
-                )
-
-            case .image(let image):
-                MessageMarkdownImageView(image: image)
-
-            case .divider:
-                Rectangle()
-                    .fill(Theme.border)
-                    .frame(height: 1)
-                    .padding(.vertical, 8)
-            }
-        }
-    }
-}
-
-private struct MessageMarkdownTableView: View {
-    let payload: DocumentTableBlockPayload
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: true) {
-            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
-                GridRow {
-                    ForEach(payload.headers.indices, id: \.self) { column in
-                        tableCell(payload.headers[column], isHeader: true)
-                    }
-                }
-
-                ForEach(payload.rows.indices, id: \.self) { rowIndex in
-                    GridRow {
-                        ForEach(payload.rows[rowIndex].indices, id: \.self) { column in
-                            tableCell(payload.rows[rowIndex][column], isHeader: false)
-                        }
-                    }
-                }
-            }
-            .background(Theme.cardBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Theme.border, lineWidth: 0.7)
-            )
-            .clipShape(.rect(cornerRadius: 8))
-        }
-    }
-
-    private func tableCell(_ value: NSAttributedString, isHeader: Bool) -> some View {
-        MarkdownSelectableTextView(
-            attributedText: value,
-            onOpenWikiLink: onOpenWikiLink
-        )
-        .frame(minWidth: 110, maxWidth: 240, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(isHeader ? Theme.surfaceSecondary : Theme.cardBackground)
-        .overlay(alignment: .trailing) {
-            Rectangle()
-                .fill(Theme.border)
-                .frame(width: 0.7)
-        }
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Theme.border)
-                .frame(height: 0.7)
-        }
-    }
-}
-
-private struct MessageMarkdownImageView: View {
-    let image: MarkdownImage
-
-    var body: some View {
-        if let url = image.resolvedURL {
-            if url.isFileURL, let nsImage = NSImage(contentsOf: url) {
-                renderedImage(Image(nsImage: nsImage))
-            } else if !url.isFileURL {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let loadedImage):
-                        renderedImage(loadedImage)
-                    case .failure:
-                        placeholder
-                    case .empty:
-                        ProgressView()
-                            .controlSize(.small)
-                            .frame(maxWidth: .infinity, minHeight: 80)
-                    @unknown default:
-                        placeholder
-                    }
-                }
-            } else {
-                placeholder
-            }
+    static func markdownListItemText(_ item: MarkdownListItem) -> String {
+        let indent = String(repeating: "    ", count: item.level)
+        let marker: String
+        if let checkbox = item.checkbox {
+            marker = checkbox == .checked ? "[x]" : "[ ]"
         } else {
-            placeholder
+            marker = item.isOrdered ? item.marker : "•"
         }
+        return "\(indent)\(marker) \(item.text)"
     }
 
-    private func renderedImage(_ image: SwiftUI.Image) -> some View {
-        image
-            .resizable()
-            .scaledToFit()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .clipShape(.rect(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Theme.border, lineWidth: 0.7)
-            )
-            .accessibilityLabel(self.image.alt.isEmpty ? "Markdown image" : self.image.alt)
+    private static func makeBodyParagraphStyle() -> NSMutableParagraphStyle {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 3
+        paragraphStyle.paragraphSpacing = 4
+        return paragraphStyle
     }
 
-    private var placeholder: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "photo")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(Theme.textTertiary)
+    private static func makeImageAttachment(for image: MarkdownImage) -> NSTextAttachment? {
+        guard let url = image.resolvedURL else { return nil }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(image.alt.isEmpty ? "Image" : image.alt)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Theme.textSecondary)
-
-                if !image.source.isEmpty {
-                    Text(image.source)
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(Theme.textTertiary)
-                        .lineLimit(2)
-                }
-            }
+        let nsImage: NSImage?
+        if url.isFileURL {
+            nsImage = NSImage(contentsOf: url)
+        } else {
+            nsImage = nil
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.surfaceSecondary)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Theme.border, lineWidth: 0.7)
+
+        guard let nsImage else { return nil }
+        let maxWidth: CGFloat = 520
+        let ratio = max(nsImage.size.width, 1) / max(nsImage.size.height, 1)
+        let width = min(nsImage.size.width, maxWidth)
+        let height = max(width / ratio, 40)
+
+        nsImage.size = NSSize(width: width, height: height)
+        let attachment = NSTextAttachment()
+        attachment.image = nsImage
+        return attachment
+    }
+
+    private static func imagePlaceholder(_ image: MarkdownImage, fontSize: CGFloat) -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 3
+        paragraphStyle.paragraphSpacing = 4
+
+        let title = image.alt.isEmpty ? "Image" : image.alt
+        let details = image.source.isEmpty ? "" : "\n\(image.source)"
+        return NSAttributedString(
+            string: "[\(title)]\(details)",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: fontSize, weight: .medium),
+                .foregroundColor: NSColor.secondaryLabelColor,
+                .backgroundColor: NSColor(Theme.surfaceSecondary),
+                .paragraphStyle: paragraphStyle,
+            ]
         )
-        .clipShape(.rect(cornerRadius: 8))
     }
 }
 
-struct DocumentTableBlockPayload: Equatable {
-    let headers: [NSAttributedString]
-    let rows: [[NSAttributedString]]
-
-    static func == (lhs: DocumentTableBlockPayload, rhs: DocumentTableBlockPayload) -> Bool {
-        guard lhs.headers.count == rhs.headers.count, lhs.rows.count == rhs.rows.count else { return false }
-        guard zip(lhs.headers, rhs.headers).allSatisfy({ $0.isEqual(to: $1) }) else { return false }
-        for (leftRow, rightRow) in zip(lhs.rows, rhs.rows) {
-            guard leftRow.count == rightRow.count else { return false }
-            guard zip(leftRow, rightRow).allSatisfy({ $0.isEqual(to: $1) }) else { return false }
-        }
-        return true
+private struct RenderedMarkdownBlock {
+    enum Kind {
+        case heading(level: Int, text: String)
+        case paragraph(String)
+        case blockquote([RenderedMarkdownBlock])
+        case list([MarkdownListItem])
+        case codeBlock(language: String?, code: String)
+        case table(MarkdownTable)
+        case thematicBreak
+        case html(String)
+        case image(MarkdownImage)
     }
+
+    let kind: Kind
 }
 
-private enum RenderedMarkdownBlock {
-    case heading(level: Int, text: String)
-    case paragraph(String)
-    case blockquote([RenderedMarkdownBlock])
-    case list([MarkdownListItem])
-    case codeBlock(language: String?, code: String)
-    case table(MarkdownTable)
-    case thematicBreak
-    case html(String)
-    case image(MarkdownImage)
+private extension RenderedMarkdownBlock {
+    static func heading(level: Int, text: String) -> RenderedMarkdownBlock { .init(kind: .heading(level: level, text: text)) }
+    static func paragraph(_ text: String) -> RenderedMarkdownBlock { .init(kind: .paragraph(text)) }
+    static func blockquote(_ blocks: [RenderedMarkdownBlock]) -> RenderedMarkdownBlock { .init(kind: .blockquote(blocks)) }
+    static func list(_ items: [MarkdownListItem]) -> RenderedMarkdownBlock { .init(kind: .list(items)) }
+    static func codeBlock(language: String?, code: String) -> RenderedMarkdownBlock { .init(kind: .codeBlock(language: language, code: code)) }
+    static func table(_ table: MarkdownTable) -> RenderedMarkdownBlock { .init(kind: .table(table)) }
+    static var thematicBreak: RenderedMarkdownBlock { .init(kind: .thematicBreak) }
+    static func html(_ html: String) -> RenderedMarkdownBlock { .init(kind: .html(html)) }
+    static func image(_ image: MarkdownImage) -> RenderedMarkdownBlock { .init(kind: .image(image)) }
 }
 
 private struct MarkdownListItem: Identifiable {
@@ -1222,6 +961,28 @@ private enum MarkdownDocumentRenderer {
     }
 }
 
+private extension NSAttributedString {
+    func withParagraphStyle(_ style: NSParagraphStyle) -> NSAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: self)
+        mutable.addAttribute(
+            .paragraphStyle,
+            value: style,
+            range: NSRange(location: 0, length: mutable.length)
+        )
+        return mutable
+    }
+}
+
+private extension NSMutableAttributedString {
+    func trimmingTrailingNewlines() -> NSAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: self)
+        while mutable.string.hasSuffix("\n") {
+            mutable.deleteCharacters(in: NSRange(location: mutable.length - 1, length: 1))
+        }
+        return NSAttributedString(attributedString: mutable)
+    }
+}
+
 private extension String {
     var trimmedMarkdown: String {
         trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1231,14 +992,15 @@ private extension String {
 #if DEBUG
 @MainActor
 enum DocumentMarkdownDebug {
-    static func segments(
+    static func renderedDocument(
         for content: String,
         mode: MarkdownDocumentPresentation.Mode,
         baseURL: URL? = nil
-    ) -> [MarkdownDisplaySegment] {
-        DocumentMarkdownSegmentBuilder.make(
-            document: MarkdownDocumentPresentation.prepare(source: content, mode: mode),
-            baseURL: baseURL
+    ) -> MarkdownRenderedDocument {
+        UnifiedMarkdownDocumentBuilder.makeDocument(
+            preparedDocument: MarkdownDocumentPresentation.prepare(source: content, mode: mode),
+            baseURL: baseURL,
+            configuration: .document(style: DocumentMarkdownStyle(scale: 1.0))
         )
     }
 }
@@ -1247,7 +1009,7 @@ enum DocumentMarkdownDebug {
 enum MessageMarkdownDebug {
     static func listItemTexts(for content: String) -> [String] {
         MarkdownDocumentRenderer.parse(content, baseURL: nil).flatMap { block -> [String] in
-            guard case .list(let items) = block else { return [] }
+            guard case .list(let items) = block.kind else { return [] }
             return items.map(\.text)
         }
     }

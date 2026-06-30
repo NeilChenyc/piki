@@ -4,3 +4,23 @@ __pycache__/
 .pytest_cache/
 .piki/
 *.egg-info/
+
+# Local env and secrets
+.env.*
+!.env.example
+*.secret
+*credentials*
+
+# Python / packaging build outputs
+build/
+dist/
+
+# SwiftPM / Xcode local build outputs
+PikiApp/.build/
+PikiApp/build/
+PikiApp/.swiftpm/xcode/package.xcworkspace/xcuserdata/
+PikiApp/.swiftpm/xcode/xcuserdata/
+*.xcuserstate
+
+# Generated reports and local research outputs
+outputs/

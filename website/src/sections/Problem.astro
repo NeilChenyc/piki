@@ -1,29 +1,24 @@
 ---
 import FeatureCard from '../components/FeatureCard.astro';
 ---
-<section class="section section--surface" id="problem">
+<section class="section" id="problem">
   <div class="container">
-    <h2 class="text-center problem__title fade-in">你是不是也这样？</h2>
+    <h2 class="text-center problem__title fade-in">你的知识库为什么总是"死"的</h2>
     <div class="problem__grid fade-in">
       <FeatureCard
-        icon="📚"
-        title="收藏了很多，但找不到也用不上"
-        description="各种平台收藏了上百条，但真正要用的时候根本想不起来。"
-      />
-      <FeatureCard
         icon="🔄"
-        title="每次问 AI 都要重新解释背景"
-        description="个人上下文无法延续，每次对话都像从零开始。"
+        title="维护是永远的债"
+        description="建文件夹、定规范、修链接——没完没了，最终放弃。"
       />
       <FeatureCard
-        icon="📝"
-        title="笔记越来越多，越来越不想打开"
-        description="笔记变成了信息的垃圾场，整理的成本比写入还高。"
+        icon="🧩"
+        title="碎片永远是碎片"
+        description="同一个概念散落在五篇笔记里，每次都需要自己拼凑。"
       />
       <FeatureCard
         icon="💬"
-        title="重要判断散落在聊天记录里"
-        description="决策的依据和结论分散在不同对话中，无法追溯和复用。"
+        title="对话成果转瞬即逝"
+        description="和 AI 讨论的判断和结论，聊完就丢，下次从零开始。"
       />
     </div>
   </div>
@@ -36,8 +31,14 @@ import FeatureCard from '../components/FeatureCard.astro';
 
   .problem__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-lg);
+  }
+
+  @media (max-width: 900px) {
+    .problem__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media (max-width: 600px) {

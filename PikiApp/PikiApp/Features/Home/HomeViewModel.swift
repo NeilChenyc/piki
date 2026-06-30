@@ -12,7 +12,12 @@ final class HomeViewModel {
     static let healthCheckPrompt =
         "请对当前 vault 运行 health check，并总结运行时连通性、配置状态、潜在风险和建议的下一步。"
     static let podcastPrompt =
-        "我想上传一集播客并自动转录。请先等我提供单集链接；收到后按播客转录流程先完成完整转录，再整理进知识库。"
+        """
+        我想上传一集播客并自动转录。请按播客转录流程先完成完整转录，再整理进知识库。
+
+        播客链接：
+        请把这里替换为单集链接后再发送。
+        """
 
     private let logger = Logger(subsystem: "com.piki.app", category: "HomeViewModel")
 

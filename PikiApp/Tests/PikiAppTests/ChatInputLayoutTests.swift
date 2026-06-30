@@ -19,4 +19,13 @@ struct ChatInputLayoutTests {
         #expect(hero.minHeight <= 82)
         #expect(hero.textSize < 21)
     }
+
+    @Test
+    func attachmentMenuDismissBackdropStaysWithinLocalBounds() {
+        let hero = ChatInputMetrics(style: .hero)
+        let docked = ChatInputMetrics(style: .docked)
+
+        #expect(hero.usesFullscreenDismissOverlay == false)
+        #expect(docked.usesFullscreenDismissOverlay == false)
+    }
 }

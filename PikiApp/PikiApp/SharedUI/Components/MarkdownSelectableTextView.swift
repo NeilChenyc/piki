@@ -14,64 +14,57 @@ struct MarkdownSelectableTextView: NSViewRepresentable {
         Coordinator(onOpenWikiLink: onOpenWikiLink)
     }
 
-    func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = Self.makeContainerScrollView()
+    func makeNSView(context: Context) -> NSTextView {
         let textView = Self.makeConfiguredTextView()
-        textView.delegate = context.coordinator
         updateTextView(textView, coordinator: context.coordinator)
-        scrollView.documentView = textView
-        return scrollView
-    }
-
-    static func makeContainerScrollView() -> NSScrollView {
-        let scrollView = NSScrollView()
-        scrollView.drawsBackground = false
-        scrollView.borderType = .noBorder
-        scrollView.hasVerticalScroller = false
-        scrollView.hasHorizontalScroller = false
-        scrollView.autohidesScrollers = true
-        return scrollView
+        return textView
     }
 
     static func makeConfiguredTextView() -> NSTextView {
-        let textView = NSTextView(frame: .zero)
+        let textStorage = NSTextStorage()
+        let layoutManager = NSLayoutManager()
+        textStorage.addLayoutManager(layoutManager)
+
+        let textContainer = NSTextContainer(containerSize: NSSize(
+            width: 1,
+            height: CGFloat.greatestFiniteMagnitude
+        ))
+        textContainer.widthTracksTextView = true
+        textContainer.heightTracksTextView = false
+        textContainer.lineFragmentPadding = 0
+        layoutManager.addTextContainer(textContainer)
+
+        let textView = NSTextView(frame: .zero, textContainer: textContainer)
         Self.configure(textView)
         return textView
     }
 
-    func updateNSView(_ scrollView: NSScrollView, context: Context) {
-        guard let textView = scrollView.documentView as? NSTextView else { return }
+    func updateNSView(_ textView: NSTextView, context: Context) {
         context.coordinator.onOpenWikiLink = onOpenWikiLink
         updateTextView(textView, coordinator: context.coordinator)
     }
 
-    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSScrollView, context: Context) -> CGSize? {
-        guard let textView = nsView.documentView as? NSTextView else {
-            return nil
-        }
-
-        let width = proposal.width ?? nsView.bounds.width
-        let resolvedWidth = max(width, 1)
-
-        if let textContainer = textView.textContainer, let layoutManager = textView.layoutManager {
-            textContainer.containerSize = NSSize(width: resolvedWidth, height: .greatestFiniteMagnitude)
-            layoutManager.ensureLayout(for: textContainer)
-            let usedRect = layoutManager.usedRect(for: textContainer)
-            let height = ceil(usedRect.height + textView.textContainerInset.height * 2)
-            return CGSize(width: resolvedWidth, height: height)
-        }
-
-        return nil
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSTextView, context: Context) -> CGSize? {
+        let width = Self.measurementWidth(
+            proposalWidth: proposal.width,
+            currentWidth: nsView.bounds.width,
+            lastKnownWidth: context.coordinator.lastKnownWidth
+        )
+        context.coordinator.lastKnownWidth = width
+        let height = Self.measuredHeight(for: nsView, width: width)
+        return CGSize(width: width, height: max(height, 1))
     }
 
     static func configure(_ textView: NSTextView) {
         textView.isEditable = false
         textView.isSelectable = true
         textView.isRichText = true
-        textView.importsGraphics = false
+        textView.importsGraphics = true
         textView.drawsBackground = false
         textView.backgroundColor = .clear
         textView.textContainerInset = .zero
+        textView.wantsLayer = true
+        textView.layer?.masksToBounds = true
         textView.isHorizontallyResizable = false
         textView.isVerticallyResizable = true
         textView.maxSize = NSSize(
@@ -88,15 +81,78 @@ struct MarkdownSelectableTextView: NSViewRepresentable {
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .cursor: NSCursor.pointingHand,
         ]
+        textView.textContainer?.lineBreakMode = .byWordWrapping
+    }
+
+    static func measurementWidth(
+        proposalWidth: CGFloat?,
+        currentWidth: CGFloat,
+        lastKnownWidth: CGFloat? = nil
+    ) -> CGFloat {
+        if let proposalWidth, proposalWidth > 1 {
+            return proposalWidth
+        }
+        if currentWidth > 1 {
+            return currentWidth
+        }
+        if let lastKnownWidth, lastKnownWidth > 1 {
+            return lastKnownWidth
+        }
+        return 1
+    }
+
+    static func shouldUpdateText(existing: NSAttributedString?, incoming: NSAttributedString) -> Bool {
+        guard let existing else { return true }
+        return existing.isEqual(to: incoming) == false
+    }
+
+    static func measuredHeight(for textView: NSTextView, width: CGFloat) -> CGFloat {
+        guard let textContainer = textView.textContainer, let layoutManager = textView.layoutManager else {
+            return 1
+        }
+
+        textContainer.containerSize = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.ensureLayout(for: textContainer)
+
+        let usedRect = layoutManager.usedRect(for: textContainer)
+        let contentBottom = max(
+            usedRect.maxY,
+            layoutManager.extraLineFragmentRect.maxY,
+            maximumLineFragmentMaxY(layoutManager: layoutManager)
+        )
+        return ceil(contentBottom + textView.textContainerInset.height * 2)
+    }
+
+    private static func maximumLineFragmentMaxY(layoutManager: NSLayoutManager) -> CGFloat {
+        guard layoutManager.numberOfGlyphs > 0 else { return 0 }
+
+        var maxY: CGFloat = 0
+        var glyphIndex = 0
+
+        while glyphIndex < layoutManager.numberOfGlyphs {
+            var range = NSRange()
+            let rect = layoutManager.lineFragmentUsedRect(
+                forGlyphAt: glyphIndex,
+                effectiveRange: &range,
+                withoutAdditionalLayout: true
+            )
+            maxY = max(maxY, rect.maxY)
+            glyphIndex = NSMaxRange(range)
+        }
+
+        return maxY
     }
 
     private func updateTextView(_ textView: NSTextView, coordinator: Coordinator) {
         textView.delegate = coordinator
-        textView.textStorage?.setAttributedString(attributedText)
+        if Self.shouldUpdateText(existing: textView.textStorage, incoming: attributedText) {
+            textView.textStorage?.setAttributedString(attributedText)
+        }
     }
 
     final class Coordinator: NSObject, NSTextViewDelegate {
         var onOpenWikiLink: ((WikiLinkTarget) -> Void)?
+        var lastKnownWidth: CGFloat?
 
         init(onOpenWikiLink: ((WikiLinkTarget) -> Void)?) {
             self.onOpenWikiLink = onOpenWikiLink

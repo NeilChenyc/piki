@@ -10,8 +10,35 @@ enum ChatInputExternalRequest: Equatable {
     case openLocalFilePicker
 }
 
+enum ChatInputAttachmentMenuAction: Equatable {
+    case localFileUpload
+    case podcastTranscription
+}
+
+struct ChatInputAttachmentMenuState: Equatable {
+    var isExpanded = false
+
+    mutating func toggle() {
+        isExpanded.toggle()
+    }
+
+    mutating func dismiss() -> ChatInputAttachmentMenuAction? {
+        isExpanded = false
+        return nil
+    }
+
+    mutating func select(_ action: ChatInputAttachmentMenuAction) -> ChatInputAttachmentMenuAction {
+        isExpanded = false
+        return action
+    }
+}
+
 struct ChatInputMetrics {
     let style: ChatInputStyle
+
+    var usesFullscreenDismissOverlay: Bool {
+        false
+    }
 
     var minHeight: CGFloat {
         style == .hero ? 82 : 0
@@ -77,7 +104,7 @@ struct ChatInputMetrics {
 struct ChatInputView: View {
     @Binding var text: String
     @State private var selectedFiles: [URL] = []
-    @State private var showsAttachmentOptions = false
+    @State private var attachmentMenuState = ChatInputAttachmentMenuState()
     @FocusState private var isFocused: Bool
     let placeholder: String
     let isDisabled: Bool
@@ -130,125 +157,137 @@ struct ChatInputView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: style == .hero ? 14 : 8) {
-            if !selectedFiles.isEmpty {
-                HStack(spacing: 8) {
-                    ForEach(selectedFiles, id: \.path) { file in
-                        HStack(spacing: 4) {
-                            Image(systemName: "paperclip")
-                                .font(.system(size: chipIconSize))
-                            Text(file.lastPathComponent)
-                                .font(.system(size: chipTextSize))
-                                .lineLimit(1)
-                            Button {
-                                selectedFiles.removeAll { $0 == file }
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
+        ZStack(alignment: .bottomLeading) {
+            if attachmentMenuState.isExpanded {
+                Color.black.opacity(0.001)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        _ = attachmentMenuState.dismiss()
+                    }
+            }
+
+            VStack(alignment: .leading, spacing: style == .hero ? 14 : 8) {
+                if !selectedFiles.isEmpty {
+                    HStack(spacing: 8) {
+                        ForEach(selectedFiles, id: \.path) { file in
+                            HStack(spacing: 4) {
+                                Image(systemName: "paperclip")
                                     .font(.system(size: chipIconSize))
+                                Text(file.lastPathComponent)
+                                    .font(.system(size: chipTextSize))
+                                    .lineLimit(1)
+                                Button {
+                                    selectedFiles.removeAll { $0 == file }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: chipIconSize))
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
+                            .padding(.horizontal, chipHorizontalPadding)
+                            .padding(.vertical, chipVerticalPadding)
+                            .background(Theme.subtleFill)
+                            .clipShape(.rect(cornerRadius: 8))
                         }
-                        .padding(.horizontal, chipHorizontalPadding)
-                        .padding(.vertical, chipVerticalPadding)
-                        .background(Theme.subtleFill)
-                        .clipShape(.rect(cornerRadius: 8))
                     }
                 }
-            }
 
-            TextField(placeholder, text: $text, axis: .vertical)
-                .textFieldStyle(.plain)
-                .font(.system(size: textSize))
-                .lineLimit(style == .hero ? 1...8 : 1...12)
-                .focused($isFocused)
-                .onSubmit {
-                    if showsStopButton {
-                        onStop()
-                    } else {
-                        sendIfNotEmpty()
-                    }
-                }
-                .disabled(isDisabled)
-
-            if let helperText, !helperText.isEmpty {
-                Text(helperText)
-                    .font(.system(size: helperTextSize))
-                    .foregroundStyle(Theme.textSecondary)
-                    .lineLimit(2)
-                    .padding(.top, style == .hero ? 2 : 0)
-            }
-
-            HStack(spacing: style == .hero ? 14 : 12) {
-                Button(action: chooseFile) {
-                    Image(systemName: metrics.attachmentSymbolName)
-                        .font(.system(size: metrics.attachmentIconSize, weight: .regular))
-                        .foregroundStyle(attachmentTint)
-                        .frame(width: metrics.actionButtonSize, height: metrics.actionButtonSize)
-                        .background(
-                            Circle()
-                                .fill(attachmentBackground)
-                        )
-                }
-                .disabled(isDisabled)
-                .buttonStyle(.plain)
-                .help("Choose a file")
-                .confirmationDialog(
-                    "选择导入方式",
-                    isPresented: $showsAttachmentOptions,
-                    titleVisibility: .visible
-                ) {
-                    Button("上传本地文件") {
-                        if let onRequestFileUpload {
-                            onRequestFileUpload()
+                TextField(placeholder, text: $text, axis: .vertical)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: textSize))
+                    .lineLimit(style == .hero ? 1...8 : 1...12)
+                    .focused($isFocused)
+                    .onSubmit {
+                        if showsStopButton {
+                            onStop()
                         } else {
-                            presentFilePanel()
+                            sendIfNotEmpty()
                         }
                     }
-                    Button("上传播客-自动转录") {
-                        onRequestPodcastPrompt?()
-                    }
-                    Button("取消", role: .cancel) {}
+                    .disabled(isDisabled)
+
+                if let helperText, !helperText.isEmpty {
+                    Text(helperText)
+                        .font(.system(size: helperTextSize))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(2)
+                        .padding(.top, style == .hero ? 2 : 0)
                 }
 
-                Spacer(minLength: 0)
-
-                if showsStopButton {
-                    Button(action: onStop) {
-                        Image(systemName: isStopping ? "stop.circle" : "stop.circle.fill")
-                            .font(.system(size: sendIconSize))
-                            .foregroundStyle(isStopping ? Theme.textTertiary : Theme.error)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isStopping)
-                    .help(isStopping ? "Stopping…" : "Stop current run")
-                } else {
-                    Button(action: sendIfNotEmpty) {
-                        Image(systemName: metrics.sendSymbolName)
-                            .font(.system(size: metrics.sendIconSize))
-                            .foregroundStyle(sendIconTint)
+                HStack(spacing: style == .hero ? 14 : 12) {
+                    Button(action: chooseFile) {
+                        Image(systemName: metrics.attachmentSymbolName)
+                            .font(.system(size: metrics.attachmentIconSize, weight: .regular))
+                            .foregroundStyle(attachmentTint)
                             .frame(width: metrics.actionButtonSize, height: metrics.actionButtonSize)
                             .background(
                                 Circle()
-                                    .fill(sendButtonBackground)
+                                    .fill(attachmentBackground)
                             )
                     }
+                    .disabled(isDisabled)
                     .buttonStyle(.plain)
-                    .disabled(!canSend)
+                    .help("Choose a file")
+                    .overlay(alignment: .topLeading) {
+                        if attachmentMenuState.isExpanded {
+                            ChatInputAttachmentMenuBubble(
+                                style: style,
+                                onSelect: handleAttachmentMenuSelection
+                            )
+                            .offset(x: -6, y: -attachmentMenuVerticalOffset)
+                            .transition(
+                                .asymmetric(
+                                    insertion: .scale(scale: 0.96, anchor: .bottomLeading)
+                                        .combined(with: .opacity),
+                                    removal: .opacity
+                                )
+                            )
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+
+                    if showsStopButton {
+                        Button(action: onStop) {
+                            Image(systemName: isStopping ? "stop.circle" : "stop.circle.fill")
+                                .font(.system(size: sendIconSize))
+                                .foregroundStyle(isStopping ? Theme.textTertiary : Theme.error)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isStopping)
+                        .help(isStopping ? "Stopping…" : "Stop current run")
+                    } else {
+                        Button(action: sendIfNotEmpty) {
+                            Image(systemName: metrics.sendSymbolName)
+                                .font(.system(size: metrics.sendIconSize))
+                                .foregroundStyle(sendIconTint)
+                                .frame(width: metrics.actionButtonSize, height: metrics.actionButtonSize)
+                                .background(
+                                    Circle()
+                                        .fill(sendButtonBackground)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!canSend)
+                    }
                 }
             }
+            .padding(.horizontal, metrics.horizontalPadding)
+            .padding(.vertical, metrics.verticalPadding)
+            .frame(maxWidth: .infinity, minHeight: metrics.minHeight, alignment: .topLeading)
+            .background(
+                RoundedRectangle(cornerRadius: metrics.cornerRadius)
+                    .fill(Theme.elevatedCardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: metrics.cornerRadius)
+                            .stroke(style == .hero ? Theme.border.opacity(0.8) : Theme.border.opacity(0.35), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(style == .hero ? 0.08 : 0.06), radius: style == .hero ? 16 : 4, x: 0, y: style == .hero ? 8 : 2)
+            )
+            .zIndex(1)
         }
-        .padding(.horizontal, metrics.horizontalPadding)
-        .padding(.vertical, metrics.verticalPadding)
-        .frame(maxWidth: .infinity, minHeight: metrics.minHeight, alignment: .topLeading)
-        .background(
-            RoundedRectangle(cornerRadius: metrics.cornerRadius)
-                .fill(Theme.elevatedCardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: metrics.cornerRadius)
-                        .stroke(style == .hero ? Theme.border.opacity(0.8) : Theme.border.opacity(0.35), lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(style == .hero ? 0.08 : 0.06), radius: style == .hero ? 16 : 4, x: 0, y: style == .hero ? 8 : 2)
-        )
+        .clipped()
+        .animation(.spring(response: 0.24, dampingFraction: 0.86), value: attachmentMenuState.isExpanded)
         .onAppear {
             isFocused = autofocus
         }
@@ -324,6 +363,10 @@ struct ChatInputView: View {
         metrics.sendIconSize
     }
 
+    private var attachmentMenuVerticalOffset: CGFloat {
+        style == .hero ? 110 : 102
+    }
+
     private var attachmentTint: Color {
         isDisabled ? Theme.textTertiary : Theme.textPrimary
     }
@@ -356,7 +399,20 @@ struct ChatInputView: View {
     }
 
     private func chooseFile() {
-        showsAttachmentOptions = true
+        attachmentMenuState.toggle()
+    }
+
+    private func handleAttachmentMenuSelection(_ action: ChatInputAttachmentMenuAction) {
+        switch attachmentMenuState.select(action) {
+        case .localFileUpload:
+            if let onRequestFileUpload {
+                onRequestFileUpload()
+            } else {
+                presentFilePanel()
+            }
+        case .podcastTranscription:
+            onRequestPodcastPrompt?()
+        }
     }
 
     private func presentFilePanel() {
@@ -396,5 +452,105 @@ struct ChatInputView: View {
             return URL(string: value)
         }
         return nil
+    }
+}
+
+private struct ChatInputAttachmentMenuBubble: View {
+    let style: ChatInputStyle
+    let onSelect: (ChatInputAttachmentMenuAction) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(spacing: 4) {
+                ChatInputAttachmentMenuOptionRow(
+                    icon: "doc.badge.plus",
+                    title: "上传本地文件",
+                    subtitle: "选择文档或笔记素材"
+                ) {
+                    onSelect(.localFileUpload)
+                }
+
+                Divider()
+                    .padding(.horizontal, 12)
+
+                ChatInputAttachmentMenuOptionRow(
+                    icon: "waveform.badge.mic",
+                    title: "上传播客-自动转录",
+                    subtitle: "生成可继续整理的文本"
+                ) {
+                    onSelect(.podcastTranscription)
+                }
+            }
+            .padding(.vertical, 6)
+
+            ChatInputAttachmentMenuPointer()
+                .fill(Theme.elevatedCardBackground)
+                .frame(width: 16, height: 10)
+                .overlay {
+                    ChatInputAttachmentMenuPointer()
+                        .stroke(Theme.border.opacity(0.9), lineWidth: 1)
+                }
+                .padding(.leading, style == .hero ? 18 : 16)
+                .offset(y: 0.5)
+        }
+        .frame(width: style == .hero ? 224 : 214)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Theme.elevatedCardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Theme.border.opacity(0.95), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.1), radius: style == .hero ? 18 : 12, x: 0, y: 8)
+        )
+    }
+}
+
+private struct ChatInputAttachmentMenuOptionRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 9)
+                        .fill(Theme.subtleFill)
+                    Image(systemName: icon)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Theme.textPrimary)
+                }
+                .frame(width: 34, height: 34)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(subtitle)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ChatInputAttachmentMenuPointer: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.closeSubpath()
+        return path
     }
 }

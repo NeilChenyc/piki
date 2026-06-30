@@ -99,7 +99,13 @@ struct WikiView: View {
                     .padding(.horizontal, 8)
                 }
             }
-            .frame(minWidth: 200, idealWidth: 240, maxWidth: 280)
+            .frame(
+                minWidth: 200,
+                idealWidth: DetailLayoutGuide.wikiSidebarIdealWidth,
+                maxWidth: DetailLayoutGuide.wikiSidebarMaxWidth,
+                maxHeight: .infinity,
+                alignment: .topLeading
+            )
             .background(Theme.secondaryPanelBackground)
 
             if let page = viewModel.selectedPage {
@@ -118,6 +124,7 @@ struct WikiView: View {
                 .background(Theme.primaryPanelBackground)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.primaryPanelBackground)
         .task(id: refreshTrigger) {
             guard isWikiVisible else { return }

@@ -31,6 +31,11 @@
   --max-width: 1120px;
   --radius: 10px;
   --radius-sm: 6px;
+  --radius-lg: 16px;
+
+  --color-warning: #FF9800;
+  --color-danger: #EF5350;
+  --color-success: #66BB6A;
 }
 
 html {

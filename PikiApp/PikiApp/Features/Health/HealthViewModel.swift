@@ -316,10 +316,16 @@ final class HealthViewModel {
 }
 
 struct OverviewMetric: Identifiable {
+    enum Group {
+        case pageCounts
+        case recentActivity
+    }
+
     let id: String
     let title: String
     let value: String
     let subtitle: String
+    let group: Group
 }
 
 struct VaultOverview {
@@ -335,15 +341,15 @@ struct VaultOverview {
 
     var metrics: [OverviewMetric] {
         [
-            OverviewMetric(id: "pages", title: "Wiki 页面", value: "\(totalPages)", subtitle: "当前知识页总数"),
-            OverviewMetric(id: "sources", title: "原始来源", value: "\(totalSources)", subtitle: "raw/sources 文件数"),
-            OverviewMetric(id: "sourcePages", title: "来源页", value: "\(sourcePages)", subtitle: "wiki/sources"),
-            OverviewMetric(id: "concepts", title: "概念页", value: "\(conceptPages)", subtitle: "wiki/concepts"),
-            OverviewMetric(id: "entities", title: "实体页", value: "\(entityPages)", subtitle: "wiki/entities"),
-            OverviewMetric(id: "domains", title: "领域页", value: "\(domainPages)", subtitle: "wiki/domains"),
-            OverviewMetric(id: "synthesis", title: "综合页", value: "\(synthesisPages)", subtitle: "wiki/synthesis"),
-            OverviewMetric(id: "maintenance", title: "最近维护", value: Self.displayDate(latestMaintenance), subtitle: "最近一次写入记录"),
-            OverviewMetric(id: "lint", title: "最近检查", value: Self.displayDate(latestCheck), subtitle: "最近一次 health 检查"),
+            OverviewMetric(id: "pages", title: "Wiki 页面", value: "\(totalPages)", subtitle: "当前知识页总数", group: .pageCounts),
+            OverviewMetric(id: "sources", title: "原始来源", value: "\(totalSources)", subtitle: "raw/sources 文件数", group: .pageCounts),
+            OverviewMetric(id: "sourcePages", title: "来源页", value: "\(sourcePages)", subtitle: "wiki/sources", group: .pageCounts),
+            OverviewMetric(id: "concepts", title: "概念页", value: "\(conceptPages)", subtitle: "wiki/concepts", group: .pageCounts),
+            OverviewMetric(id: "entities", title: "实体页", value: "\(entityPages)", subtitle: "wiki/entities", group: .pageCounts),
+            OverviewMetric(id: "domains", title: "领域页", value: "\(domainPages)", subtitle: "wiki/domains", group: .pageCounts),
+            OverviewMetric(id: "synthesis", title: "综合页", value: "\(synthesisPages)", subtitle: "wiki/synthesis", group: .pageCounts),
+            OverviewMetric(id: "maintenance", title: "最近维护", value: Self.displayDate(latestMaintenance), subtitle: "最近一次写入记录", group: .recentActivity),
+            OverviewMetric(id: "lint", title: "最近检查", value: Self.displayDate(latestCheck), subtitle: "最近一次 health 检查", group: .recentActivity),
         ]
     }
 

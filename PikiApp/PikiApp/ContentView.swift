@@ -8,9 +8,16 @@ struct ContentView: View {
 
         NavigationSplitView(columnVisibility: $appState.sidebarVisibility) {
             SidebarView()
-                .navigationSplitViewColumnWidth(min: 220, ideal: 220, max: 220)
+                .navigationSplitViewColumnWidth(
+                    min: DetailLayoutGuide.sidebarIdealWidth,
+                    ideal: DetailLayoutGuide.sidebarIdealWidth,
+                    max: DetailLayoutGuide.sidebarIdealWidth
+                )
         } detail: {
-            Group {
+            ZStack {
+                Theme.primaryPanelBackground
+                    .ignoresSafeArea()
+
                 switch appState.selectedTab {
                 case .home:
                     HomeView()
@@ -24,6 +31,7 @@ struct ContentView: View {
                     RuntimeSettingsView()
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Theme.primaryPanelBackground)
         }
         .background(Theme.appBackground)

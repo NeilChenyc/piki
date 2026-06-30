@@ -72,6 +72,46 @@ struct HealthLintCachingTests {
         #expect(viewModel.issueBreakdown.isEmpty == false)
     }
 
+    @Test
+    func overviewMetricsKeepPageCountsAndRecentTimestampsAsSeparateRows() async {
+        let runtime = HealthCachingRuntimeService()
+        let appState = AppState(runtimeService: runtime)
+        appState.connectionStatus = .connected
+        appState.vaultPath = makeVault()
+        appState.cacheLintResult(sampleLintResult(), receivedAt: Date())
+
+        let viewModel = HealthViewModel()
+        await viewModel.loadIfNeeded(appState: appState)
+
+        let titles = viewModel.overviewMetrics.map(\.title)
+        #expect(titles.contains("Wiki 页面"))
+        #expect(titles.contains("来源页"))
+        #expect(titles.contains("概念页"))
+        #expect(titles.contains("实体页"))
+        #expect(titles.contains("领域页"))
+        #expect(titles.contains("综合页"))
+        #expect(titles.contains("最近维护"))
+        #expect(titles.contains("最近检查"))
+    }
+
+    @Test
+    func overviewLayoutUsesTwoColumnsForCountsAndKeepsRecentActivitySeparate() async {
+        let runtime = HealthCachingRuntimeService()
+        let appState = AppState(runtimeService: runtime)
+        appState.connectionStatus = .connected
+        appState.vaultPath = makeVault()
+        appState.cacheLintResult(sampleLintResult(), receivedAt: Date())
+
+        let viewModel = HealthViewModel()
+        await viewModel.loadIfNeeded(appState: appState)
+
+        let layout = HealthOverviewLayout(metrics: viewModel.overviewMetrics)
+
+        #expect(HealthOverviewLayout.pageMetricColumnCount == 2)
+        #expect(layout.pageMetrics.count == 7)
+        #expect(layout.recentMetrics.count == 2)
+    }
+
     private func makeVault() -> URL {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

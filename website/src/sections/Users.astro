@@ -1,0 +1,70 @@
+---
+---
+<section class="section" id="users">
+  <div class="container">
+    <h2 class="text-center fade-in" style="margin-bottom: var(--space-xl)">为谁而做</h2>
+    <div class="grid-4 fade-in">
+      <div class="user-card">
+        <div class="user-card__avatar">PM</div>
+        <h3>AI 产品经理</h3>
+        <p>调研、访谈、文档自动编成可复用的产品 Wiki</p>
+      </div>
+      <div class="user-card">
+        <div class="user-card__avatar">R</div>
+        <h3>研究者 / 顾问</h3>
+        <p>来源→分析→结论的完整链路，自动维护</p>
+      </div>
+      <div class="user-card">
+        <div class="user-card__avatar">D</div>
+        <h3>独立开发者</h3>
+        <p>技术碎片编译为个人技术知识体系</p>
+      </div>
+      <div class="user-card">
+        <div class="user-card__avatar">L</div>
+        <h3>深度学习者</h3>
+        <p>跨领域阅读自生长，而非堆积成灰</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .user-card {
+    padding: var(--space-lg);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  .user-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-accent-light);
+    color: var(--color-accent-dark);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-md);
+  }
+
+  .user-card h3 {
+    font-size: 16px;
+    margin-bottom: var(--space-sm);
+  }
+
+  .user-card p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+</style>

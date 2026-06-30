@@ -5,6 +5,13 @@ struct PikiLogo: View {
         case navigation
         case hero
 
+        var assetName: String {
+            switch self {
+            case .navigation: "BrandLogo"
+            case .hero: "MainPageLogo"
+            }
+        }
+
         var height: CGFloat {
             switch self {
             case .navigation: 78.4
@@ -20,7 +27,7 @@ struct PikiLogo: View {
     }
 
     var body: some View {
-        Image("BrandLogo", bundle: brandLogoBundle)
+        Image(style.assetName, bundle: brandLogoBundle)
             .resizable()
             .scaledToFit()
             .frame(height: style.height)

@@ -1,5 +1,10 @@
 import SwiftUI
 
+enum SidebarGreetingContent {
+    static let title = "Hi"
+    static let message = "今天收获了什么？"
+}
+
 struct SidebarView: View {
     @Environment(AppState.self) private var appState
 
@@ -7,13 +12,21 @@ struct SidebarView: View {
         @Bindable var state = appState
 
         VStack(spacing: 0) {
-            HStack {
-                PikiLogo(style: .navigation)
-                Spacer()
+            VStack(alignment: .leading, spacing: 6) {
+                Text(SidebarGreetingContent.title)
+                    .font(.system(size: 28, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Theme.textPrimary)
+                    .tracking(-0.6)
+
+                Text(SidebarGreetingContent.message)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
             .padding(.top, 20)
-            .padding(.bottom, 28)
+            .padding(.bottom, 24)
 
             // Navigation items
             VStack(spacing: 4) {
@@ -48,7 +61,11 @@ struct SidebarView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
-        .frame(minWidth: 200, idealWidth: 220, maxWidth: 240)
+        .frame(
+            minWidth: DetailLayoutGuide.sidebarIdealWidth,
+            idealWidth: DetailLayoutGuide.sidebarIdealWidth,
+            maxWidth: DetailLayoutGuide.sidebarIdealWidth
+        )
         .background(Theme.secondaryPanelBackground)
     }
 

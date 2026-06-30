@@ -3,11 +3,12 @@ import Button from '../components/Button.astro';
 ---
 <section class="section section--surface" id="download">
   <div class="container text-center">
-    <h2 class="fade-in">开始构建你的个人知识库</h2>
-    <p class="cta__subtitle text-secondary fade-in">macOS 15+ · 完全免费 · 本地运行</p>
+    <h2 class="fade-in">开始构建你的 LLM Wiki</h2>
+    <p class="cta__subtitle text-secondary fade-in">macOS 15+ · Python 3.11+ · Anthropic API Key</p>
     <div class="cta__action fade-in">
-      <Button href="#">免费下载</Button>
+      <Button href="#">免费下载 macOS 版</Button>
     </div>
+    <p class="cta__note fade-in">本地运行 · 无需注册 · 无需云服务</p>
   </div>
 </section>
 
@@ -19,5 +20,11 @@ import Button from '../components/Button.astro';
 
   .cta__action {
     margin-top: var(--space-md);
+  }
+
+  .cta__note {
+    margin-top: var(--space-md);
+    font-size: 14px;
+    color: var(--color-text-tertiary);
   }
 </style>

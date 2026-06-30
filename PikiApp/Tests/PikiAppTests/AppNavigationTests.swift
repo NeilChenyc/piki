@@ -10,7 +10,7 @@ struct AppNavigationTests {
         #expect(SidebarTab.home.title == "首页")
         #expect(SidebarTab.inbox.title == "资料箱")
         #expect(SidebarTab.wiki.title == "Wiki")
-        #expect(SidebarTab.health.title == "健康")
+        #expect(SidebarTab.health.title == "知识库健康")
         #expect(SidebarTab.settings.title == "设置")
     }
 
@@ -19,6 +19,12 @@ struct AppNavigationTests {
         let appState = AppState(runtimeService: NavigationStubRuntimeService())
 
         #expect(appState.sidebarVisibility == .all)
+    }
+
+    @Test
+    func sidebarGreetingUsesWarmWelcomeCopy() {
+        #expect(SidebarGreetingContent.title == "Hi")
+        #expect(SidebarGreetingContent.message == "今天收获了什么？")
     }
 }
 

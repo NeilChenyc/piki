@@ -49,6 +49,7 @@ struct PikiApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1200, height: 800)
+        .windowResizability(.automatic)
 
         Settings {
             SettingsView()

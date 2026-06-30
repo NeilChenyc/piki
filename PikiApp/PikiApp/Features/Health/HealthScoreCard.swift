@@ -1,26 +1,114 @@
 import SwiftUI
 
-struct OverviewMetricCard: View {
+struct HealthOverviewLayout {
+    static let pageMetricColumnCount = 2
+
+    let pageMetrics: [OverviewMetric]
+    let recentMetrics: [OverviewMetric]
+
+    init(metrics: [OverviewMetric]) {
+        pageMetrics = metrics.filter { $0.group == .pageCounts }
+        recentMetrics = metrics.filter { $0.group == .recentActivity }
+    }
+}
+
+struct HealthOverviewList: View {
+    let metrics: [OverviewMetric]
+
+    private var layout: HealthOverviewLayout {
+        HealthOverviewLayout(metrics: metrics)
+    }
+
+    private let countColumns = Array(
+        repeating: GridItem(.flexible(minimum: 120, maximum: .infinity), spacing: 18, alignment: .top),
+        count: HealthOverviewLayout.pageMetricColumnCount
+    )
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 28) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("页面数量")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+
+                LazyVGrid(columns: countColumns, alignment: .leading, spacing: 10) {
+                    ForEach(layout.pageMetrics) { metric in
+                        CompactMetricTextRow(metric: metric)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+
+            if !layout.recentMetrics.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("维护节奏")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(layout.recentMetrics) { metric in
+                            MetricTextRow(metric: metric, isCompact: true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                }
+                .frame(width: 220, alignment: .topLeading)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+private struct CompactMetricTextRow: View {
     let metric: OverviewMetric
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 3) {
             Text(metric.title)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Theme.textSecondary)
 
-            Text(metric.value)
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(Theme.textPrimary)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(metric.value)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
 
-            Text(metric.subtitle)
-                .font(.system(size: 11))
-                .foregroundStyle(Theme.textTertiary)
-                .lineLimit(2)
+                Text(metric.subtitle)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
         }
-        .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
-        .padding(16)
-        .cardStyle()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 2)
+    }
+}
+
+private struct MetricTextRow: View {
+    let metric: OverviewMetric
+    var isCompact = false
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(metric.title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Theme.textPrimary)
+
+                Text(metric.subtitle)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(isCompact ? 1 : nil)
+            }
+
+            Spacer(minLength: 16)
+
+            Text(metric.value)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+        }
+        .padding(.vertical, 3)
     }
 }
 

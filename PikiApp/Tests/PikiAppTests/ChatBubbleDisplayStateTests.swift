@@ -132,6 +132,36 @@ struct ChatBubbleDisplayStateTests {
 
         #expect(state.headerStatusText == "正在分析上下文")
         #expect(!state.shouldShowTraceSummaryRow)
+        #expect(state.shouldAnimateHeaderStatusText)
+    }
+
+    @Test
+    func completedAgentRunDoesNotAnimateHeaderStatusText() {
+        let message = ChatMessage(
+            id: "assistant-4b",
+            role: .assistant,
+            content: "已完成",
+            timestamp: .now,
+            traceItems: [
+                ChatTraceItem(
+                    key: "run",
+                    kind: "agent_run",
+                    title: "正在分析上下文",
+                    summary: "读取文件中",
+                    category: "model",
+                    status: "completed"
+                )
+            ],
+            isRunning: false,
+            isTraceExpanded: false,
+            hasStartedAnswering: true,
+            isAgentRun: true,
+            runStatus: "completed"
+        )
+
+        let state = ChatBubbleDisplayState(message: message)
+
+        #expect(!state.shouldAnimateHeaderStatusText)
     }
 
     @Test

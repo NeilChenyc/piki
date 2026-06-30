@@ -1,41 +1,106 @@
 ---
-import MockupFrame from '../components/MockupFrame.astro';
-import { Image } from 'astro:assets';
-import healthPage from '../assets/mockups/health-page.png';
+import SVGVisual from '../components/SVGVisual.astro';
 ---
-<section class="section section--surface">
-  <div class="container grid-2 fade-in">
-    <div class="feature-text">
-      <h2>自动写入，但你随时能退</h2>
-      <p class="text-secondary">
-        每次 Agent 修改知识库，Piki 都记录完整变更日志。不满意？一键回退到上一个版本。
-      </p>
-      <p class="text-secondary">
-        还有自动健康检查：孤立页面、断链、重复标题，Piki 帮你维护知识库的干净整洁。
-      </p>
+<section class="section section--surface" id="baseline">
+  <div class="container grid-2">
+    <div class="feature-text fade-in">
+      <h2>维基线：不中断的结构自检</h2>
+      <p class="text-secondary">Piki 持续自动检查 Wiki 是否偏离 LLM Wiki 的结构标准。</p>
+      <ul class="feature__list">
+        <li>孤立页面 — 有页面但无链接指向它</li>
+        <li>断裂链接 — 指向不存在或已重命名的页面</li>
+        <li>缺失索引 — 新页面未被导航收录</li>
+        <li>结构偏差 — 偏离统一的格式和命名规范</li>
+      </ul>
+      <p class="text-secondary">发现即自动修复。不评分，不报警，不间断。你的 Wiki 永远在轨道上。</p>
     </div>
-    <div class="feature-visual">
-      <MockupFrame>
-        <Image src={healthPage} alt="Piki 变更日志与健康检查" />
-      </MockupFrame>
-    </div>
+    <SVGVisual alt="轨道维基线持续对齐">
+      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="f3-shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.06"/>
+          </filter>
+          <linearGradient id="f3-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.5"/>
+            <stop offset="50%" stop-color="#4CAF50" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.5"/>
+          </linearGradient>
+          <radialGradient id="f3-ambient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.05"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="f3-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.05"/>
+          </pattern>
+        </defs>
+
+        <rect width="480" height="290" fill="url(#f3-dots)"/>
+        <circle cx="240" cy="170" r="180" fill="url(#f3-ambient)"/>
+
+        <!-- Baseline track with glow -->
+        <line x1="15" y1="170" x2="465" y2="170" stroke="url(#f3-grad)" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Scanner bar -->
+        <rect class="f3-scanner" x="0" y="48" width="2" height="200" fill="#4CAF50" opacity="0.08" rx="1"/>
+
+        <!-- Nodes -->
+        <g class="f3-node f3-n1" filter="url(#f3-shadow)">
+          <circle cx="70" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="70" y="202" text-anchor="middle" font-size="9" fill="#888">架构笔记</text>
+        </g>
+        <g class="f3-node f3-n2" filter="url(#f3-shadow)">
+          <circle cx="180" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="180" y="202" text-anchor="middle" font-size="9" fill="#888">商业模式</text>
+        </g>
+
+        <g class="f3-node f3-drift1" filter="url(#f3-shadow)">
+          <circle cx="290" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="290" y="202" text-anchor="middle" font-size="9" fill="#888">历史脉络</text>
+          <circle class="f3-alert" cx="290" cy="170" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+        </g>
+
+        <g class="f3-node f3-n4" filter="url(#f3-shadow)">
+          <circle cx="400" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="400" y="202" text-anchor="middle" font-size="9" fill="#888">设计原则</text>
+        </g>
+
+        <g class="f3-node f3-drift2" filter="url(#f3-shadow)">
+          <circle cx="450" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="450" y="202" text-anchor="middle" font-size="9" fill="#888">知识索引</text>
+          <circle class="f3-alert" cx="450" cy="170" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+        </g>
+
+        <text x="450" y="278" text-anchor="end" font-size="10" fill="#bbb">LLM Wiki 结构标准</text>
+      </svg>
+    </SVGVisual>
   </div>
 </section>
 
-<style>
-  .feature-text h2 {
-    margin-bottom: var(--space-md);
-  }
+<style is:global>
+  .feature-text h2 { margin-bottom: var(--space-md); }
+  .feature-text p { font-size: 17px; line-height: 1.7; margin-bottom: var(--space-md); }
+  .feature__list { margin: var(--space-md) 0; padding-left: var(--space-lg); font-size: 15px; color: var(--color-text-secondary); line-height: 1.8; }
+  .feature__list li::marker { color: var(--color-accent); }
 
-  .feature-text p {
-    font-size: 17px;
-    line-height: 1.7;
-    margin-bottom: var(--space-md);
-  }
+  .f3-scanner { transform-box: fill-box; transform-origin: left center; }
+  .svg-visual.visible .f3-scanner { animation: f3-sweep 3.5s ease-in-out infinite; animation-delay: 1s; }
+  @keyframes f3-sweep { 0% { transform: translateX(0); } 100% { transform: translateX(480px); } }
 
-  @media (max-width: 900px) {
-    .feature-visual {
-      order: -1;
-    }
-  }
+  .f3-node { opacity: 0; transform-box: fill-box; transform-origin: center center; }
+  .svg-visual.visible .f3-n1 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.15s; }
+  .svg-visual.visible .f3-n2 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.35s; }
+  .svg-visual.visible .f3-n4 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.55s; }
+  @keyframes f3-pop { 0% { opacity: 0; transform: translateY(-12px); } 100% { opacity: 1; transform: translateY(0); } }
+
+  .svg-visual.visible .f3-drift1 { animation: f3-drift-up 6s ease-in-out infinite, f3-pop 0.45s var(--spring) forwards; animation-delay: 1.5s, 0.75s; }
+  @keyframes f3-drift-up { 0%, 12% { transform: translateY(0); } 22%, 52% { transform: translateY(-34px); } 62%, 100% { transform: translateY(0); } }
+
+  .svg-visual.visible .f3-drift2 { animation: f3-drift-down 6s ease-in-out infinite, f3-pop 0.45s var(--spring) forwards; animation-delay: 4s, 0.95s; }
+  @keyframes f3-drift-down { 0%, 40% { transform: translateY(0); } 50%, 72% { transform: translateY(34px); } 82%, 100% { transform: translateY(0); } }
+
+  .svg-visual.visible .f3-drift1 .f3-alert { animation: f3-pulse 2s ease-in-out infinite; animation-delay: 2.2s; }
+  .svg-visual.visible .f3-drift2 .f3-alert { animation: f3-pulse 2s ease-in-out infinite; animation-delay: 4.7s; }
+  @keyframes f3-pulse { 0%, 35% { opacity: 0; r: 20; } 45%, 65% { opacity: 1; r: 25; } 75%, 100% { opacity: 0; r: 20; } }
+
+  @media (max-width: 900px) { .grid-2 :global(.svg-visual) { order: -1; } }
 </style>

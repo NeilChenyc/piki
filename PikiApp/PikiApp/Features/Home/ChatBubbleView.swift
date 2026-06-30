@@ -12,6 +12,12 @@ struct ChatBubbleDisplayState {
         return currentTraceItem?.title
     }
 
+    var shouldAnimateHeaderStatusText: Bool {
+        guard message.isAgentRun, message.isRunning else { return false }
+        guard let currentTraceItem else { return false }
+        return currentTraceItem.status == "running" && !currentTraceItem.title.isEmpty
+    }
+
     var shouldShowTraceSummaryRow: Bool {
         message.role == .assistant && currentTraceItem != nil && headerStatusText == nil
     }
@@ -167,10 +173,13 @@ struct ChatBubbleView: View {
                 .foregroundStyle(Theme.textPrimary)
 
             if let headerStatusText = displayState.headerStatusText {
-                Text(headerStatusText)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.textSecondary)
-                    .lineLimit(1)
+                RunningStatusText(
+                    text: headerStatusText,
+                    isActive: displayState.shouldAnimateHeaderStatusText,
+                    font: .system(size: 12),
+                    color: Theme.textSecondary,
+                    lineLimit: 1
+                )
             } else {
                 Text(runStatusTitle)
                     .font(.system(size: 10, weight: .semibold))

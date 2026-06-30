@@ -166,7 +166,7 @@ enum SidebarTab: String, CaseIterable, Identifiable {
         case .home: "首页"
         case .inbox: "资料箱"
         case .wiki: "Wiki"
-        case .health: "健康"
+        case .health: "知识库健康"
         case .settings: "设置"
         }
     }

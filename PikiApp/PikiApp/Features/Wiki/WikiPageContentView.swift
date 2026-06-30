@@ -71,61 +71,66 @@ struct WikiPageContentView: View {
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 20) {
-                if wikiViewModel.isEditingSelectedPage && wikiViewModel.selectedPage?.id == page.id {
-                    if let editingText = wikiViewModel.editingText {
-                        WikiMarkdownEditorView(
-                            text: Binding(
-                                get: { wikiViewModel.editingText ?? editingText },
-                                set: { wikiViewModel.updateDraftForSelectedPage($0) }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    if wikiViewModel.isEditingSelectedPage && wikiViewModel.selectedPage?.id == page.id {
+                        if let editingText = wikiViewModel.editingText {
+                            WikiMarkdownEditorView(
+                                text: Binding(
+                                    get: { wikiViewModel.editingText ?? editingText },
+                                    set: { wikiViewModel.updateDraftForSelectedPage($0) }
+                                )
                             )
-                        )
-                        .padding(.horizontal, 24)
-                        .padding(.top, 24)
-                        .padding(.bottom, 24)
-                    }
-                } else {
-                    if page.content.isEmpty {
-                        Text("No content yet")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Theme.textTertiary)
-                            .padding(24)
+                            .padding(.horizontal, 24)
+                            .padding(.top, 24)
+                            .padding(.bottom, 24)
+                        }
                     } else {
-                        DocumentMarkdownView(
-                            page.content,
-                            presentationMode: .documentPage(displayTitle: page.title),
-                            baseURL: URL(fileURLWithPath: page.filePath).deletingLastPathComponent(),
-                            textScale: wikiViewModel.previewTextScale,
-                            onOpenWikiLink: openWikiLink
-                        )
-                        .padding(.horizontal, 24)
-                        .padding(.top, 24)
-                    }
+                        if page.content.isEmpty {
+                            Text("No content yet")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Theme.textTertiary)
+                                .padding(24)
+                        } else {
+                            DocumentMarkdownView(
+                                page.content,
+                                presentationMode: .documentPage(displayTitle: page.title),
+                                baseURL: URL(fileURLWithPath: page.filePath).deletingLastPathComponent(),
+                                textScale: wikiViewModel.previewTextScale,
+                                onOpenWikiLink: openWikiLink
+                            )
+                            .padding(.horizontal, 24)
+                            .padding(.top, 24)
+                        }
 
-                    if !page.relatedConcepts.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Related Concepts")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(Theme.textSecondary)
-                            FlowLayout(spacing: 6) {
-                                ForEach(page.relatedConcepts, id: \.self) { target in
-                                    WikiLinkCapsule(
-                                        target: target,
-                                        isEnabled: wikiViewModel.page(for: target) != nil,
-                                        action: {
-                                            openWikiLink(target)
-                                        }
-                                    )
+                        if !page.relatedConcepts.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Related Concepts")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(Theme.textSecondary)
+                                FlowLayout(spacing: 6) {
+                                    ForEach(page.relatedConcepts, id: \.self) { target in
+                                        WikiLinkCapsule(
+                                            target: target,
+                                            isEnabled: wikiViewModel.page(for: target) != nil,
+                                            action: {
+                                                openWikiLink(target)
+                                            }
+                                        )
+                                    }
                                 }
                             }
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 24)
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 24)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(Theme.primaryPanelBackground)
     }
 
     private func openWikiLink(_ target: WikiLinkTarget) {

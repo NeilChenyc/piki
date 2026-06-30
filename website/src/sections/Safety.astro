@@ -1,66 +1,106 @@
 ---
+import SVGVisual from '../components/SVGVisual.astro';
 ---
-<section class="section" id="safety">
-  <div class="container text-center">
-    <h2 class="fade-in">本地存储，你完全拥有</h2>
-    <p class="safety__subtitle text-secondary fade-in">数据从不离开你的电脑。随时可以用任何编辑器打开。</p>
-    <div class="safety__grid fade-in">
-      <div class="safety__item">
-        <div class="safety__icon">🔒</div>
-        <h3>纯本地 Markdown</h3>
-        <p>所有数据是本地文件夹里的 Markdown，不上传任何服务器。</p>
-      </div>
-      <div class="safety__item">
-        <div class="safety__icon">🛡️</div>
-        <h3>严格写入边界</h3>
-        <p>Agent 只能在知识库内写入，不能动你的其他文件和系统。</p>
-      </div>
-      <div class="safety__item">
-        <div class="safety__icon">📂</div>
-        <h3>随时可迁移</h3>
-        <p>不用 App 也能直接打开文件夹阅读。不锁定，不绑架。</p>
+<section class="section" id="data-sovereignty">
+  <div class="container grid-2">
+    <SVGVisual alt="本地 vs 云端数据归属对比">
+      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="s4-shadow" x="-15%" y="-15%" width="130%" height="150%">
+            <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.06"/>
+          </filter>
+          <linearGradient id="s4-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <radialGradient id="s4-amb-l" cx="25%" cy="50%" r="45%">
+            <stop offset="0%" stop-color="#EF5350" stop-opacity="0.04"/>
+            <stop offset="100%" stop-color="#EF5350" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="s4-amb-r" cx="75%" cy="50%" r="45%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.06"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="s4-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.05"/>
+          </pattern>
+        </defs>
+
+        <rect width="480" height="290" fill="url(#s4-dots)"/>
+        <circle cx="125" cy="130" r="140" fill="url(#s4-amb-l)"/>
+        <circle cx="385" cy="130" r="140" fill="url(#s4-amb-r)"/>
+
+        <!-- LEFT: Cloud locked -->
+        <g class="s4-cloud" filter="url(#s4-shadow)">
+          <path d="M 100,108 C 78,108 63,94 63,78 C 63,64 73,54 86,52 C 89,36 108,26 126,26 C 140,26 151,36 155,48 C 162,44 172,44 178,50 C 190,54 197,66 197,78 C 197,86 192,93 186,98" fill="#FFF5F5" stroke="#EF5350" stroke-width="1.5"/>
+          <rect x="118" y="64" width="14" height="12" rx="2" fill="#EF5350"/>
+          <path d="M 121,64 L 121,56 C 121,51 125,48 129,48 C 133,48 135,50 135,54" fill="none" stroke="#EF5350" stroke-width="1.5"/>
+          <rect x="90" y="84" width="26" height="18" rx="3" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.8"/>
+          <text x="103" y="96" text-anchor="middle" font-size="7" fill="#EF5350">.note</text>
+          <rect x="120" y="86" width="28" height="16" rx="3" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.8"/>
+          <text x="134" y="97" text-anchor="middle" font-size="7" fill="#EF5350">.json</text>
+          <rect x="105" y="107" width="24" height="15" rx="3" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.8"/>
+          <text x="117" y="117" text-anchor="middle" font-size="7" fill="#EF5350">.db</text>
+          <text x="125" y="178" text-anchor="middle" font-size="10" fill="#EF5350" font-weight="500">云端锁定</text>
+          <text x="125" y="194" text-anchor="middle" font-size="8" fill="#bbb">专有格式 · 账号绑定</text>
+        </g>
+
+        <!-- Center arrow -->
+        <g class="s4-arrow">
+          <path class="s4-line" d="M 200,108 L 274,108" stroke="url(#s4-grad)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <polygon points="274,103 282,108 274,113" fill="#4CAF50"/>
+        </g>
+
+        <!-- RIGHT: Local -->
+        <g class="s4-local" filter="url(#s4-shadow)">
+          <path d="M 318,95 L 318,74 C 318,67 323,60 330,60 L 358,60 C 365,60 368,67 368,74 L 371,74 L 371,95 Z" fill="#E8F5E9" stroke="url(#s4-grad)" stroke-width="1.5"/>
+          <rect x="326" y="79" width="24" height="18" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.8"/>
+          <text x="338" y="91" text-anchor="middle" font-size="7.5" fill="#2E7D32" font-weight="500">.md</text>
+          <rect x="355" y="77" width="24" height="18" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.8"/>
+          <text x="367" y="89" text-anchor="middle" font-size="7.5" fill="#2E7D32" font-weight="500">.md</text>
+          <rect x="384" y="82" width="24" height="18" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.8"/>
+          <text x="396" y="94" text-anchor="middle" font-size="7.5" fill="#2E7D32" font-weight="500">.md</text>
+          <text x="385" y="178" text-anchor="middle" font-size="10" fill="#4CAF50" font-weight="500">本地 Markdown</text>
+          <text x="385" y="194" text-anchor="middle" font-size="8" fill="#999">任何编辑器打开</text>
+        </g>
+
+        <text x="125" y="250" text-anchor="middle" font-size="9" fill="#ccc">✕ 数据被服务商持有</text>
+        <text x="385" y="250" text-anchor="middle" font-size="9" fill="#2E7D32">✓ 数据在你电脑里</text>
+      </svg>
+    </SVGVisual>
+    <div class="feature-text fade-in">
+      <h2>你的数据，你的文件</h2>
+      <p class="text-secondary">纯 Markdown 文件，存于本地文件夹。AI 仅通过 API 调用，内容不出站。</p>
+      <p class="text-secondary">不用 Piki 了？用 Obsidian、VS Code、Vim 照样打开。零锁定。</p>
+      <div class="feature__tagline">
+        <span class="feature__tag">100% 本地存储</span>
+        <span class="feature__tag">纯 Markdown</span>
+        <span class="feature__tag">零厂商锁定</span>
       </div>
     </div>
   </div>
 </section>
 
-<style>
-  .safety__subtitle {
-    font-size: 18px;
-    margin: var(--space-md) auto var(--space-xl);
-    max-width: 480px;
-  }
+<style is:global>
+  .feature-text h2 { margin-bottom: var(--space-md); }
+  .feature-text p { font-size: 17px; line-height: 1.7; margin-bottom: var(--space-md); }
+  .feature__tagline { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
+  .feature__tag { font-size: 12px; color: var(--color-accent-dark); background: var(--color-accent-light); padding: 4px 10px; border-radius: 20px; font-weight: 500; }
 
-  .safety__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-lg);
-    text-align: center;
-  }
+  .s4-cloud, .s4-local, .s4-arrow { transform-box: fill-box; transform-origin: center center; }
 
-  .safety__item {
-    padding: var(--space-lg);
-  }
+  .s4-cloud { opacity: 0; }
+  .svg-visual.visible .s4-cloud { animation: s4-in 0.6s ease-out forwards; animation-delay: 0.1s; }
+  @keyframes s4-in { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-  .safety__icon {
-    font-size: 32px;
-    margin-bottom: var(--space-md);
-  }
+  .s4-local { opacity: 0; }
+  .svg-visual.visible .s4-local { animation: s4-in 0.6s ease-out forwards; animation-delay: 0.5s; }
 
-  .safety__item h3 {
-    font-size: 17px;
-    margin-bottom: var(--space-sm);
-  }
+  .s4-line { stroke-dasharray: 74; stroke-dashoffset: 74; }
+  .s4-arrow { opacity: 0; }
+  .svg-visual.visible .s4-arrow { animation: s4-in 0.4s ease-out forwards; animation-delay: 1.0s; }
+  .svg-visual.visible .s4-line { animation: s4-draw 0.45s ease-out forwards; animation-delay: 1.0s; }
+  @keyframes s4-draw { to { stroke-dashoffset: 0; } }
 
-  .safety__item p {
-    font-size: 15px;
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-  }
-
-  @media (max-width: 600px) {
-    .safety__grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  .svg-visual.visible .s4-local path:first-child { animation: s4-breathe 3s ease-in-out infinite; animation-delay: 1.5s; }
+  @keyframes s4-breathe { 0%, 100% { fill: #E8F5E9; } 50% { fill: #C8E6C9; } }
 </style>

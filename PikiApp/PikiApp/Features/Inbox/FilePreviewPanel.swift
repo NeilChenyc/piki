@@ -12,64 +12,16 @@ struct FilePreviewPanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.fileName)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Theme.textPrimary)
-                    HStack(spacing: 8) {
-                        Text(item.directoryCategory.title)
-                            .font(.system(size: 10, weight: .bold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .foregroundStyle(Theme.textSecondary)
-                            .background(Theme.primaryPanelBackground)
-                            .clipShape(.capsule)
-                        Text(item.fileType.rawValue.uppercased())
-                            .font(.system(size: 10, weight: .bold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .foregroundStyle(item.fileType.color)
-                            .background(item.fileType.color.opacity(0.1))
-                            .clipShape(.capsule)
-                        Text(item.fileSize)
-                            .font(.system(size: 11))
-                            .foregroundStyle(Theme.textTertiary)
-                    }
-                }
-                Spacer()
-            }
+            header
 
             Divider()
 
-            Group {
-                if previewKind == .pdf, let pdfURL {
-                    PDFPreviewView(url: pdfURL)
-                } else if previewText.isEmpty {
-                    Text("正在加载...")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.textTertiary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else if previewKind == .markdown {
-                    DocumentMarkdownView(
-                        previewText,
-                        presentationMode: .documentPage(displayTitle: nil),
-                        baseURL: previewBaseURL
-                    )
-                } else {
-                    ScrollView {
-                        Text(previewText)
-                            .font(.system(size: 12))
-                            .foregroundStyle(Theme.textPrimary)
-                            .lineSpacing(3)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
-                    }
-                }
-            }
+            previewBody
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .layoutPriority(1)
+            .clipped()
 
-            Spacer()
+            Divider()
 
             HStack(spacing: 12) {
                 Button("摄入", action: onIngest)
@@ -80,10 +32,75 @@ struct FilePreviewPanel: View {
                     .disabled(!item.canClear)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(16)
         .background(Theme.secondaryPanelBackground)
         .task(id: item.id) {
             await loadPreview()
+        }
+    }
+
+    private var header: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.fileName)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                HStack(spacing: 8) {
+                    Text(item.directoryCategory.title)
+                        .font(.system(size: 10, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .foregroundStyle(Theme.textSecondary)
+                        .background(Theme.primaryPanelBackground)
+                        .clipShape(.capsule)
+                    Text(item.fileType.rawValue.uppercased())
+                        .font(.system(size: 10, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .foregroundStyle(item.fileType.color)
+                        .background(item.fileType.color.opacity(0.1))
+                        .clipShape(.capsule)
+                    Text(item.fileSize)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+            }
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var previewBody: some View {
+        if previewKind == .pdf, let pdfURL {
+            PDFPreviewView(url: pdfURL)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else if previewText.isEmpty {
+            Text("正在加载...")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.textTertiary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else if previewKind == .markdown {
+            ScrollView {
+                DocumentMarkdownView(
+                    previewText,
+                    presentationMode: .documentPage(displayTitle: nil),
+                    baseURL: previewBaseURL
+                )
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(.trailing, 4)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else {
+            ScrollView {
+                Text(previewText)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineSpacing(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
 
@@ -136,9 +153,17 @@ struct PDFPreviewView: NSViewRepresentable {
     }
 
     func updateNSView(_ pdfView: PDFView, context: Context) {
-        if let document = PDFDocument(url: url) {
-            pdfView.document = document
-        }
+        guard context.coordinator.loadedURL != url else { return }
+        context.coordinator.loadedURL = url
+        pdfView.document = PDFDocument(url: url)
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    final class Coordinator {
+        var loadedURL: URL?
     }
 }
 

@@ -1,41 +1,110 @@
 ---
-import MockupFrame from '../components/MockupFrame.astro';
-import { Image } from 'astro:assets';
-import homepage from '../assets/mockups/homepage.png';
+import SVGVisual from '../components/SVGVisual.astro';
 ---
-<section class="section section--surface" id="features">
-  <div class="container grid-2 fade-in">
-    <div class="feature-text">
-      <h2>一切从一句话开始</h2>
-      <p class="text-secondary">
-        不区分"查询"和"写入"。直接说你要做的事——导入资料、整理判断、追问上下文——Agent 自己判断该怎么处理。
-      </p>
-      <p class="text-secondary">
-        你也可以直接拖入文件，Piki 自动识别内容类型并归入合适的位置。
-      </p>
+<section class="section section--surface" id="unified-entry">
+  <div class="container grid-2">
+    <div class="feature-text fade-in">
+      <h2>一个入口，说完就等结果</h2>
+      <p class="text-secondary">不区分查询和编辑。说你要什么，Agent 自己判断执行。</p>
+      <blockquote class="feature__quote">"帮我把最近读的几本思维方法论的书，提取出可复用的框架和模型。"</blockquote>
+      <p class="text-secondary">你也可以直接拖入文件，Agent 自动识别内容类型并归入合适位置。</p>
     </div>
-    <div class="feature-visual">
-      <MockupFrame>
-        <Image src={homepage} alt="Piki 统一输入界面" />
-      </MockupFrame>
-    </div>
+    <SVGVisual alt="一句话到多点自动操作">
+      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="f1-shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.06"/>
+          </filter>
+          <filter id="f1-glow">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <linearGradient id="f1-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <radialGradient id="f1-ambient" cx="50%" cy="30%" r="55%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.05"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="f1-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.05"/>
+          </pattern>
+        </defs>
+
+        <rect width="480" height="290" fill="url(#f1-dots)"/>
+        <circle cx="240" cy="100" r="170" fill="url(#f1-ambient)"/>
+
+        <!-- Chat bubble -->
+        <g class="f1-bubble" filter="url(#f1-glow)">
+          <rect x="105" y="16" width="270" height="48" rx="14" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.5"/>
+          <text x="240" y="46" text-anchor="middle" font-size="12" fill="#2E7D32" font-weight="500">提取读书笔记中的方法论框架</text>
+          <polygon points="220,64 240,82 260,64" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.5"/>
+        </g>
+
+        <!-- Branch 1 -->
+        <g class="f1-br">
+          <path class="f1-path" d="M 155,82 C 155,108 80,118 80,148" fill="none" stroke="url(#f1-grad)" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="36" y="148" width="88" height="56" rx="9" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#f1-shadow)"/>
+          <circle cx="60" cy="164" r="7" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1"/>
+          <text x="80" y="168" font-size="10" fill="#333" font-weight="500">搜索已有</text>
+          <text x="80" y="186" font-size="9" fill="#999">匹配过往笔记</text>
+        </g>
+
+        <!-- Branch 2 -->
+        <g class="f1-br">
+          <path class="f1-path" d="M 195,84 C 195,114 168,130 168,208" fill="none" stroke="url(#f1-grad)" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="120" y="208" width="96" height="56" rx="9" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#f1-shadow)"/>
+          <circle cx="144" cy="224" r="7" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1"/>
+          <text x="168" y="228" font-size="10" fill="#333" font-weight="500">提取框架</text>
+          <text x="168" y="246" font-size="9" fill="#999">写入 concepts/</text>
+        </g>
+
+        <!-- Branch 3 -->
+        <g class="f1-br">
+          <path class="f1-path" d="M 285,84 C 285,114 312,130 312,208" fill="none" stroke="url(#f1-grad)" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="264" y="208" width="96" height="56" rx="9" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#f1-shadow)"/>
+          <circle cx="288" cy="224" r="7" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1"/>
+          <text x="312" y="228" font-size="10" fill="#333" font-weight="500">关联概念</text>
+          <text x="312" y="246" font-size="9" fill="#999">建立双向链接</text>
+        </g>
+
+        <!-- Branch 4 -->
+        <g class="f1-br">
+          <path class="f1-path" d="M 325,82 C 325,108 395,118 395,148" fill="none" stroke="url(#f1-grad)" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="350" y="148" width="90" height="56" rx="9" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#f1-shadow)"/>
+          <circle cx="374" cy="164" r="7" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1"/>
+          <text x="395" y="168" font-size="10" fill="#333" font-weight="500">更新索引</text>
+          <text x="395" y="186" font-size="9" fill="#999">维护 Wiki 结构</text>
+        </g>
+      </svg>
+    </SVGVisual>
   </div>
 </section>
 
-<style>
-  .feature-text h2 {
-    margin-bottom: var(--space-md);
-  }
+<style is:global>
+  .feature-text h2 { margin-bottom: var(--space-md); }
+  .feature-text p { font-size: 17px; line-height: 1.7; margin-bottom: var(--space-md); }
+  .feature__quote { margin: var(--space-md) 0; padding: var(--space-sm) var(--space-md); border-left: 3px solid var(--color-accent); background: var(--color-accent-light); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 15px; color: var(--color-accent-dark); font-style: italic; }
 
-  .feature-text p {
-    font-size: 17px;
-    line-height: 1.7;
-    margin-bottom: var(--space-md);
-  }
+  .f1-bubble, .f1-br { transform-box: fill-box; transform-origin: center center; }
+  .f1-path { stroke-dasharray: 130; stroke-dashoffset: 130; }
 
-  @media (max-width: 900px) {
-    .feature-visual {
-      order: -1;
-    }
-  }
+  .f1-bubble { opacity: 0; }
+  .svg-visual.visible .f1-bubble { animation: f1-up 0.5s var(--spring) forwards; animation-delay: 0.1s; }
+  @keyframes f1-up { 0% { opacity: 0; transform: translateY(-12px); } 100% { opacity: 1; transform: translateY(0); } }
+
+  .f1-br { opacity: 0; }
+  .svg-visual.visible .f1-br:nth-child(3) { animation: f1-show 0.5s ease-out forwards; animation-delay: 0.5s; }
+  .svg-visual.visible .f1-br:nth-child(4) { animation: f1-show 0.5s ease-out forwards; animation-delay: 0.7s; }
+  .svg-visual.visible .f1-br:nth-child(5) { animation: f1-show 0.5s ease-out forwards; animation-delay: 0.9s; }
+  .svg-visual.visible .f1-br:nth-child(6) { animation: f1-show 0.5s ease-out forwards; animation-delay: 1.1s; }
+  @keyframes f1-show { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 1; } }
+
+  .svg-visual.visible .f1-br:nth-child(3) .f1-path { animation: f1-draw 0.4s ease-out forwards; animation-delay: 0.55s; }
+  .svg-visual.visible .f1-br:nth-child(4) .f1-path { animation: f1-draw 0.4s ease-out forwards; animation-delay: 0.75s; }
+  .svg-visual.visible .f1-br:nth-child(5) .f1-path { animation: f1-draw 0.4s ease-out forwards; animation-delay: 0.95s; }
+  .svg-visual.visible .f1-br:nth-child(6) .f1-path { animation: f1-draw 0.4s ease-out forwards; animation-delay: 1.15s; }
+  @keyframes f1-draw { to { stroke-dashoffset: 0; } }
+
+  @media (max-width: 900px) { .grid-2 :global(.svg-visual) { order: -1; } }
 </style>

@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     '/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiRuntimeHost'
-relocations:     []
-...

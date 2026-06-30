@@ -1,0 +1,25 @@
+---
+export interface Props {
+  alt?: string;
+}
+
+const { alt = "" } = Astro.props;
+---
+
+<div class="svg-visual fade-in" role="img" aria-label={alt}>
+  <slot />
+</div>
+
+<style is:global>
+  .svg-visual {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .svg-visual svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>

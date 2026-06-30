@@ -1,0 +1,156 @@
+---
+import SVGVisual from '../components/SVGVisual.astro';
+---
+<section class="section section--surface" id="philosophy">
+  <div class="container grid-2">
+    <div class="phil-text fade-in">
+      <h2>知识库不该由你来维护</h2>
+      <p class="text-secondary">传统 Wiki 靠人维护：命名、分类、格式、链接、索引——维护成本最终超过使用价值。</p>
+      <p class="text-secondary">LLM Wiki 靠 AI 维护：你只负责输入，AI 负责让一切保持有序。</p>
+      <div class="phil__points">
+        <div class="phil__point"><span class="phil__dot"></span><span><strong>持久有序</strong> — AI 以统一格式持续维护，不随时间退化</span></div>
+        <div class="phil__point"><span class="phil__dot"></span><span><strong>由点成面</strong> — 碎片知识被 AI 自动发现关联、建立链接、聚合为网络</span></div>
+      </div>
+    </div>
+    <SVGVisual alt="传统笔记 vs LLM Wiki 对比">
+      <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="p-card-shadow" x="-10%" y="-10%" width="130%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.07"/>
+          </filter>
+          <filter id="p-node-shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#4CAF50" flood-opacity="0.1"/>
+          </filter>
+          <linearGradient id="p-accent" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <radialGradient id="p-glow-l" cx="35%" cy="50%" r="45%">
+            <stop offset="0%" stop-color="#FFF9C4" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#FFF9C4" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="p-glow-r" cx="65%" cy="50%" r="45%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.05"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="p-dots" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="12" cy="12" r="0.7" fill="#4CAF50" opacity="0.05"/>
+          </pattern>
+        </defs>
+
+        <!-- Background -->
+        <rect width="480" height="300" fill="url(#p-dots)"/>
+        <circle cx="120" cy="150" r="160" fill="url(#p-glow-l)"/>
+        <circle cx="360" cy="150" r="160" fill="url(#p-glow-r)"/>
+        <line x1="240" y1="24" x2="240" y2="280" stroke="#e8e8e8" stroke-width="1" stroke-dasharray="6,4"/>
+
+        <!-- LEFT: Traditional -->
+        <text x="120" y="22" text-anchor="middle" font-size="10" fill="#aaa" font-weight="500">传统笔记 — 你手动维护</text>
+
+        <g class="p-s" filter="url(#p-card-shadow)">
+          <rect x="30" y="42" width="86" height="50" rx="4" fill="#FFFDE7" stroke="#E0D89C" stroke-width="0.8"/>
+          <text x="73" y="60" text-anchor="middle" font-size="9" fill="#888">分布式系统笔记</text>
+          <text x="73" y="78" text-anchor="middle" font-size="8" fill="#bbb">未分类</text>
+        </g>
+        <g class="p-s" filter="url(#p-card-shadow)">
+          <rect x="128" y="36" width="72" height="44" rx="4" fill="#FFFDE7" stroke="#E0D89C" stroke-width="0.8"/>
+          <text x="164" y="54" text-anchor="middle" font-size="9" fill="#888">商业模式画布</text>
+          <text x="164" y="70" text-anchor="middle" font-size="8" fill="#bbb">标签混乱</text>
+        </g>
+        <g class="p-s" filter="url(#p-card-shadow)">
+          <rect x="26" y="114" width="74" height="44" rx="4" fill="#E3F2FD" stroke="#BBDEFB" stroke-width="0.8"/>
+          <text x="63" y="132" text-anchor="middle" font-size="9" fill="#888">罗马帝国研究</text>
+          <text x="63" y="148" text-anchor="middle" font-size="8" fill="#bbb">待归类</text>
+        </g>
+        <g class="p-s" filter="url(#p-card-shadow)">
+          <rect x="112" y="108" width="72" height="48" rx="4" fill="#FFFDE7" stroke="#E0D89C" stroke-width="0.8"/>
+          <text x="148" y="126" text-anchor="middle" font-size="9" fill="#888">设计原则</text>
+          <text x="148" y="144" text-anchor="middle" font-size="8" fill="#bbb">格式不一</text>
+        </g>
+        <g class="p-s" filter="url(#p-card-shadow)">
+          <rect x="148" y="168" width="68" height="40" rx="4" fill="#E8F5E9" stroke="#C8E6C9" stroke-width="0.8"/>
+          <text x="182" y="186" text-anchor="middle" font-size="9" fill="#888">投资方法论</text>
+          <text x="182" y="202" text-anchor="middle" font-size="8" fill="#bbb">根目录</text>
+        </g>
+        <g class="p-s" filter="url(#p-card-shadow)">
+          <rect x="30" y="180" width="76" height="46" rx="4" fill="#FFFDE7" stroke="#E0D89C" stroke-width="0.8"/>
+          <text x="68" y="198" text-anchor="middle" font-size="9" fill="#888">叙事结构分析</text>
+          <text x="68" y="216" text-anchor="middle" font-size="8" fill="#bbb">无链接指向</text>
+        </g>
+
+        <g class="p-bad"><text x="120" y="280" text-anchor="middle" font-size="9" fill="#EF5350">✕ 分散 · 断裂 · 无法检索</text></g>
+
+        <!-- RIGHT: LLM Wiki -->
+        <text x="360" y="22" text-anchor="middle" font-size="10" fill="#4CAF50" font-weight="500">LLM Wiki — AI 持续维护</text>
+
+        <g class="p-w" filter="url(#p-node-shadow)">
+          <rect x="275" y="44" width="132" height="42" rx="8" fill="white" stroke="url(#p-accent)" stroke-width="1.5"/>
+          <text x="341" y="60" text-anchor="middle" font-size="10" fill="#333">分布式架构设计</text>
+          <text x="341" y="77" text-anchor="middle" font-size="8" fill="#999">wiki/tech/</text>
+        </g>
+        <g class="p-w" filter="url(#p-node-shadow)">
+          <rect x="275" y="104" width="132" height="42" rx="8" fill="white" stroke="url(#p-accent)" stroke-width="1.5"/>
+          <text x="341" y="120" text-anchor="middle" font-size="10" fill="#333">商业模式分析</text>
+          <text x="341" y="137" text-anchor="middle" font-size="8" fill="#999">wiki/business/</text>
+        </g>
+        <g class="p-w" filter="url(#p-node-shadow)">
+          <rect x="275" y="164" width="132" height="42" rx="8" fill="white" stroke="url(#p-accent)" stroke-width="1.5"/>
+          <text x="341" y="180" text-anchor="middle" font-size="10" fill="#333">罗马帝国兴衰</text>
+          <text x="341" y="197" text-anchor="middle" font-size="8" fill="#999">wiki/history/</text>
+        </g>
+        <g class="p-w" filter="url(#p-node-shadow)">
+          <rect x="275" y="224" width="132" height="42" rx="8" fill="white" stroke="url(#p-accent)" stroke-width="1.5"/>
+          <text x="341" y="240" text-anchor="middle" font-size="10" fill="#333">设计系统参考</text>
+          <text x="341" y="257" text-anchor="middle" font-size="8" fill="#999">wiki/design/</text>
+        </g>
+
+        <!-- Edges -->
+        <g class="p-e"><line x1="341" y1="86" x2="341" y2="104" stroke="url(#p-accent)" stroke-width="1.5" stroke-dasharray="18" stroke-dashoffset="18" stroke-linecap="round"/></g>
+        <g class="p-e"><line x1="341" y1="146" x2="341" y2="164" stroke="url(#p-accent)" stroke-width="1.5" stroke-dasharray="18" stroke-dashoffset="18" stroke-linecap="round"/></g>
+        <g class="p-e"><line x1="341" y1="206" x2="341" y2="224" stroke="url(#p-accent)" stroke-width="1.5" stroke-dasharray="18" stroke-dashoffset="18" stroke-linecap="round"/></g>
+
+        <g class="p-good"><text x="341" y="294" text-anchor="middle" font-size="9" fill="#4CAF50">✓ 统一 · 自链接 · 随时可检索</text></g>
+      </svg>
+    </SVGVisual>
+  </div>
+</section>
+
+<style is:global>
+  .phil-text h2 { margin-bottom: var(--space-md); }
+  .phil-text p { font-size: 17px; line-height: 1.7; margin-bottom: var(--space-md); }
+  .phil__points { margin-top: var(--space-md); display: flex; flex-direction: column; gap: var(--space-sm); }
+  .phil__point { display: flex; align-items: flex-start; gap: var(--space-sm); font-size: 15px; color: var(--color-text-secondary); }
+  .phil__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); margin-top: 6px; flex-shrink: 0; }
+
+  .p-s, .p-bad, .p-w, .p-e, .p-good { transform-box: fill-box; transform-origin: center center; }
+
+  .p-s { opacity: 0; }
+  .svg-visual.visible .p-s:nth-of-type(1) { animation: ps-in 0.4s var(--spring) forwards; animation-delay: 0.05s; }
+  .svg-visual.visible .p-s:nth-of-type(2) { animation: ps-in 0.4s var(--spring) forwards; animation-delay: 0.15s; }
+  .svg-visual.visible .p-s:nth-of-type(3) { animation: ps-in 0.4s var(--spring) forwards; animation-delay: 0.25s; }
+  .svg-visual.visible .p-s:nth-of-type(4) { animation: ps-in 0.4s var(--spring) forwards; animation-delay: 0.35s; }
+  .svg-visual.visible .p-s:nth-of-type(5) { animation: ps-in 0.4s var(--spring) forwards; animation-delay: 0.45s; }
+  .svg-visual.visible .p-s:nth-of-type(6) { animation: ps-in 0.4s var(--spring) forwards; animation-delay: 0.55s; }
+  @keyframes ps-in { 0% { opacity: 0; transform: translateY(-8px) rotate(-2deg); } 100% { opacity: 1; transform: translateY(0) rotate(0deg); } }
+
+  .p-bad { opacity: 0; }
+  .svg-visual.visible .p-bad { animation: ps-fade 0.5s ease-out forwards; animation-delay: 1.3s; }
+  @keyframes ps-fade { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+  .p-w { opacity: 0; }
+  .svg-visual.visible .p-w:nth-of-type(1) { animation: pw-in 0.5s var(--spring) forwards; animation-delay: 0.8s; }
+  .svg-visual.visible .p-w:nth-of-type(2) { animation: pw-in 0.5s var(--spring) forwards; animation-delay: 1.0s; }
+  .svg-visual.visible .p-w:nth-of-type(3) { animation: pw-in 0.5s var(--spring) forwards; animation-delay: 1.2s; }
+  .svg-visual.visible .p-w:nth-of-type(4) { animation: pw-in 0.5s var(--spring) forwards; animation-delay: 1.4s; }
+  @keyframes pw-in { 0% { opacity: 0; transform: translateX(14px); } 100% { opacity: 1; transform: translateX(0); } }
+
+  .p-e { opacity: 0; }
+  .svg-visual.visible .p-e:nth-of-type(1) { animation: pe-draw 0.3s ease-out forwards; animation-delay: 1.25s; }
+  .svg-visual.visible .p-e:nth-of-type(2) { animation: pe-draw 0.3s ease-out forwards; animation-delay: 1.5s; }
+  .svg-visual.visible .p-e:nth-of-type(3) { animation: pe-draw 0.3s ease-out forwards; animation-delay: 1.75s; }
+  @keyframes pe-draw { 0% { opacity: 1; stroke-dashoffset: 18; } 100% { stroke-dashoffset: 0; } }
+
+  .p-good { opacity: 0; }
+  .svg-visual.visible .p-good { animation: ps-fade 0.5s ease-out forwards; animation-delay: 2.2s; }
+
+  @media (max-width: 900px) { .phil-text { order: 0; } }
+</style>

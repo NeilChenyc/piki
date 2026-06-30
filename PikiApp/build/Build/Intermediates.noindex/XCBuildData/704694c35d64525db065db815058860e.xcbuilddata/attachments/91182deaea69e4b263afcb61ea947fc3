@@ -1,7 +1,0 @@
-#!/bin/sh
-set -euo pipefail
-HOST_PRODUCT_PATH="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost"
-cp -f "${BUILT_PRODUCTS_DIR}/PikiRuntimeHost" "$HOST_PRODUCT_PATH"
-chmod +x "$HOST_PRODUCT_PATH"
-codesign --force --sign - --timestamp=none "$HOST_PRODUCT_PATH"
-

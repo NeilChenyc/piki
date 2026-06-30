@@ -1,2 +1,0 @@
-Target dependency graph (1 target)
-Target 'PikiRuntimeHost' in project 'PikiApp' (no dependencies)

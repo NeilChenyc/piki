@@ -70,6 +70,36 @@ struct HomeDisplayStateTests {
         #expect(state.emptyStateHint == "需要你补充更多信息")
         #expect(state.inputHint == "需要你补充更多信息")
     }
+
+    @Test
+    func runningConversationStatusEnablesAnimatedStatusText() {
+        let appState = AppState(runtimeService: HomeDisplayRuntimeService())
+        appState.connectionStatus = .connected
+        appState.vaultPath = URL(fileURLWithPath: "/tmp/vault", isDirectory: true)
+
+        let viewModel = HomeViewModel()
+        viewModel.isSending = true
+        viewModel.statusText = "正在生成回答"
+
+        let state = HomeViewDisplayState(appState: appState, viewModel: viewModel)
+
+        #expect(state.shouldAnimateStatusText)
+    }
+
+    @Test
+    func nonRunningStatusDoesNotAnimateStatusText() {
+        let appState = AppState(runtimeService: HomeDisplayRuntimeService())
+        appState.connectionStatus = .connected
+        appState.vaultPath = URL(fileURLWithPath: "/tmp/vault", isDirectory: true)
+
+        let viewModel = HomeViewModel()
+        viewModel.isSending = false
+        viewModel.statusText = "已完成"
+
+        let state = HomeViewDisplayState(appState: appState, viewModel: viewModel)
+
+        #expect(!state.shouldAnimateStatusText)
+    }
 }
 
 private enum HomeDisplayStateTestError: Error {
