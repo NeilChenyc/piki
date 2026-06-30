@@ -5,38 +5,61 @@ import UniformTypeIdentifiers
 @MainActor
 final class InboxViewModel {
     var items: [InboxItem] = []
-    var selectedFilter: InboxFilter = .all
+    var selectedDirectoryFilter: InboxDirectoryFilter = .all
+    var selectedFileTypeFilter: InboxFileTypeFilter = .all
     var selectedItem: InboxItem?
     var errorMessage: String?
     var statusMessage: String?
     var isLoading = false
+    var searchQuery: String = ""
 
     private var loadedVaultPath: String?
 
     var filteredItems: [InboxItem] {
-        switch selectedFilter {
+        let filterByDirectory: [InboxItem] = switch selectedDirectoryFilter {
         case .all: items
-        case .new: items.filter { $0.status == .new }
-        case .processing: items.filter { $0.status == .processing }
-        case .completed: items.filter { $0.status == .completed }
-        case .failed: items.filter { $0.status == .failed }
+        case .staging, .source, .asset:
+            items.filter { $0.directoryCategory == selectedDirectoryFilter.directoryCategory }
+        }
+
+        let filterByType: [InboxItem] = switch selectedFileTypeFilter {
+        case .all: filterByDirectory
+        case .pdf, .markdown, .docx, .text, .other:
+            filterByDirectory.filter { $0.fileType == selectedFileTypeFilter.fileType }
+        }
+
+        if searchQuery.isEmpty {
+            return filterByType
+        }
+
+        return filterByType.filter { item in
+            item.fileName.localizedCaseInsensitiveContains(searchQuery)
         }
     }
 
-    var filterCounts: [InboxFilter: Int] {
+    var directoryCounts: [InboxDirectoryFilter: Int] {
         [
             .all: items.count,
-            .new: items.filter { $0.status == .new }.count,
-            .processing: items.filter { $0.status == .processing }.count,
-            .completed: items.filter { $0.status == .completed }.count,
-            .failed: items.filter { $0.status == .failed }.count,
+            .staging: items.filter { $0.directoryCategory == .staging }.count,
+            .source: items.filter { $0.directoryCategory == .source }.count,
+            .asset: items.filter { $0.directoryCategory == .asset }.count,
+        ]
+    }
+
+    var fileTypeCounts: [InboxFileTypeFilter: Int] {
+        [
+            .all: items.count,
+            .pdf: items.filter { $0.fileType == .pdf }.count,
+            .markdown: items.filter { $0.fileType == .markdown }.count,
+            .docx: items.filter { $0.fileType == .docx }.count,
+            .text: items.filter { $0.fileType == .text }.count,
+            .other: items.filter { $0.fileType == .other }.count,
         ]
     }
 
     func handleFileDrop(_ urls: [URL], appState: AppState) {
         guard let first = urls.first else { return }
-        addDroppedItems([first])
-        selectedItem = items.last
+        importFiles([first], appState: appState)
     }
 
     func chooseFiles(appState: AppState) {
@@ -46,8 +69,75 @@ final class InboxViewModel {
         panel.allowsMultipleSelection = false
         panel.allowedContentTypes = [.pdf, .plainText, .init(filenameExtension: "md")!, .init(filenameExtension: "markdown")!, .init(filenameExtension: "docx")!]
         if panel.runModal() == .OK, let url = panel.url {
-            addDroppedItems([url])
-            selectedItem = items.last
+            importFiles([url], appState: appState)
+        }
+    }
+
+    private func importFiles(_ urls: [URL], appState: AppState) {
+        guard let vaultURL = appState.vaultPath else {
+            errorMessage = "未选择知识库。"
+            return
+        }
+
+        statusMessage = "正在导入文件..."
+        errorMessage = nil
+
+        do {
+            let importedItems = try urls.map { url in
+                let copiedURL = try Self.copyIntoRawInbox(sourceURL: url, vaultURL: vaultURL)
+                return InboxItem(
+                    id: copiedURL.path(percentEncoded: false),
+                    fileName: copiedURL.lastPathComponent,
+                    fileType: InboxItem.fileType(for: copiedURL),
+                    fileSize: InboxItem.fileSize(at: copiedURL),
+                    directoryCategory: .staging,
+                    status: .new,
+                    addedAt: Date(),
+                    filePath: copiedURL
+                )
+            }
+            items.append(contentsOf: importedItems)
+            items.sort { $0.addedAt > $1.addedAt }
+            selectedItem = importedItems.last ?? items.first
+            statusMessage = "已导入到 raw/inbox"
+        } catch {
+            errorMessage = "导入失败: \(error.localizedDescription)"
+            statusMessage = nil
+        }
+    }
+
+    private nonisolated static func copyIntoRawInbox(sourceURL: URL, vaultURL: URL) throws -> URL {
+        let fileManager = FileManager.default
+        let inboxURL = vaultURL.appendingPathComponent("raw/inbox", isDirectory: true)
+        try fileManager.createDirectory(at: inboxURL, withIntermediateDirectories: true)
+
+        let destinationURL = uniqueInboxDestination(for: sourceURL.lastPathComponent, inboxURL: inboxURL)
+        if fileManager.fileExists(atPath: destinationURL.path) {
+            try fileManager.removeItem(at: destinationURL)
+        }
+        try fileManager.copyItem(at: sourceURL, to: destinationURL)
+        return destinationURL
+    }
+
+    private nonisolated static func uniqueInboxDestination(for fileName: String, inboxURL: URL) -> URL {
+        let candidateURL = inboxURL.appendingPathComponent(fileName)
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: candidateURL.path) else {
+            return candidateURL
+        }
+
+        let sourceURL = URL(fileURLWithPath: fileName)
+        let stem = sourceURL.deletingPathExtension().lastPathComponent
+        let ext = sourceURL.pathExtension
+
+        var index = 2
+        while true {
+            let suffix = ext.isEmpty ? "\(stem)-\(index)" : "\(stem)-\(index).\(ext)"
+            let dedupedURL = inboxURL.appendingPathComponent(suffix)
+            if !fileManager.fileExists(atPath: dedupedURL.path) {
+                return dedupedURL
+            }
+            index += 1
         }
     }
 
@@ -58,6 +148,7 @@ final class InboxViewModel {
                 fileName: url.lastPathComponent,
                 fileType: InboxItem.fileType(for: url),
                 fileSize: InboxItem.fileSize(at: url),
+                directoryCategory: .staging,
                 status: .new,
                 addedAt: Date(),
                 filePath: url
@@ -75,7 +166,7 @@ final class InboxViewModel {
 
     func loadVaultInbox(vaultURL: URL?) async {
         guard let vaultURL else {
-            errorMessage = "No vault selected."
+            errorMessage = "未选择知识库。"
             return
         }
 
@@ -101,28 +192,39 @@ final class InboxViewModel {
     private nonisolated static func scanDirectories(vaultURL: URL) -> [InboxItem] {
         let fileManager = FileManager.default
         let directories = [
-            vaultURL.appendingPathComponent("raw/inbox", isDirectory: true),
-            vaultURL.appendingPathComponent("raw/sources", isDirectory: true),
+            ScannedDirectory(
+                category: .staging,
+                url: vaultURL.appendingPathComponent("raw/inbox", isDirectory: true)
+            ),
+            ScannedDirectory(
+                category: .source,
+                url: vaultURL.appendingPathComponent("raw/sources", isDirectory: true)
+            ),
+            ScannedDirectory(
+                category: .asset,
+                url: vaultURL.appendingPathComponent("raw/assets", isDirectory: true)
+            ),
         ]
 
         var loadedItems: [InboxItem] = []
         for directory in directories {
             guard let urls = try? fileManager.contentsOfDirectory(
-                at: directory,
+                at: directory.url,
                 includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey],
                 options: [.skipsHiddenFiles]
             ) else {
                 continue
             }
 
-            for url in urls where isRegularFile(url) {
+            for url in urls.flatMap({ scannedURLs(in: $0, category: directory.category) }) where isRegularFile(url) {
                 loadedItems.append(
                     InboxItem(
                         id: url.path(percentEncoded: false),
                         fileName: url.lastPathComponent,
                         fileType: InboxItem.fileType(for: url),
                         fileSize: InboxItem.fileSize(at: url),
-                        status: url.path(percentEncoded: false).contains("/raw/sources/") ? .completed : .new,
+                        directoryCategory: directory.category,
+                        status: directory.category == .source ? .completed : .new,
                         addedAt: modificationDate(for: url),
                         filePath: url
                     )
@@ -136,12 +238,12 @@ final class InboxViewModel {
     func clear(_ item: InboxItem, appState: AppState) {
         guard let vaultPath = appState.vaultPath,
               let filePath = item.filePath else {
-            errorMessage = "No vault or file selected."
+            errorMessage = "未选择知识库或文件。"
             return
         }
         Task {
             do {
-                statusMessage = "Clearing..."
+                statusMessage = "正在清除..."
                 let request = TaskCreateRequest(
                     vaultPath: vaultPath.path(percentEncoded: false),
                     userInput: "清理这个 inbox 文件",
@@ -150,9 +252,9 @@ final class InboxViewModel {
                 )
                 _ = try await appState.runtimeService.createTask(request)
                 await loadVaultInbox(vaultURL: vaultPath)
-                statusMessage = "Cleared"
+                statusMessage = "已清除"
             } catch {
-                errorMessage = "Clear failed: \(error.localizedDescription)"
+                errorMessage = "清除失败: \(error.localizedDescription)"
                 statusMessage = nil
             }
         }
@@ -162,9 +264,33 @@ final class InboxViewModel {
         (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
     }
 
+    private nonisolated static func scannedURLs(in url: URL, category: InboxDirectoryCategory) -> [URL] {
+        switch category {
+        case .asset:
+            if isRegularFile(url) {
+                return [url]
+            }
+            guard let nestedURLs = try? FileManager.default.contentsOfDirectory(
+                at: url,
+                includingPropertiesForKeys: [.isRegularFileKey],
+                options: [.skipsHiddenFiles]
+            ) else {
+                return []
+            }
+            return nestedURLs.filter { isRegularFile($0) }
+        case .staging, .source:
+            return [url]
+        }
+    }
+
     private nonisolated static func modificationDate(for url: URL) -> Date {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date()
     }
+}
+
+private struct ScannedDirectory {
+    let category: InboxDirectoryCategory
+    let url: URL
 }
 
 struct InboxItem: Identifiable {
@@ -172,6 +298,7 @@ struct InboxItem: Identifiable {
     let fileName: String
     let fileType: FileType
     let fileSize: String
+    let directoryCategory: InboxDirectoryCategory
     var status: InboxStatus
     let addedAt: Date
     let filePath: URL?
@@ -225,6 +352,20 @@ struct InboxItem: Identifiable {
     }
 }
 
+enum InboxDirectoryCategory: String {
+    case staging
+    case source
+    case asset
+
+    var title: String {
+        switch self {
+        case .staging: "原资料"
+        case .source: "来源页"
+        case .asset: "附件库"
+        }
+    }
+}
+
 enum InboxStatus: String {
     case new, processing, completed, failed
 
@@ -240,7 +381,58 @@ enum InboxStatus: String {
     }
 }
 
-enum InboxFilter: String, CaseIterable {
-    case all, new, processing, completed, failed
-    var title: String { rawValue.capitalized }
+enum InboxDirectoryFilter: CaseIterable {
+    case all
+    case staging
+    case source
+    case asset
+
+    var title: String {
+        switch self {
+        case .all: "全部"
+        case .staging: "原资料"
+        case .source: "来源页"
+        case .asset: "附件库"
+        }
+    }
+
+    var directoryCategory: InboxDirectoryCategory? {
+        switch self {
+        case .all: nil
+        case .staging: .staging
+        case .source: .source
+        case .asset: .asset
+        }
+    }
+}
+
+enum InboxFileTypeFilter: CaseIterable {
+    case all
+    case pdf
+    case markdown
+    case docx
+    case text
+    case other
+
+    var title: String {
+        switch self {
+        case .all: "全部类型"
+        case .pdf: "PDF"
+        case .markdown: "Markdown"
+        case .docx: "DOCX"
+        case .text: "文字"
+        case .other: "其他"
+        }
+    }
+
+    var fileType: InboxItem.FileType? {
+        switch self {
+        case .all: nil
+        case .pdf: .pdf
+        case .markdown: .markdown
+        case .docx: .docx
+        case .text: .text
+        case .other: .other
+        }
+    }
 }

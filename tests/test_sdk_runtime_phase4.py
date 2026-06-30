@@ -1,7 +1,9 @@
+import asyncio
 import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,6 +12,7 @@ from fastapi.testclient import TestClient
 from agent_service.app import create_app
 from agent_service.config import ServiceConfig
 from agent_service.runtime import PikiWikiAgentRunner, RunnerStatus
+from agent_service.runtime.transcript_mirror import ClaudeTranscriptMirror
 from agent_service.runtime.runner import _collect_outputs
 from agent_service.store import SQLiteStore
 
@@ -61,6 +64,12 @@ def test_claude_agent_task_uses_provider_neutral_events(tmp_path: Path, monkeypa
         assert options.setting_sources == []
         assert options.strict_mcp_config is True
         assert options.env["CLAUDE_CODE_DISABLE_AUTO_MEMORY"] == "1"
+        assert isinstance(prompt, list)
+        assert len(prompt) == 1
+        assert prompt[0]["role"] == "user"
+        assert "conversation_context" in prompt[0]["content"]
+        assert "<runtime_contract>" in options.system_prompt
+        assert "<agent_规则>" in options.system_prompt
         yield SimpleNamespace(
             event={"type": "content_block_delta", "delta": {"text": "hello "}},
             session_id="sess_1",
@@ -574,6 +583,139 @@ def test_sdk_client_runtime_stops_after_result_message_even_if_stream_stays_open
     task = client.get(f"/tasks/{response.json()['task_id']}").json()
     assert task["status"] == "completed"
     assert task["output"]["answer"] == "最终答案"
+
+
+def test_sdk_client_runtime_sends_string_prompt_to_connect(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    captured_prompts: list[object] = []
+
+    class FakeClient:
+        def __init__(self, *, options):
+            self.options = options
+
+        async def connect(self, user_input):
+            captured_prompts.append(user_input)
+            return None
+
+        async def disconnect(self):
+            return None
+
+        async def receive_messages(self):
+            yield SimpleNamespace(
+                content=[SimpleNamespace(text="最终答案")],
+                session_id="sess_sdk_prompt",
+            )
+            yield _result_message(session_id="sess_sdk_prompt", result="最终答案")
+
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
+    )
+    app = create_app(config, store=store)
+    app.state.runner._client_cls = FakeClient
+    app.state.runner._query_impl = app.state.runner._sdk_query_impl
+    app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
+    client = TestClient(app)
+
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+
+    assert response.status_code == 200
+    assert len(captured_prompts) == 1
+    assert isinstance(captured_prompts[0], str)
+    assert "你好" in captured_prompts[0]
+
+
+def test_sdk_client_runtime_fails_after_stream_idle_timeout(tmp_path: Path, monkeypatch):
+    vault_path = make_runtime_vault(tmp_path)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    monkeypatch.setenv("PIKI_AGENT_STREAM_IDLE_TIMEOUT_SECONDS", "1")
+
+    class FakeClient:
+        def __init__(self, *, options):
+            self.options = options
+
+        async def connect(self, user_input):
+            return None
+
+        async def disconnect(self):
+            return None
+
+        async def receive_messages(self):
+            while True:
+                await asyncio.sleep(60)
+                yield SimpleNamespace(event={"type": "noop"})
+
+    runner = PikiWikiAgentRunner()
+    runner._client_cls = FakeClient
+    runner._query_impl = runner._sdk_query_impl
+    runner.status = RunnerStatus(True, "Claude Agent SDK available")
+
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        runtime_config_path=tmp_path / "runtime-config.json",
+        claude_config_dir=tmp_path / ".piki/claude-runtime",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
+    )
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(config, store=store)
+    app.state.runner._client_cls = FakeClient
+    app.state.runner._query_impl = app.state.runner._sdk_query_impl
+    app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
+    client = TestClient(app)
+
+    started_at = time.monotonic()
+    response = client.post("/tasks", json={"vault_path": str(vault_path), "user_input": "你好"})
+    elapsed = time.monotonic() - started_at
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "failed"
+    assert "idle timeout" in task["summary"]
+    assert elapsed < 10
+
+
+def test_transcript_mirror_matches_prompt_when_user_content_is_block_list(tmp_path: Path):
+    project_root = tmp_path / ".piki" / "claude-runtime" / "projects"
+    project_dir = project_root / "-tmp-vault"
+    project_dir.mkdir(parents=True)
+    transcript_path = project_dir / "session.jsonl"
+    transcript_path.write_text(
+        "\n".join(
+            [
+                json.dumps({"type": "queue-operation"}),
+                json.dumps({"type": "queue-operation"}),
+                json.dumps(
+                    {
+                        "type": "user",
+                        "timestamp": "2026-06-30T06:46:37.600000+00:00",
+                        "message": {
+                            "content": [
+                                {"type": "text", "text": "system preface"},
+                                {"type": "text", "text": "hi"},
+                            ]
+                        },
+                    },
+                    ensure_ascii=False,
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    mirror = ClaudeTranscriptMirror(
+        claude_config_dir=tmp_path / ".piki" / "claude-runtime",
+        cwd=Path("/tmp/vault"),
+        task_id="task_test",
+        user_input="hi",
+        events=SimpleNamespace(),
+    )
+
+    assert mirror._matches_prompt(transcript_path) is True
 
 
 async def _single_message_stream(text: str):

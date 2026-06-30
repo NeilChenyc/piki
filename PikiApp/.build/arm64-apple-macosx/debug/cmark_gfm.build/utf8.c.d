@@ -1,6 +1,6 @@
 dependencies: \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/utf8.c \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/utf8.c \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/Darwin.modulemap \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/stdlib.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/DarwinFoundation3.modulemap \
@@ -229,14 +229,14 @@ dependencies: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/xlocale/_wctype.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/xlocale/___wctype.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/assert.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark_ctype.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/export.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/utf8.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/buffer.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark_ctype.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/export.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/utf8.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/buffer.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/string.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/limits.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark-gfm_config.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark-gfm.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark-gfm_version.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/case_fold_switch.inc
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm_config.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm_version.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/case_fold_switch.inc

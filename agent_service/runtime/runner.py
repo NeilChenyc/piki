@@ -10,10 +10,16 @@ from types import SimpleNamespace
 from typing import Any
 
 from agent_service.diagnostics import runtime_log
-from agent_service.agents.prompts import build_piki_instructions
+from agent_service.agents.prompts import (
+    SystemContextMessage,
+    build_piki_instructions,
+    build_piki_system_context,
+    serialize_system_context_messages,
+)
 from agent_service.application.events import EventPublisher
 from agent_service.application.task_control import TaskRunControl
 from agent_service.config import ServiceConfig, anthropic_auth_token
+from agent_service.context import AgentPromptEnvelope
 from agent_service.models import AgentResult, EventType, TaskStatus
 from agent_service.runtime.event_mapper import (
     extract_text_delta,
@@ -79,6 +85,9 @@ class PikiWikiAgentRunner:
 
     def build_instructions(self, *, context_contents: dict[str, str]) -> str:
         return build_piki_instructions(context_contents=context_contents)
+
+    def build_system_messages(self, *, context_contents: dict[str, str]) -> list[SystemContextMessage]:
+        return build_piki_system_context(context_contents=context_contents)
 
     def can_run(self, config: ServiceConfig) -> bool:
         return self.status.available and config.agent_runtime_configured
@@ -180,8 +189,8 @@ class PikiWikiAgentRunner:
         if run_control is not None and run_control.cancel_requested:
             return AgentResult(status=TaskStatus.CANCELLED, summary="任务已停止。", answer="")
         staged_files = _stage_selected_paths(config.staging_root, task_id, selected_paths)
-        prompt = self._build_prompt(
-            base_instructions=self.build_instructions(context_contents=context_contents),
+        prompt_envelope = self._build_prompt_envelope(
+            system_messages=self.build_system_messages(context_contents=context_contents),
             agent_input=agent_input or user_input,
             staged_files=staged_files,
         )
@@ -194,8 +203,9 @@ class PikiWikiAgentRunner:
         )
         hooks = self._build_hooks(config=config, events=events, tracker=tracker, staged_files=staged_files)
         max_turns = _resolve_max_turns(config=config, action_context=action_context)
+        serialized_system_prompt = serialize_system_context_messages(prompt_envelope.system_messages)
         options = self._options_cls(
-            system_prompt=prompt,
+            system_prompt=serialized_system_prompt,
             model=config.agent_model or None,
             cwd=str(vault.root),
             add_dirs=_runtime_add_dirs(vault_root=vault.root, staged_files=staged_files),
@@ -213,6 +223,14 @@ class PikiWikiAgentRunner:
             resume=resume_session_id,
             enable_file_checkpointing=config.enable_file_checkpointing,
             thinking={"type": "disabled"},
+        )
+        query_input = self._build_query_input(
+            prompt_envelope=prompt_envelope,
+            fallback_user_input=user_input,
+        )
+        streaming_connect_input = self._build_streaming_connect_input(
+            prompt_envelope=prompt_envelope,
+            fallback_user_input=user_input,
         )
         events.emit(
             task_id,
@@ -276,13 +294,17 @@ class PikiWikiAgentRunner:
         if run_control is not None and run_task is not None:
             run_control.bind_async_task(asyncio.get_running_loop(), run_task)
         runtime_log("runner", "task_async_begin", extra={"task_id": task_id, "conversation_id": conversation_id})
+        idle_timeout_seconds = max(1, int(config.agent_stream_idle_timeout_seconds))
         try:
             if self._client_cls is not None and self._query_impl is self._sdk_query_impl:
                 runtime_log("runner", "sdk_client_connect", extra={"task_id": task_id})
                 client = self._client_cls(options=options)
-                await client.connect(user_input)
+                await client.connect(streaming_connect_input)
                 try:
-                    async for message in client.receive_messages():
+                    async for message in _iterate_with_idle_timeout(
+                        client.receive_messages(),
+                        idle_timeout_seconds=idle_timeout_seconds,
+                    ):
                         if run_control is not None and run_control.cancel_requested:
                             await _stop_active_sdk_task(client=client, messages=messages)
                             raise asyncio.CancelledError
@@ -310,7 +332,10 @@ class PikiWikiAgentRunner:
                     await client.disconnect()
             else:
                 runtime_log("runner", "query_stream_begin", extra={"task_id": task_id})
-                async for message in self._query_impl(prompt=user_input, options=options):
+                async for message in _iterate_with_idle_timeout(
+                    self._query_impl(prompt=query_input, options=options),
+                    idle_timeout_seconds=idle_timeout_seconds,
+                ):
                     if run_control is not None and run_control.cancel_requested:
                         raise asyncio.CancelledError
                     _consume_stream_message(
@@ -389,7 +414,13 @@ class PikiWikiAgentRunner:
             pending_input=pending_input,
         )
 
-    def _build_prompt(self, *, base_instructions: str, agent_input: str, staged_files: list[dict[str, Any]]) -> str:
+    def _build_prompt_envelope(
+        self,
+        *,
+        system_messages: list[SystemContextMessage],
+        agent_input: str,
+        staged_files: list[dict[str, Any]],
+    ) -> AgentPromptEnvelope:
         extra = [
             "你运行在 Piki 的 Claude Agent runtime 中。",
             "可用工具只有 Claude 内建工具：Read、Write、Edit、Glob、Grep、Bash、AskUserQuestion。",
@@ -408,7 +439,30 @@ class PikiWikiAgentRunner:
                     "```",
                 ]
             )
-        return "\n\n".join([base_instructions, *extra, agent_input])
+        user_message = {
+            "role": "user",
+            "content": "\n\n".join([*extra, agent_input]),
+        }
+        return AgentPromptEnvelope(system_messages=system_messages, user_message=user_message)
+
+    def _build_query_input(self, *, prompt_envelope: AgentPromptEnvelope, fallback_user_input: str) -> Any:
+        if self._query_supports_message_array():
+            return [prompt_envelope.user_message]
+        return prompt_envelope.user_message["content"]
+
+    def _build_streaming_connect_input(
+        self,
+        *,
+        prompt_envelope: AgentPromptEnvelope,
+        fallback_user_input: str,
+    ) -> str:
+        content = prompt_envelope.user_message.get("content")
+        if isinstance(content, str) and content.strip():
+            return content
+        return fallback_user_input
+
+    def _query_supports_message_array(self) -> bool:
+        return True
 
     def _build_hooks(self, *, config: ServiceConfig, events: EventPublisher, tracker: JournalTracker, staged_files: list[dict[str, Any]]):
         staged_roots = {Path(entry["staged_path"]).resolve() for entry in staged_files}
@@ -519,6 +573,17 @@ class PikiWikiAgentRunner:
             env["ANTHROPIC_AUTH_TOKEN"] = token
             env["ANTHROPIC_API_KEY"] = token
         return env
+
+
+async def _iterate_with_idle_timeout(async_iterable, *, idle_timeout_seconds: int):
+    iterator = async_iterable.__aiter__()
+    while True:
+        try:
+            yield await asyncio.wait_for(iterator.__anext__(), timeout=idle_timeout_seconds)
+        except StopAsyncIteration:
+            break
+        except asyncio.TimeoutError as exc:
+            raise RuntimeError(f"Claude runtime stream idle timeout after {idle_timeout_seconds} seconds.") from exc
 
 
 def _stage_selected_paths(staging_root: Path, task_id: str, selected_paths: list[str]) -> list[dict[str, Any]]:

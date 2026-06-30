@@ -86,7 +86,7 @@ class TaskExecutor:
             return
 
         try:
-            self.events.progress(task_id, "thinking", "正在思考", "正在让 Claude 判断本轮需要调用哪些工具。")
+            self.events.progress(task_id, "thinking", "正在思考", "piki正在思考中")
             agent_result = self.runner.run_task(
                 config=self.config,
                 store=self.store,

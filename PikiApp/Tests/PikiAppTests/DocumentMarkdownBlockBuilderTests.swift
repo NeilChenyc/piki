@@ -148,4 +148,19 @@ struct DocumentMarkdownBlockBuilderTests {
 
         #expect(view.textScale == 1.3)
     }
+
+    @MainActor
+    @Test
+    func preservesListItemParagraphSpacingWithinSingleListItem() {
+        let items = MessageMarkdownDebug.listItemTexts(
+            for: """
+            - 第一段
+
+              第二段
+            """
+        )
+
+        #expect(items.count == 1)
+        #expect(items.first == "第一段\n\n第二段")
+    }
 }

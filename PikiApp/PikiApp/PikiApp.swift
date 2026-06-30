@@ -46,7 +46,7 @@ struct PikiApp: App {
                     await manager.start()
                 }
         }
-        .windowStyle(.titleBar)
+        .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1200, height: 800)
 
         Settings {

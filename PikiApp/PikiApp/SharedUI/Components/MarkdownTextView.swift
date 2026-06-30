@@ -549,16 +549,20 @@ private struct MessageMarkdownBlockView: View {
             .padding(.vertical, 4)
 
         case .list(let items):
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 10) {
                 ForEach(items) { item in
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    HStack(alignment: .top, spacing: 10) {
                         listMarker(for: item)
-                        InlineMarkdownText(
-                            item.text,
-                            font: .system(size: 13),
-                            foregroundColor: foregroundColor,
-                            onOpenWikiLink: onOpenWikiLink
-                        )
+                        VStack(alignment: .leading, spacing: 0) {
+                            InlineMarkdownText(
+                                item.text,
+                                font: .system(size: 13),
+                                foregroundColor: foregroundColor,
+                                onOpenWikiLink: onOpenWikiLink
+                            )
+                            .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.top, 1)
                     }
                     .padding(.leading, CGFloat(item.level) * 18)
                 }
@@ -591,11 +595,13 @@ private struct MessageMarkdownBlockView: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(checkbox == .checked ? Theme.success : Theme.textTertiary)
                 .frame(width: 18, alignment: .trailing)
+                .padding(.top, 1)
         } else {
             Text(item.marker)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.textTertiary)
                 .frame(width: item.isOrdered ? 28 : 16, alignment: .trailing)
+                .padding(.top, 1)
         }
     }
 
@@ -1144,7 +1150,7 @@ private enum MarkdownDocumentRenderer {
                 .filter { !($0 is OrderedList) && !($0 is UnorderedList) }
                 .map(inlineTextForListItemBlock)
                 .filter { !$0.isEmpty }
-                .joined(separator: "\n")
+                .joined(separator: "\n\n")
 
             result.append(
                 MarkdownListItem(
@@ -1262,6 +1268,16 @@ enum DocumentMarkdownDebug {
             document: MarkdownDocumentPresentation.prepare(source: content, mode: mode),
             baseURL: baseURL
         )
+    }
+}
+
+@MainActor
+enum MessageMarkdownDebug {
+    static func listItemTexts(for content: String) -> [String] {
+        MarkdownDocumentRenderer.parse(content, baseURL: nil).flatMap { block -> [String] in
+            guard case .list(let items) = block else { return [] }
+            return items.map(\.text)
+        }
     }
 }
 #endif

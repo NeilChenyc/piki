@@ -106,7 +106,7 @@ struct LintIssueRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(Theme.cardBackground)
+        .background(Theme.elevatedCardBackground)
         .clipShape(.rect(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -138,7 +138,7 @@ struct AffectedPageRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(Theme.cardBackground)
+        .background(Theme.elevatedCardBackground)
         .clipShape(.rect(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -156,7 +156,7 @@ struct SidebarEmptyState: View {
             .foregroundStyle(Theme.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
-            .background(Theme.cardBackground)
+            .background(Theme.elevatedCardBackground)
             .clipShape(.rect(cornerRadius: 10))
     }
 }
@@ -174,7 +174,7 @@ struct SidebarLoadingState: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(Theme.cardBackground)
+        .background(Theme.elevatedCardBackground)
         .clipShape(.rect(cornerRadius: 10))
     }
 }

@@ -67,13 +67,13 @@ final class HomeViewModel {
                         key: "run",
                         kind: "agent_run",
                         title: "正在思考",
-                        summary: "正在创建任务并准备本轮 Agent Run。",
+                        summary: "正在创建任务并准备本轮任务。",
                         category: "model",
                         status: "running"
                     )
                 ],
                 isRunning: true,
-                isTraceExpanded: true,
+                isTraceExpanded: false,
                 isAgentRun: true,
                 runStatus: "running"
             )
@@ -399,7 +399,7 @@ final class HomeViewModel {
                 messageId: assistantMessageId,
                 key: "run",
                 kind: "agent_run",
-                title: "Agent Run 已完成",
+                title: "任务已完成",
                 summary: preview ?? "正在整理最终回答。",
                 category: "model",
                 status: "completed"
@@ -455,6 +455,11 @@ final class HomeViewModel {
         }
     }
 
+    @discardableResult
+    func handleForTesting(_ event: TaskEvent, assistantMessageId: String) -> String? {
+        handle(event, assistantMessageId: assistantMessageId)
+    }
+
     private func updateMessage(id: String, content: String) {
         mutateMessage(id: id) { message in
             message.content = content
@@ -483,7 +488,6 @@ final class HomeViewModel {
         mutateMessage(id: id) { message in
             if !message.hasStartedAnswering {
                 message.hasStartedAnswering = true
-                message.isTraceExpanded = false
             }
             message.liveContent += delta
         }
@@ -520,7 +524,6 @@ final class HomeViewModel {
             }
 
             message.liveContent = ""
-            message.isTraceExpanded = true
         }
     }
 
@@ -643,7 +646,7 @@ final class HomeViewModel {
             message.content = content
             message.liveContent = ""
             message.isRunning = false
-            message.isTraceExpanded = true
+            message.isTraceExpanded = false
             message.runStatus = "failed"
         }
     }
@@ -660,7 +663,7 @@ final class HomeViewModel {
             }
             message.liveContent = ""
             message.isRunning = false
-            message.isTraceExpanded = true
+            message.isTraceExpanded = false
             message.runStatus = "cancelled"
         }
     }
@@ -670,7 +673,7 @@ final class HomeViewModel {
             message.content = content
             message.liveContent = ""
             message.isRunning = false
-            message.isTraceExpanded = true
+            message.isTraceExpanded = false
             message.runStatus = "input_required"
         }
     }

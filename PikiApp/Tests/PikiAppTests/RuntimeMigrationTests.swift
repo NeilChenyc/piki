@@ -29,6 +29,87 @@ struct RuntimeMigrationTests {
         #expect(runtime.healthCallCount == 1)
         #expect(appState.connectionStatus == .connected)
     }
+
+    @Test
+    func runtimeBundleConfigurationParsesBundledPythonAndSitePackages() throws {
+        let tempRoot = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let resourcesURL = tempRoot.appendingPathComponent("Resources", isDirectory: true)
+        let pythonURL = resourcesURL.appendingPathComponent("PikiRuntime/Python/bin/python3")
+        let sitePackagesURL = resourcesURL.appendingPathComponent("PikiRuntime/site-packages", isDirectory: true)
+
+        try FileManager.default.createDirectory(at: pythonURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: sitePackagesURL, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: pythonURL.path, contents: Data())
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o755],
+            ofItemAtPath: pythonURL.path
+        )
+        try """
+        {"python":"PikiRuntime/Python/bin/python3","site_packages":"PikiRuntime/site-packages","arch":"aarch64"}
+        """.write(to: resourcesURL.appendingPathComponent("runtime-paths.json"), atomically: true, encoding: .utf8)
+
+        let configuration = LocalServiceManager.runtimeBundleConfiguration(resourcesURL: resourcesURL)
+
+        #expect(configuration?.pythonURL == pythonURL)
+        #expect(configuration?.sitePackagesURL == sitePackagesURL)
+    }
+
+    @Test
+    func pythonCandidatesPreferBundledRuntimeAheadOfFallbacks() throws {
+        let tempRoot = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let resourcesURL = tempRoot.appendingPathComponent("Resources", isDirectory: true)
+        let pikiHome = tempRoot.appendingPathComponent(".piki-home", isDirectory: true)
+        let projectRoot = tempRoot.appendingPathComponent("project", isDirectory: true)
+        let bundledPythonURL = resourcesURL.appendingPathComponent("PikiRuntime/Python/bin/python3")
+
+        try FileManager.default.createDirectory(at: bundledPythonURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: bundledPythonURL.path, contents: Data())
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o755],
+            ofItemAtPath: bundledPythonURL.path
+        )
+        try """
+        {"python":"PikiRuntime/Python/bin/python3","site_packages":"PikiRuntime/site-packages","arch":"aarch64"}
+        """.write(to: resourcesURL.appendingPathComponent("runtime-paths.json"), atomically: true, encoding: .utf8)
+
+        let candidates = LocalServiceManager.pythonCandidates(
+            resourcesURL: resourcesURL,
+            projectRoot: projectRoot,
+            pikiHome: pikiHome
+        )
+
+        #expect(candidates.first == bundledPythonURL)
+    }
+
+    @Test
+    func mergedPythonPathPrependsBundledSitePackagesOnce() {
+        let sitePackagesURL = URL(fileURLWithPath: "/tmp/PikiRuntime/site-packages", isDirectory: true)
+
+        let merged = LocalServiceManager.mergedPythonPath(
+            existingPythonPath: "/usr/lib/python:/tmp/PikiRuntime/site-packages",
+            sitePackagesURL: sitePackagesURL
+        )
+
+        #expect(merged == "/tmp/PikiRuntime/site-packages:/usr/lib/python")
+    }
+
+    @Test
+    func listeningProcessIdentifiersParsesDistinctNumericPIDs() {
+        let pids = LocalServiceManager.listeningProcessIdentifiers(
+            from: "74716\n 67282 \ninvalid\n74716\n"
+        )
+
+        #expect(pids == [67282, 74716])
+    }
+
+    @Test
+    func listeningProcessIdentifiersIgnoresBlankOutput() {
+        let pids = LocalServiceManager.listeningProcessIdentifiers(from: "\n \n")
+
+        #expect(pids.isEmpty)
+    }
 }
 
 @MainActor

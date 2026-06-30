@@ -6,19 +6,6 @@ import threading
 import traceback
 from pathlib import Path
 
-from agent_service.diagnostics import runtime_log
-from agent_service.runtime.worker import RuntimeWorker
-from agent_service.system import (
-    build_source_slug,
-    detect_source_format,
-    extract_text,
-    extract_title,
-    hash_file,
-    render_canonical_source,
-    run_wiki_lint,
-)
-from agent_service.vault import Vault
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(prog="python -m agent_service.runtime.cli")
@@ -40,6 +27,9 @@ def main() -> int:
     if args.command == "lint":
         payload = _lint(args.vault)
     elif args.command == "stdio":
+        from agent_service.diagnostics import runtime_log
+        from agent_service.runtime.worker import RuntimeWorker
+
         runtime_log("cli", "stdio_start", extra={"db_path": args.db_path, "runtime_config_path": args.runtime_config_path})
         stdout_lock = threading.Lock()
 
@@ -82,13 +72,25 @@ def main() -> int:
 
 
 def _lint(vault_path: str) -> dict:
+    from agent_service.vault import Vault
+    from agent_service.workflows.lint_compat import run_wiki_lint_compat
+
     vault = Vault(vault_path)
     vault.validate()
-    result = run_wiki_lint(vault)
-    return result.model_dump(mode="json")
+    result = run_wiki_lint_compat(vault)
+    return result.to_dict()
 
 
 def _extract_source(path: str) -> dict:
+    from agent_service.system.source_intake import (
+        build_source_slug,
+        detect_source_format,
+        extract_text,
+        extract_title,
+        hash_file,
+        render_canonical_source,
+    )
+
     source_file = Path(path).expanduser().resolve()
     source_format = detect_source_format(source_file)
     file_hash = hash_file(source_file)

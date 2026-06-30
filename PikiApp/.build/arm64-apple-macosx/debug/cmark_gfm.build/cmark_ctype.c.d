@@ -1,6 +1,6 @@
 dependencies: \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/cmark_ctype.c \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/cmark_ctype.c \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/module.modulemap \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/Darwin.modulemap \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/DarwinFoundation2.modulemap \
@@ -179,5 +179,5 @@ dependencies: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/sys/_types/_timespec.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/xlocale/_time.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/stdint.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark_ctype.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/export.h
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark_ctype.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/export.h

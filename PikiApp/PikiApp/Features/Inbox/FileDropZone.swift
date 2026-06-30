@@ -21,7 +21,7 @@ struct FileDropZone: View {
                 Image(systemName: "icloud.and.arrow.up")
                     .font(.system(size: 24))
                     .foregroundStyle(isTargeted ? Theme.primary : Theme.textTertiary)
-                Text("Drop files here or click to browse")
+                Text("拖入文件或点击浏览")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textSecondary)
             }

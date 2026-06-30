@@ -9,22 +9,19 @@ struct InboxView: View {
         @Bindable var viewModel = viewModel
 
         HSplitView {
-            // Main list area
             VStack(alignment: .leading, spacing: 0) {
-                // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Inbox")
+                    Text("资料箱")
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("Drop files to add to your knowledge base")
+                    Text("拖入文件以添加到知识库")
                         .font(.system(size: 13))
                         .foregroundStyle(Theme.textSecondary)
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 24)
+                .padding(.top, 16)
                 .padding(.bottom, 16)
 
-                // Drop zone
                 FileDropZone(
                     onDrop: { urls in
                         viewModel.handleFileDrop(urls, appState: appState)
@@ -36,10 +33,40 @@ struct InboxView: View {
                     .padding(.horizontal, 24)
                     .padding(.bottom, 16)
 
-                // Filter tabs
                 InboxFilterBar(
-                    selectedFilter: $viewModel.selectedFilter,
-                    counts: viewModel.filterCounts
+                    selectedDirectoryFilter: $viewModel.selectedDirectoryFilter,
+                    selectedFileTypeFilter: $viewModel.selectedFileTypeFilter,
+                    directoryCounts: viewModel.directoryCounts,
+                    fileTypeCounts: viewModel.fileTypeCounts
+                )
+                .padding(.horizontal, 24)
+                .padding(.bottom, 12)
+
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textTertiary)
+                    TextField("搜索文件名...", text: $viewModel.searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 12))
+                    if !viewModel.searchQuery.isEmpty {
+                        Button {
+                            viewModel.searchQuery = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Theme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Theme.elevatedCardBackground)
+                .clipShape(.rect(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Theme.border, lineWidth: 0.5)
                 )
                 .padding(.horizontal, 24)
                 .padding(.bottom, 12)
@@ -58,7 +85,7 @@ struct InboxView: View {
                         if viewModel.isLoading && viewModel.items.isEmpty {
                             HStack(spacing: 8) {
                                 ProgressView().controlSize(.small)
-                                Text("Loading files...")
+                                Text("正在加载文件...")
                                     .font(.system(size: 12))
                                     .foregroundStyle(Theme.textSecondary)
                             }
@@ -80,7 +107,7 @@ struct InboxView: View {
                 Divider()
 
                 HStack {
-                    Text("\(viewModel.filteredItems.count) items")
+                    Text("\(viewModel.filteredItems.count) 项")
                         .font(.caption)
                         .foregroundStyle(Theme.textTertiary)
                     if let status = viewModel.statusMessage {
@@ -93,8 +120,9 @@ struct InboxView: View {
                 }
                 .padding(16)
             }
+            .background(Theme.primaryPanelBackground)
+            .frame(minWidth: 400, idealWidth: 500)
 
-            // Preview panel
             if let item = viewModel.selectedItem {
                 FilePreviewPanel(
                     item: item,
@@ -109,9 +137,11 @@ struct InboxView: View {
                         viewModel.clear(item, appState: appState)
                     }
                 )
-                    .frame(width: 320)
+                .background(Theme.secondaryPanelBackground)
+                .frame(minWidth: 400, idealWidth: 500)
             }
         }
+        .background(Theme.primaryPanelBackground)
         .task(id: appState.vaultPath) {
             await viewModel.loadIfNeeded(vaultURL: appState.vaultPath)
         }

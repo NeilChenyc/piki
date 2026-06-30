@@ -1,6 +1,6 @@
 dependencies: \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/linked_list.c \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/linked_list.c \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/Darwin.modulemap \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/stdlib.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/DarwinFoundation3.modulemap \
@@ -228,6 +228,6 @@ dependencies: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/_types/_wctrans_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/xlocale/_wctype.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/xlocale/___wctype.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark-gfm.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/export.h \
-  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/cmark-gfm_version.h
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/export.h \
+  /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm_version.h

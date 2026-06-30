@@ -32,6 +32,14 @@ def test_claude_config_dir_defaults_to_private_runtime_dir(monkeypatch):
     assert config.runtime_config_path == Path(".piki/runtime-config.json")
 
 
+def test_agent_stream_idle_timeout_defaults_to_sixty_seconds(monkeypatch):
+    monkeypatch.delenv("PIKI_AGENT_STREAM_IDLE_TIMEOUT_SECONDS", raising=False)
+
+    config = ServiceConfig()
+
+    assert config.agent_stream_idle_timeout_seconds == 60
+
+
 def test_runtime_is_configured_with_anthropic_auth_token(monkeypatch):
     monkeypatch.setenv("PIKI_ENABLE_AGENT_RUNTIME", "1")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)

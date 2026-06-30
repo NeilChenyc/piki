@@ -5,6 +5,16 @@ check_after: 2027-01-01
 
 # 日志
 
+## [2026-06-30] ingest | 微信背后的产品观（张小龙）
+
+- 来源：`微信背后的产品观 (张小龙).pdf` — 张小龙系统阐述微信产品哲学（用户篇、需求篇、设计篇、气质篇、UI 篇）
+- 写入 `raw/sources/1-1-72c6e0d0.md`（canonical source）
+- 新建 `wiki/sources/微信背后的产品观.md` — 来源页，含核心观点、关键案例和方法论框架
+- 新建 `wiki/entities/张小龙.md` — 实体页，记载履历与产品哲学核心
+- 新建 `wiki/concepts/微信产品哲学.md` — 概念页，提炼人性驱动、极简主义、群体效应等核心理念
+- 更新 `wiki/index.md` — 新增 3 条索引条目（sources、entities、concepts）
+- 补充 wikilink：来源页、实体页、概念页之间互相链接
+
 ## [2026-06-23] lint | 修复 source 类型字段不一致
 
 - 来源/任务：run_lint + 手工分析
@@ -119,3 +129,14 @@ check_after: 2027-01-01
 - 清空原有重内容资料，重建轻量测试 vault。
 - 保留 query、lint、Health、轻量写入所需的最小页面结构。
 - 当前故意保留一页未入索引的 synthesis 页面，方便测试 lint 修复链路。
+
+## [2026-06-25] lint | 补充缺失的 raw_source frontmatter
+
+- 来源/任务：手动 lint（CLI 工具因 Python 版本不兼容不可用）
+- 扫描文件数：14，发现 3 个问题（全部为低风险）
+- 修复路径：
+  - `wiki/sources/测试来源-LLM Wiki 摘记.md` — 新增 `raw_source: raw/sources/llm-wiki-idea-lite.md`
+  - `wiki/sources/测试来源-孟岩近况.md` — 新增 `raw_source: raw/sources/mengyan-health-note-lite.md`
+  - `wiki/sources/待摄入测试文档.md` — 将正文中的 canonical source 引用迁移至 frontmatter `raw_source`，删除冗余描述
+- 结果：3 处 raw_source frontmatter 补齐；所有 wikilink 验证有效（0 断裂）；索引完整（14/14 页全覆盖）
+- 剩余风险：`raw/inbox/next-test-source.md` 在 ingest 完成后仍驻留，可考虑清理或归档

@@ -4,23 +4,29 @@ struct ContentView: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        NavigationSplitView {
+        @Bindable var appState = appState
+
+        NavigationSplitView(columnVisibility: $appState.sidebarVisibility) {
             SidebarView()
+                .navigationSplitViewColumnWidth(min: 220, ideal: 220, max: 220)
         } detail: {
-            switch appState.selectedTab {
-            case .home:
-                HomeView()
-            case .inbox:
-                InboxView()
-            case .wiki:
-                WikiView()
-            case .health:
-                HealthView()
-            case .settings:
-                RuntimeSettingsView()
+            Group {
+                switch appState.selectedTab {
+                case .home:
+                    HomeView()
+                case .inbox:
+                    InboxView()
+                case .wiki:
+                    WikiView()
+                case .health:
+                    HealthView()
+                case .settings:
+                    RuntimeSettingsView()
+                }
             }
+            .background(Theme.primaryPanelBackground)
         }
-        .background(Theme.surfaceBackground)
+        .background(Theme.appBackground)
     }
 }
 

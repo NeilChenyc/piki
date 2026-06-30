@@ -57,9 +57,9 @@
   },
   {
     "case_id": "6",
-    "intent": "上传文件并记录",
-    "prompt": "帮我记录这个文档。",
-    "conversation_group": "record_upload",
+    "intent": "最小 ingest smoke / 页面模板上传文件并记录",
+    "prompt": "请帮我 ingest 这个文件，并整理进知识库。请在需要时创建或更新合适的 wiki 页面、补充必要链接，并在完成后告诉我结果。",
+    "conversation_group": "ingest_smoke",
     "attachment_type": "markdown",
     "action_context": {
       "action": "ingest_file"

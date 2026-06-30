@@ -9,7 +9,7 @@ struct VaultStatusCard: View {
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Vault Status")
+                Text("仓库现状")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
@@ -19,9 +19,9 @@ struct VaultStatusCard: View {
             }
 
             HStack(spacing: 16) {
-                StatItem(label: "Pages", value: "\(stats.pages)")
-                StatItem(label: "Sources", value: "\(stats.sources)")
-                StatItem(label: "Health", value: stats.health)
+                StatItem(label: "页面数", value: "\(stats.pages)")
+                StatItem(label: "原材料", value: "\(stats.sources)")
+                StatItem(label: "健康度", value: stats.health)
             }
         }
         .padding(16)
@@ -47,17 +47,17 @@ struct VaultStats {
         guard let vaultURL else {
             pages = 0
             sources = 0
-            health = "No vault"
+            health = "未选择"
             return
         }
 
         pages = Self.countMarkdownFiles(in: vaultURL.appendingPathComponent("wiki", isDirectory: true))
         sources = Self.countSourceFiles(in: vaultURL.appendingPathComponent("raw/sources", isDirectory: true))
         health = switch status {
-        case .connected: "OK"
-        case .starting: "Starting"
-        case .disconnected: "Offline"
-        case .error: "Error"
+        case .connected: "正常"
+        case .starting: "启动中"
+        case .disconnected: "离线"
+        case .error: "错误"
         }
     }
 
@@ -115,12 +115,12 @@ struct RecentActivityList: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity")
+            Text("近期活动")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
 
             if entries.isEmpty {
-                Text("No recent activity")
+                Text("暂无近期活动")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textTertiary)
                     .padding(.vertical, 8)

@@ -7,13 +7,14 @@ struct Theme {
     static let accentDark = Color(red: 46/255, green: 125/255, blue: 50/255)
 
     // MARK: - Surfaces
-    static let surfaceBackground = Color(red: 247/255, green: 247/255, blue: 249/255)
-    static let sidebarBackground = Color.white
-    static let cardBackground = Color.white
-    static let surfaceSecondary = Color(red: 244/255, green: 244/255, blue: 246/255)
+    static let appBackground = Color(red: 241/255, green: 241/255, blue: 243/255)
+    static let primaryPanelBackground = Color.white
+    static let secondaryPanelBackground = Color(red: 244/255, green: 244/255, blue: 246/255)
+    static let elevatedCardBackground = Color.white
+    static let subtleFill = Color(red: 236/255, green: 236/255, blue: 239/255)
 
     // MARK: - Selection
-    static let selection = Color(red: 238/255, green: 238/255, blue: 240/255)
+    static let selection = Color(red: 228/255, green: 228/255, blue: 232/255)
 
     // MARK: - Border
     static let border = Color(red: 232/255, green: 232/255, blue: 234/255)
@@ -38,6 +39,10 @@ struct Theme {
     static let primary = accent
     static let primaryDark = accentDark
     static let primaryLight = accentLight
+    static let surfaceBackground = appBackground
+    static let sidebarBackground = secondaryPanelBackground
+    static let cardBackground = elevatedCardBackground
+    static let surfaceSecondary = subtleFill
 }
 
 struct CardModifier: ViewModifier {

@@ -7,7 +7,7 @@ let package = Package(
         .macOS(.v15)
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-markdown", from: "0.4.0"),
+        .package(path: "LocalPackages/swift-markdown"),
     ],
     targets: [
         .executableTarget(

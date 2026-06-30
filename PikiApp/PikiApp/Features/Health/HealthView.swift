@@ -29,7 +29,7 @@ struct HealthView: View {
                     } else if viewModel.isLoading && !viewModel.hasOverview && viewModel.lintSummary == nil {
                         HStack(spacing: 8) {
                             ProgressView().controlSize(.small)
-                            Text("Loading health data...")
+                            Text("正在加载健康数据...")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Theme.textSecondary)
                         }
@@ -81,8 +81,10 @@ struct HealthView: View {
                     }
                 }
                 .padding(24)
+                .padding(.top, 16)
             }
             .frame(minWidth: 760)
+            .background(Theme.primaryPanelBackground)
 
             VStack(alignment: .leading, spacing: 16) {
                 Text("关键问题")
@@ -107,7 +109,9 @@ struct HealthView: View {
             }
             .padding(16)
             .frame(minWidth: 300, idealWidth: 340, maxWidth: 360)
+            .background(Theme.secondaryPanelBackground)
         }
+        .background(Theme.primaryPanelBackground)
         .task(id: taskIdentifier) {
             await self.viewModel.loadIfNeeded(appState: appState)
         }

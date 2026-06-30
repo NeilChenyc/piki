@@ -131,7 +131,7 @@ struct SummaryMetricTile: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(Theme.surfaceSecondary)
+        .background(Theme.subtleFill)
         .clipShape(.rect(cornerRadius: 10))
     }
 }
@@ -150,7 +150,7 @@ struct BreakdownChip: View {
         .foregroundStyle(Theme.textPrimary)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Theme.surfaceSecondary)
+        .background(Theme.subtleFill)
         .clipShape(.capsule)
     }
 }

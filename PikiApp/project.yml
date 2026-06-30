@@ -15,8 +15,7 @@ settings:
 
 packages:
   swift-markdown:
-    url: https://github.com/apple/swift-markdown
-    from: "0.4.0"
+    path: LocalPackages/swift-markdown
 
 targets:
   PikiApp:

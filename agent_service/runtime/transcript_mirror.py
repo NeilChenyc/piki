@@ -31,6 +31,21 @@ def _clip(value: str, limit: int = 200) -> str:
     return value[:limit] + "…"
 
 
+def _extract_text_from_content_blocks(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+    if not isinstance(content, list):
+        return ""
+    parts: list[str] = []
+    for block in content:
+        if isinstance(block, dict):
+            if isinstance(block.get("text"), str):
+                parts.append(block["text"])
+            elif isinstance(block.get("content"), str):
+                parts.append(block["content"])
+    return "\n".join(part for part in parts if part)
+
+
 def _tool_title(tool_name: str) -> str:
     return {
         "Read": "正在阅读 Wiki",
@@ -174,7 +189,8 @@ class ClaudeTranscriptMirror:
                         continue
                     message = record.get("message") or {}
                     content = message.get("content")
-                    if isinstance(content, str) and self.user_input[:40] in content:
+                    content_text = _extract_text_from_content_blocks(content)
+                    if self.user_input[:40] in content_text:
                         return True
         except (OSError, json.JSONDecodeError):
             return False

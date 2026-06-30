@@ -1,0 +1,48 @@
+{
+  "run_date": "2026-06-30T07:17:41.455900+00:00",
+  "service_url": "http://127.0.0.1:8783",
+  "model": "deepseek-v4-flash",
+  "provider": "claude",
+  "source_vault": "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/piki-vault",
+  "temp_vault_strategy": "copied-main-vault",
+  "results": [
+    {
+      "case_id": "6",
+      "intent": "最小 ingest smoke / 页面模板上传文件并记录",
+      "prompt": "请帮我 ingest 这个文件，并整理进知识库。请在需要时创建或更新合适的 wiki 页面、补充必要链接，并在完成后告诉我结果。",
+      "task_id": "task_9f946457aad44280bcfa1061d185580f",
+      "task_status": "failed",
+      "summary": "Claude runtime stream idle timeout after 20 seconds.",
+      "started_at": "2026-06-30T07:17:20.036990+00:00",
+      "finished_at": "2026-06-30T07:17:41.178108+00:00",
+      "timed_out": false,
+      "conversation_id": "task_9f946457aad44280bcfa1061d185580f",
+      "answer": "Claude runtime stream idle timeout after 20 seconds.",
+      "affected_files": [],
+      "journal_entry": null,
+      "event_summary": {
+        "event_types": [
+          "task.created",
+          "intent.received",
+          "agent.progress",
+          "context.loaded",
+          "agent.progress",
+          "agent.run.started",
+          "task.failed"
+        ],
+        "process_events_present": true,
+        "tool_summaries": [],
+        "trace_excerpt": "",
+        "message_excerpt": "",
+        "journal_entry_id": null
+      },
+      "verdict": "fail",
+      "issues": [
+        "task_failed",
+        "upload_ingest_failed",
+        "missing_raw_source_write",
+        "missing_source_page_write"
+      ]
+    }
+  ]
+}

@@ -6,6 +6,70 @@ enum ChatInputStyle {
     case docked
 }
 
+struct ChatInputMetrics {
+    let style: ChatInputStyle
+
+    var minHeight: CGFloat {
+        style == .hero ? 82 : 0
+    }
+
+    var horizontalPadding: CGFloat {
+        style == .hero ? 20 : 16
+    }
+
+    var verticalPadding: CGFloat {
+        style == .hero ? 16 : 16
+    }
+
+    var cornerRadius: CGFloat {
+        style == .hero ? 24 : 18
+    }
+
+    var textSize: CGFloat {
+        style == .hero ? 17 : 13
+    }
+
+    var helperTextSize: CGFloat {
+        style == .hero ? 12 : 11
+    }
+
+    var chipTextSize: CGFloat {
+        style == .hero ? 12 : 11
+    }
+
+    var chipIconSize: CGFloat {
+        style == .hero ? 10 : 10
+    }
+
+    var chipHorizontalPadding: CGFloat {
+        style == .hero ? 9 : 8
+    }
+
+    var chipVerticalPadding: CGFloat {
+        style == .hero ? 4 : 4
+    }
+
+    var actionButtonSize: CGFloat {
+        style == .hero ? 34 : 28
+    }
+
+    var attachmentIconSize: CGFloat {
+        style == .hero ? 18 : 20
+    }
+
+    var sendIconSize: CGFloat {
+        style == .hero ? 20 : 24
+    }
+
+    var attachmentSymbolName: String {
+        "plus.circle.fill"
+    }
+
+    var sendSymbolName: String {
+        "arrow.up.circle.fill"
+    }
+}
+
 struct ChatInputView: View {
     @State private var text: String = ""
     @State private var selectedFiles: [URL] = []
@@ -19,6 +83,10 @@ struct ChatInputView: View {
     let autofocus: Bool
     let onSend: (String, [URL]) -> Void
     let onStop: () -> Void
+
+    private var metrics: ChatInputMetrics {
+        ChatInputMetrics(style: style)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: style == .hero ? 14 : 8) {
@@ -41,7 +109,7 @@ struct ChatInputView: View {
                         }
                         .padding(.horizontal, chipHorizontalPadding)
                         .padding(.vertical, chipVerticalPadding)
-                        .background(Theme.surfaceSecondary)
+                        .background(Theme.subtleFill)
                         .clipShape(.rect(cornerRadius: 8))
                     }
                 }
@@ -71,10 +139,10 @@ struct ChatInputView: View {
 
             HStack(spacing: style == .hero ? 14 : 12) {
                 Button(action: chooseFile) {
-                    Image(systemName: style == .hero ? "paperclip" : "plus.circle.fill")
-                        .font(.system(size: attachmentIconSize, weight: style == .hero ? .semibold : .regular))
+                    Image(systemName: metrics.attachmentSymbolName)
+                        .font(.system(size: metrics.attachmentIconSize, weight: .regular))
                         .foregroundStyle(attachmentTint)
-                        .frame(width: actionButtonSize, height: actionButtonSize)
+                        .frame(width: metrics.actionButtonSize, height: metrics.actionButtonSize)
                         .background(
                             Circle()
                                 .fill(attachmentBackground)
@@ -97,10 +165,10 @@ struct ChatInputView: View {
                     .help(isStopping ? "Stopping…" : "Stop current run")
                 } else {
                     Button(action: sendIfNotEmpty) {
-                        Image(systemName: style == .hero ? "paperplane.fill" : "arrow.up.circle.fill")
-                            .font(.system(size: sendIconSize))
+                        Image(systemName: metrics.sendSymbolName)
+                            .font(.system(size: metrics.sendIconSize))
                             .foregroundStyle(sendIconTint)
-                            .frame(width: actionButtonSize, height: actionButtonSize)
+                            .frame(width: metrics.actionButtonSize, height: metrics.actionButtonSize)
                             .background(
                                 Circle()
                                     .fill(sendButtonBackground)
@@ -111,14 +179,14 @@ struct ChatInputView: View {
                 }
             }
         }
-        .padding(.horizontal, horizontalPadding)
-        .padding(.vertical, verticalPadding)
-        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
+        .padding(.horizontal, metrics.horizontalPadding)
+        .padding(.vertical, metrics.verticalPadding)
+        .frame(maxWidth: .infinity, minHeight: metrics.minHeight, alignment: .topLeading)
         .background(
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Theme.cardBackground)
+            RoundedRectangle(cornerRadius: metrics.cornerRadius)
+                .fill(Theme.elevatedCardBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: cornerRadius)
+                    RoundedRectangle(cornerRadius: metrics.cornerRadius)
                         .stroke(style == .hero ? Theme.border.opacity(0.8) : Theme.border.opacity(0.35), lineWidth: 1)
                 )
                 .shadow(color: .black.opacity(style == .hero ? 0.08 : 0.06), radius: style == .hero ? 16 : 4, x: 0, y: style == .hero ? 8 : 2)
@@ -139,55 +207,55 @@ struct ChatInputView: View {
     }
 
     private var minHeight: CGFloat {
-        style == .hero ? 232 : 0
+        metrics.minHeight
     }
 
     private var horizontalPadding: CGFloat {
-        style == .hero ? 24 : 16
+        metrics.horizontalPadding
     }
 
     private var verticalPadding: CGFloat {
-        style == .hero ? 22 : 16
+        metrics.verticalPadding
     }
 
     private var cornerRadius: CGFloat {
-        style == .hero ? 28 : 18
+        metrics.cornerRadius
     }
 
     private var textSize: CGFloat {
-        style == .hero ? 21 : 13
+        metrics.textSize
     }
 
     private var helperTextSize: CGFloat {
-        style == .hero ? 12 : 11
+        metrics.helperTextSize
     }
 
     private var chipTextSize: CGFloat {
-        style == .hero ? 13 : 11
+        metrics.chipTextSize
     }
 
     private var chipIconSize: CGFloat {
-        style == .hero ? 11 : 10
+        metrics.chipIconSize
     }
 
     private var chipHorizontalPadding: CGFloat {
-        style == .hero ? 10 : 8
+        metrics.chipHorizontalPadding
     }
 
     private var chipVerticalPadding: CGFloat {
-        style == .hero ? 5 : 4
+        metrics.chipVerticalPadding
     }
 
     private var actionButtonSize: CGFloat {
-        style == .hero ? 42 : 28
+        metrics.actionButtonSize
     }
 
     private var attachmentIconSize: CGFloat {
-        style == .hero ? 22 : 20
+        metrics.attachmentIconSize
     }
 
     private var sendIconSize: CGFloat {
-        style == .hero ? 18 : 24
+        metrics.sendIconSize
     }
 
     private var attachmentTint: Color {
@@ -195,7 +263,7 @@ struct ChatInputView: View {
     }
 
     private var attachmentBackground: Color {
-        style == .hero ? Theme.surfaceSecondary : .clear
+        style == .hero ? .clear : .clear
     }
 
     private var sendButtonBackground: Color {

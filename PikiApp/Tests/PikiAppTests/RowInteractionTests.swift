@@ -26,6 +26,7 @@ struct RowInteractionTests {
             fileName: "about-the-dataset.md",
             fileType: .markdown,
             fileSize: "12 KB",
+            directoryCategory: .staging,
             status: .new,
             addedAt: .distantPast,
             filePath: URL(fileURLWithPath: "/tmp/raw/inbox/about-the-dataset.md")

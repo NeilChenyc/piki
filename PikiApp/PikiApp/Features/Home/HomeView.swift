@@ -21,28 +21,28 @@ struct HomeViewDisplayState {
                 inputPlaceholder = "有问题尽管问"
             }
         } else if !appState.isConnected {
-            inputPlaceholder = "Connect to the runtime host before chatting"
+            inputPlaceholder = "连接运行时服务后方可对话"
         } else if appState.vaultPath == nil {
-            inputPlaceholder = "Select a vault before chatting"
+            inputPlaceholder = "选择知识库后方可对话"
         } else if viewModel.isStopping {
-            inputPlaceholder = "Stopping current run..."
+            inputPlaceholder = "正在停止当前任务..."
         } else if viewModel.isSending {
-            inputPlaceholder = "Piki is working..."
+            inputPlaceholder = "Piki 正在处理..."
         } else if viewModel.pendingInputTaskId != nil {
-            inputPlaceholder = "Reply to continue the current Claude task..."
+            inputPlaceholder = "继续回复以推进当前 Claude 任务..."
         } else {
-            inputPlaceholder = "Ask anything about your knowledge base..."
+            inputPlaceholder = "上传新知识或随意提问"
         }
 
         if !appState.isConnected {
-            let message = appState.serviceErrorMessage ?? "Runtime host is disconnected."
+            let message = appState.serviceErrorMessage ?? "运行时服务已断线。"
             inputHint = message
             emptyStateHint = message
         } else if let prompt = viewModel.pendingInputPrompt, !prompt.isEmpty {
             inputHint = prompt
             emptyStateHint = prompt
         } else if appState.vaultPath == nil {
-            inputHint = "Choose a vault in Settings before sending a message."
+            inputHint = "请先在设置里选择一个知识库。"
             emptyStateHint = "请先在设置里选择一个 vault。"
         } else if appState.serviceHealth?.agentRuntimeConfigured != true {
             inputHint = appState.runtimeModeDetail
@@ -93,6 +93,7 @@ struct HomeView: View {
                     }
                     .padding(24)
                 }
+                .background(Theme.primaryPanelBackground)
 
                 Divider()
 
@@ -136,6 +137,7 @@ struct HomeView: View {
                 .matchedGeometryEffect(id: "home-input-shell", in: inputTransition)
                 .padding(16)
             }
+            .background(Theme.primaryPanelBackground)
 
             VStack(alignment: .leading, spacing: 16) {
                 VaultStatusCard(status: appState.connectionStatus, vaultURL: appState.vaultPath)
@@ -147,9 +149,13 @@ struct HomeView: View {
                 )
                 Spacer()
             }
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 16)
             .frame(width: 280)
+            .background(Theme.primaryPanelBackground)
         }
+        .background(Theme.primaryPanelBackground)
     }
 
     private var emptyStateView: some View {
@@ -157,8 +163,7 @@ struct HomeView: View {
             Spacer(minLength: 48)
 
             VStack(spacing: 36) {
-                PikiLogo()
-                    .frame(width: 280, height: 124)
+                PikiLogo(style: .hero)
 
                 VStack(alignment: .leading, spacing: 12) {
                     ChatInputView(
@@ -184,6 +189,7 @@ struct HomeView: View {
 
             Spacer(minLength: 96)
         }
+        .background(Theme.primaryPanelBackground)
     }
 
     private var isInputDisabled: Bool {

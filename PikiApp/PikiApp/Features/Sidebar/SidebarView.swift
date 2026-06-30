@@ -7,10 +7,8 @@ struct SidebarView: View {
         @Bindable var state = appState
 
         VStack(spacing: 0) {
-            // Logo area
             HStack {
-                PikiLogo()
-                    .frame(width: 104, height: 36, alignment: .leading)
+                PikiLogo(style: .navigation)
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -51,7 +49,7 @@ struct SidebarView: View {
             .padding(.bottom, 16)
         }
         .frame(minWidth: 200, idealWidth: 220, maxWidth: 240)
-        .background(Theme.sidebarBackground)
+        .background(Theme.secondaryPanelBackground)
     }
 
     private var connectionColor: Color {

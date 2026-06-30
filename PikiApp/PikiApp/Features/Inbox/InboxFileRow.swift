@@ -20,9 +20,14 @@ struct InboxFileRow: View {
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
                         .lineLimit(1)
-                    Text(item.fileSize)
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.textTertiary)
+                    HStack(spacing: 6) {
+                        Text(item.directoryCategory.title)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Theme.textSecondary)
+                        Text(item.fileSize)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.textTertiary)
+                    }
                 }
 
                 Spacer()

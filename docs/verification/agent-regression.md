@@ -21,7 +21,7 @@
 | 3 | 跨页面综合 / 分析 | 我对个人知识库产品的判断是什么？ |
 | 4 | 基于回答继续追问 | 展开讲第二点 |
 | 5 | 记录对话框中的内容 | 帮我记一下：…… |
-| 6 | 上传文件并记录 | 上传文档 + 帮我记录这个文档 |
+| 6 | 最小 ingest smoke / 页面模板上传文件并记录 | 上传文档 + 请帮我 ingest 这个文件，并整理进知识库。 |
 | 7 | 更新/修正已有 wiki 知识 | 孟岩这页有个地方不对…… |
 | 8 | lint | Run vault lint. |
 
@@ -34,6 +34,17 @@
 | 结果整理表 | [agent-regression-tracker-20260606.xlsx](/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/outputs/agent-regression/agent-regression-tracker-20260606.xlsx) |
 
 > 回归测试直接走 HTTP API，与 App 使用相同的端点。
+
+## 最小必跑项
+
+当改动不再是“仅 SwiftUI 视图层”而开始触及可能影响服务行为的逻辑时，默认至少跑一轮 case 6。
+
+case 6 的定位不是全面验收，而是一个很小的 ingest smoke test：
+
+- 使用和页面模板动作一致的 ingest 请求文案
+- 附上一份很小的 Markdown 文件
+- 验证任务能完成最基础的附件读取与落库动作
+- 重点看 `raw/sources/` 与 `wiki/sources/` 是否至少发生了正确写入
 
 ## 最近结果
 

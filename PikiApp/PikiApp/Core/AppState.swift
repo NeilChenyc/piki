@@ -9,6 +9,7 @@ final class AppState {
     }
 
     var selectedTab: SidebarTab = .home
+    var sidebarVisibility: NavigationSplitViewVisibility = .all
     var vaultPath: URL? { didSet { persistConfig() } }
     var connectionStatus: ServiceConnectionStatus = .disconnected
     var serviceErrorMessage: String?
@@ -147,11 +148,11 @@ enum SidebarTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .home: "Today"
-        case .inbox: "Inbox"
+        case .home: "首页"
+        case .inbox: "资料箱"
         case .wiki: "Wiki"
-        case .health: "Health"
-        case .settings: "Settings"
+        case .health: "健康"
+        case .settings: "设置"
         }
     }
 

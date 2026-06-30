@@ -79,7 +79,7 @@ class ServiceConfig(BaseModel):
         default_factory=lambda: int(os.environ.get("PIKI_AGENT_TASK_TIMEOUT_SECONDS", "180"))
     )
     agent_stream_idle_timeout_seconds: int = Field(
-        default_factory=lambda: int(os.environ.get("PIKI_AGENT_STREAM_IDLE_TIMEOUT_SECONDS", "20"))
+        default_factory=lambda: int(os.environ.get("PIKI_AGENT_STREAM_IDLE_TIMEOUT_SECONDS", "60"))
     )
     agent_max_turns: int = Field(
         default_factory=lambda: int(os.environ.get("PIKI_AGENT_MAX_TURNS", "50"))

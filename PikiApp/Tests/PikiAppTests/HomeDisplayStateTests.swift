@@ -17,7 +17,7 @@ struct HomeDisplayStateTests {
         #expect(state.isEmptyState)
         #expect(state.inputPlaceholder == "有问题尽管问")
         #expect(state.emptyStateHint == "请先在设置里选择一个 vault。")
-        #expect(state.inputHint == "Choose a vault in Settings before sending a message.")
+        #expect(state.inputHint == "请先在设置里选择一个知识库。")
     }
 
     @Test
@@ -48,7 +48,7 @@ struct HomeDisplayStateTests {
         let state = HomeViewDisplayState(appState: appState, viewModel: viewModel)
 
         #expect(!state.isEmptyState)
-        #expect(state.inputPlaceholder == "Ask anything about your knowledge base...")
+        #expect(state.inputPlaceholder == "上传新知识或随意提问")
         #expect(state.inputHint == nil)
         #expect(state.emptyStateHint == nil)
     }

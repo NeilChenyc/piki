@@ -1,6 +1,7 @@
 ---
 title: 测试来源-LLM Wiki 摘记
 type: source
+raw_source: raw/sources/llm-wiki-idea-lite.md
 ---
 
 # 测试来源-LLM Wiki 摘记

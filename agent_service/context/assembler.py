@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import json
 
+from agent_service.agents.prompts import SystemContextMessage
 from agent_service.models import ContextManifest
 from agent_service.models import TaskCreateRequest
 from agent_service.vault import Vault, VaultAccessError
@@ -35,6 +36,12 @@ class AgentTaskInput:
                 "```",
             ]
         )
+
+
+@dataclass(frozen=True)
+class AgentPromptEnvelope:
+    system_messages: list[SystemContextMessage] = field(default_factory=list)
+    user_message: dict = field(default_factory=dict)
 
 
 def assemble_baseline_context(vault: Vault) -> tuple[ContextManifest, dict[str, str]]:

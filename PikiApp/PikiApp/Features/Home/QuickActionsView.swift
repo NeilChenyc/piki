@@ -6,17 +6,17 @@ struct QuickActionsView: View {
     var body: some View {
         HStack(spacing: 8) {
             QuickActionChip(
-                title: "Ask a question",
+                title: "提个问题",
                 icon: "questionmark.circle",
                 action: { onAction(.ask) }
             )
             QuickActionChip(
-                title: "Ingest a source",
+                title: "添加素材",
                 icon: "doc.badge.plus",
                 action: { onAction(.ingest) }
             )
             QuickActionChip(
-                title: "Run health check",
+                title: "运行健康检查",
                 icon: "heart.text.square",
                 action: { onAction(.healthCheck) }
             )
@@ -41,7 +41,7 @@ struct QuickActionChip: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .foregroundStyle(Theme.textPrimary)
-            .background(Theme.surfaceSecondary)
+            .background(Theme.subtleFill)
             .clipShape(.capsule)
         }
         .buttonStyle(.plain)

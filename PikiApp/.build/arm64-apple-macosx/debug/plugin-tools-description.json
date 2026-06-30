@@ -41,283 +41,283 @@
       "inputs" : [
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Document.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Document.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Markup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Markup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupData.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupData.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/RawMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/RawMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift"
         },
         {
           "kind" : "file",
@@ -545,7 +545,7 @@
       ],
       "otherArguments" : [
         "-target",
-        "arm64-apple-macosx10.13",
+        "arm64-apple-macosx15.0",
         "-incremental",
         "-enable-batch-mode",
         "-serialize-diagnostics",
@@ -558,23 +558,23 @@
         "-DDEBUG",
         "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-        "-Xcc",
-        "-I",
-        "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-        "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+        "-Xcc",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
+        "-Xcc",
+        "-I",
+        "-Xcc",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
         "-module-cache-path",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
         "-parseable-output",
@@ -613,9 +613,6 @@
         "-fPIC",
         "-Xcc",
         "-g",
-        "-suppress-warnings",
-        "-user-module-version",
-        "0.8.0",
         "-package-name",
         "swift_markdown"
       ],
@@ -908,76 +905,76 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Document.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Markup.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupData.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/RawMarkup.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift"
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Document.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Markup.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupData.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/RawMarkup.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift"
       ],
       "tempsPath" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Markdown.build",
       "wholeModuleOptimization" : false
@@ -1284,23 +1281,23 @@
         "-DDEBUG",
         "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-        "-Xcc",
-        "-I",
-        "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-        "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+        "-Xcc",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-Xcc",
+        "-I",
+        "-Xcc",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
         "-module-cache-path",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
         "-parseable-output",
@@ -1660,23 +1657,23 @@
         "-DDEBUG",
         "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-        "-Xcc",
-        "-I",
-        "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-        "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+        "-Xcc",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-Xcc",
+        "-I",
+        "-Xcc",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
         "-module-cache-path",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
         "-parseable-output",
@@ -1741,6 +1738,22 @@
       "inputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift"
         },
         {
@@ -1757,6 +1770,14 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownDocumentPresentationTests.swift"
         },
         {
@@ -1766,6 +1787,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownSelectableTextViewTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/PikiLogoStyleTests.swift"
         },
         {
           "kind" : "file",
@@ -1804,13 +1829,20 @@
       "moduleName" : "PikiAppTests",
       "moduleOutputPath" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Modules/PikiAppTests.swiftmodule",
       "objects" : [
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppNavigationTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/BrandLogoAssetTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatBubbleDisplayStateTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatInputLayoutTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HealthLintCachingTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeDisplayStateTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeTemplateActionTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeTraceStateTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/InboxViewModelTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownInlineTextStylerTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/PikiLogoStyleTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RowInteractionTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/RuntimeMigrationTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/VaultInitializationTests.swift.o",
@@ -1834,23 +1866,23 @@
         "-DDEBUG",
         "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
         "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-        "-Xcc",
-        "-I",
-        "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-        "-Xcc",
-        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
         "-Xcc",
         "-I",
         "-Xcc",
-        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+        "-Xcc",
+        "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
+        "-Xcc",
+        "-I",
+        "-Xcc",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
         "-module-cache-path",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
         "-parseable-output",
@@ -1893,6 +1925,22 @@
       "outputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppNavigationTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/BrandLogoAssetTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatBubbleDisplayStateTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatInputLayoutTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.swift.o"
         },
         {
@@ -1909,6 +1957,14 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeTraceStateTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/InboxViewModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.swift.o"
         },
         {
@@ -1918,6 +1974,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/PikiLogoStyleTests.swift.o"
         },
         {
           "kind" : "file",
@@ -1946,13 +2006,20 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HealthLintCachingTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTemplateActionTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownDocumentPresentationTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownInlineTextStylerTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownSelectableTextViewTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/PikiLogoStyleTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RowInteractionTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/VaultInitializationTests.swift",
@@ -1974,80 +2041,80 @@
       "-package-name",
       "swift_markdown",
       "-c",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Document.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Markup.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupData.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/RawMarkup.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Document.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Markup.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupData.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/RawMarkup.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift",
       "-I",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Modules",
       "-target",
-      "arm64-apple-macosx10.13",
+      "arm64-apple-macosx15.0",
       "-incremental",
       "-enable-batch-mode",
       "-serialize-diagnostics",
@@ -2060,23 +2127,23 @@
       "-DDEBUG",
       "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-      "-Xcc",
-      "-I",
-      "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-      "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+      "-Xcc",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
+      "-Xcc",
+      "-I",
+      "-Xcc",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
       "-module-cache-path",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
       "-parseable-output",
@@ -2115,9 +2182,6 @@
       "-fPIC",
       "-Xcc",
       "-g",
-      "-suppress-warnings",
-      "-user-module-version",
-      "0.8.0",
       "-package-name",
       "swift_markdown",
       "-driver-use-frontend-path",
@@ -2198,23 +2262,23 @@
       "-DDEBUG",
       "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-      "-Xcc",
-      "-I",
-      "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-      "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+      "-Xcc",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-Xcc",
+      "-I",
+      "-Xcc",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
       "-module-cache-path",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
       "-parseable-output",
@@ -2284,23 +2348,23 @@
       "-DDEBUG",
       "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-      "-Xcc",
-      "-I",
-      "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-      "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+      "-Xcc",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-Xcc",
+      "-I",
+      "-Xcc",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
       "-module-cache-path",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
       "-parseable-output",
@@ -2349,13 +2413,20 @@
       "-package-name",
       "pikiapp",
       "-c",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HealthLintCachingTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTemplateActionTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownDocumentPresentationTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownInlineTextStylerTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownSelectableTextViewTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/PikiLogoStyleTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RowInteractionTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/RuntimeMigrationTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/VaultInitializationTests.swift",
@@ -2379,23 +2450,23 @@
       "-DDEBUG",
       "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/extensions/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/extensions/include",
       "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include/module.modulemap",
-      "-Xcc",
-      "-I",
-      "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-cmark/src/include",
-      "-Xcc",
-      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap",
       "-Xcc",
       "-I",
       "-Xcc",
-      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/CAtomic/include",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/build/SourcePackages/checkouts/swift-cmark/src/include",
+      "-Xcc",
+      "-fmodule-map-file=/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include/module.modulemap",
+      "-Xcc",
+      "-I",
+      "-Xcc",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/CAtomic/include",
       "-module-cache-path",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/ModuleCache",
       "-parseable-output",
@@ -2513,283 +2584,283 @@
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/ChildIndexPath.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/DirectiveArgument.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Document.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Document.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/LiteralMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/Markup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/Markup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupChildren.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/MarkupData.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/MarkupData.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/PlainTextConvertibleMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Base/RawMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Base/RawMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockDirective.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/BlockQuote.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/CustomBlock.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenAbstract.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenDiscussion.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenNote.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenParameter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/Doxygen Commands/DoxygenReturns.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/OrderedList.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/UnorderedList.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Inline Container Blocks/Paragraph.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/CodeBlock.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/HTMLBlock.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/Heading.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Leaf Blocks/ThematicBreak.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/Table.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableBody.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCell.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableCellContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableHead.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Block Nodes/Tables/TableRow.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/Replacement.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Infrastructure/SourceLocation.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Emphasis.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Image.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/InlineAttributes.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Link.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strikethrough.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Containers/Strong.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/CustomInline.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineCode.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/InlineHTML.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/LineBreak.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SoftBreak.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/SymbolLink.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Inline Nodes/Inline Leaves/Text.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Interpretive Nodes/Aside.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/BlockDirectiveParser.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/CommonMarkConverter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/LazySplitLines.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/ParseOptions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangeAdjuster.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Parser/RangerTracker.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Rewriter/MarkupRewriter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicBlockContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BasicInlineContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/BlockMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/InlineMarkup.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Structural Restrictions/ListItemContainer.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/AtomicCounter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CharacterExtensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/CollectionExtensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Utility/StringExtensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Visitor/MarkupVisitor.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/MarkupWalker.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/HTMLFormatter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupFormatter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/checkouts/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift"
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/LocalPackages/swift-markdown/Sources/Markdown/Walker/Walkers/MarkupTreeDumper.swift"
         }
       ],
       "outputFilePath" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Markdown.build/sources"
@@ -4183,6 +4254,22 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppNavigationTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/BrandLogoAssetTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatBubbleDisplayStateTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatInputLayoutTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.swift.o"
         },
         {
@@ -4199,6 +4286,14 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeTraceStateTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/InboxViewModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownDocumentPresentationTests.swift.o"
         },
         {
@@ -4208,6 +4303,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/MarkdownSelectableTextViewTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/PikiLogoStyleTests.swift.o"
         },
         {
           "kind" : "file",
@@ -4377,6 +4476,22 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift"
         },
         {
@@ -4393,6 +4508,14 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownDocumentPresentationTests.swift"
         },
         {
@@ -4402,6 +4525,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/MarkdownSelectableTextViewTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/PikiLogoStyleTests.swift"
         },
         {
           "kind" : "file",

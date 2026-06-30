@@ -20,6 +20,7 @@ final class WikiViewModel {
     var searchQuery: String = ""
     var errorMessage: String?
     var isLoading = false
+    var isRefreshing = false
     var previewTextScale: CGFloat = PreviewScale.default
 
     private(set) var editingPageID: String?
@@ -49,6 +50,14 @@ final class WikiViewModel {
         previewTextScale > PreviewScale.minimum + 0.001
     }
 
+    var shouldAutoRefresh: Bool {
+        !isEditingSelectedPage && !selectedPageHasUnsavedDraft
+    }
+
+    var isRefreshInFlight: Bool {
+        isLoading || isRefreshing
+    }
+
     var filteredCategories: [WikiCategory] {
         let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return categories }
@@ -70,15 +79,43 @@ final class WikiViewModel {
         await loadWiki(vaultURL: vaultURL)
     }
 
-    func loadWiki(vaultURL: URL?) async {
+    func refreshWikiIfSafe(vaultURL: URL?) async {
+        guard shouldAutoRefresh else { return }
+        await refreshWiki(vaultURL: vaultURL)
+    }
+
+    func syncVisibleWiki(vaultURL: URL?) async {
+        let path = vaultURL?.path(percentEncoded: false)
+        if path != loadedVaultPath {
+            await loadIfNeeded(vaultURL: vaultURL)
+        } else {
+            await refreshWikiIfSafe(vaultURL: vaultURL)
+        }
+    }
+
+    func refreshWiki(vaultURL: URL?) async {
+        await loadWiki(vaultURL: vaultURL, preservesVisibleContent: true)
+    }
+
+    func loadWiki(vaultURL: URL?, preservesVisibleContent: Bool = false) async {
         guard let vaultURL else {
             errorMessage = "No vault selected."
             categories = WikiCategory.defaults
             selectedPage = nil
+            isLoading = false
+            isRefreshing = false
             return
         }
 
-        isLoading = true
+        let hasVisibleContent = categories.contains(where: { !$0.pages.isEmpty })
+        let selectedPageID = selectedPage?.id
+
+        if preservesVisibleContent && hasVisibleContent {
+            isRefreshing = true
+        } else {
+            isLoading = true
+        }
+
         let wikiURL = vaultURL.appendingPathComponent("wiki", isDirectory: true)
         let loaded = await Task.detached {
             Self.loadAllCategories(wikiURL: wikiURL)
@@ -87,15 +124,15 @@ final class WikiViewModel {
         guard !Task.isCancelled else {
             loadedVaultPath = nil
             isLoading = false
+            isRefreshing = false
             return
         }
 
         categories = loaded
-        if selectedPage == nil {
-            selectedPage = loaded.flatMap(\.pages).first
-        }
+        selectedPage = Self.reboundSelection(for: selectedPageID, categories: loaded)
         errorMessage = nil
         isLoading = false
+        isRefreshing = false
     }
 
     @discardableResult
@@ -174,6 +211,12 @@ final class WikiViewModel {
 
     private func roundedScale(_ value: CGFloat) -> CGFloat {
         (value * 100).rounded() / 100
+    }
+
+    private nonisolated static func reboundSelection(for pageID: String?, categories: [WikiCategory]) -> WikiPage? {
+        let pages = categories.flatMap(\.pages)
+        guard let pageID else { return pages.first }
+        return pages.first(where: { $0.id == pageID }) ?? pages.first
     }
 
     private nonisolated static func loadAllCategories(wikiURL: URL) -> [WikiCategory] {

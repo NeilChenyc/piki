@@ -1,6 +1,21 @@
 import Foundation
 import os
 
+struct RuntimeBundleConfiguration: Equatable {
+    let pythonURL: URL
+    let sitePackagesURL: URL?
+}
+
+private struct RuntimePathsManifest: Decodable {
+    let python: String
+    let sitePackages: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case python
+        case sitePackages = "site_packages"
+    }
+}
+
 @MainActor
 final class LocalServiceManager {
     private static let logger = Logger(subsystem: "com.piki.app", category: "ServiceManager")
@@ -20,9 +35,10 @@ final class LocalServiceManager {
         appState.connectionStatus = .starting
         appState.serviceErrorMessage = nil
 
-        if await probeHealth() {
-            startMonitoring()
-            return
+        if launchedProcess {
+            stopProcess()
+        } else {
+            terminateConflictingServices()
         }
 
         if launchAgentService() {
@@ -111,12 +127,18 @@ final class LocalServiceManager {
     }
 
     private func launchAgentService() -> Bool {
-        guard let pythonURL = locatePython() else {
+        let projectRoot = locateProjectRoot()
+        let pikiHome = pikiHome()
+        let bundleRuntime = Self.runtimeBundleConfiguration(resourcesURL: Bundle.main.resourceURL)
+        guard let pythonURL = locatePython(
+            resourcesURL: Bundle.main.resourceURL,
+            projectRoot: projectRoot,
+            pikiHome: pikiHome
+        ) else {
             Self.logger.error("Python not found for Agent Service")
             return false
         }
 
-        let projectRoot = locateProjectRoot()
         let proc = Process()
         proc.executableURL = pythonURL
         proc.arguments = [
@@ -132,6 +154,15 @@ final class LocalServiceManager {
 
         var env = ProcessInfo.processInfo.environment
         env["PIKI_APP_MANAGED_SERVICE"] = "1"
+        if pythonURL == bundleRuntime?.pythonURL {
+            env["PIKI_APP_RUNTIME_SOURCE"] = "bundle"
+            if let pythonPath = Self.mergedPythonPath(
+                existingPythonPath: env["PYTHONPATH"],
+                sitePackagesURL: bundleRuntime?.sitePackagesURL
+            ) {
+                env["PYTHONPATH"] = pythonPath
+            }
+        }
         proc.environment = env
 
         let logURL = pikiLogDirectory().appendingPathComponent("agent-service.log")
@@ -151,6 +182,7 @@ final class LocalServiceManager {
             try proc.run()
             self.process = proc
             launchedProcess = true
+            restartCount = 0
             Self.logger.info("Agent Service launched pid=\(proc.processIdentifier)")
             return true
         } catch {
@@ -171,15 +203,24 @@ final class LocalServiceManager {
         launchedProcess = false
     }
 
-    private func locatePython() -> URL? {
-        let candidates = [
-            pikiHome().appendingPathComponent("venv/bin/python"),
-            locateProjectRoot()?.appendingPathComponent(".venv/bin/python"),
-            URL(fileURLWithPath: "/opt/anaconda3/bin/python3"),
-            URL(fileURLWithPath: "/usr/local/bin/python3"),
-            URL(fileURLWithPath: "/opt/homebrew/bin/python3"),
-            URL(fileURLWithPath: "/usr/bin/python3"),
-        ].compactMap { $0 }
+    private func terminateConflictingServices() {
+        let pids = Self.listeningProcessIdentifiers(onPort: 8782)
+        guard pids.isEmpty == false else {
+            return
+        }
+
+        Self.logger.warning("Terminating existing Agent Service listeners on port 8782: \(pids)")
+        for pid in pids {
+            Self.terminateProcess(pid: pid)
+        }
+    }
+
+    private func locatePython(resourcesURL: URL?, projectRoot: URL?, pikiHome: URL) -> URL? {
+        let candidates = Self.pythonCandidates(
+            resourcesURL: resourcesURL,
+            projectRoot: projectRoot,
+            pikiHome: pikiHome
+        )
 
         for url in candidates {
             if FileManager.default.isExecutableFile(atPath: url.path) {
@@ -187,6 +228,142 @@ final class LocalServiceManager {
             }
         }
         return nil
+    }
+
+    static func runtimeBundleConfiguration(
+        resourcesURL: URL?,
+        fileManager: FileManager = .default
+    ) -> RuntimeBundleConfiguration? {
+        guard let resourcesURL else {
+            return nil
+        }
+        let metadataURL = resourcesURL.appendingPathComponent("runtime-paths.json")
+        guard
+            let data = try? Data(contentsOf: metadataURL),
+            let manifest = try? JSONDecoder().decode(RuntimePathsManifest.self, from: data)
+        else {
+            return nil
+        }
+
+        let pythonURL = resourcesURL.appendingPathComponent(manifest.python)
+        guard fileManager.isExecutableFile(atPath: pythonURL.path) else {
+            return nil
+        }
+
+        var sitePackagesURL: URL? = nil
+        if let rawSitePackagesPath = manifest.sitePackages?.trimmingCharacters(in: .whitespacesAndNewlines),
+           rawSitePackagesPath.isEmpty == false {
+            let candidate = resourcesURL.appendingPathComponent(rawSitePackagesPath)
+            var isDirectory: ObjCBool = false
+            if fileManager.fileExists(atPath: candidate.path, isDirectory: &isDirectory), isDirectory.boolValue {
+                sitePackagesURL = candidate
+            }
+        }
+
+        return RuntimeBundleConfiguration(
+            pythonURL: pythonURL,
+            sitePackagesURL: sitePackagesURL
+        )
+    }
+
+    static func pythonCandidates(
+        resourcesURL: URL?,
+        projectRoot: URL?,
+        pikiHome: URL,
+        fileManager: FileManager = .default
+    ) -> [URL] {
+        var candidates: [URL] = []
+        if let bundledRuntime = runtimeBundleConfiguration(resourcesURL: resourcesURL, fileManager: fileManager) {
+            candidates.append(bundledRuntime.pythonURL)
+        }
+        candidates.append(contentsOf: [
+            pikiHome.appendingPathComponent("venv/bin/python"),
+            projectRoot?.appendingPathComponent(".venv/bin/python"),
+            URL(fileURLWithPath: "/opt/anaconda3/bin/python3"),
+            URL(fileURLWithPath: "/usr/local/bin/python3"),
+            URL(fileURLWithPath: "/opt/homebrew/bin/python3"),
+            URL(fileURLWithPath: "/usr/bin/python3"),
+        ].compactMap { $0 })
+
+        var uniqueCandidates: [URL] = []
+        var seenPaths = Set<String>()
+        for url in candidates {
+            let standardizedPath = url.standardizedFileURL.path
+            if seenPaths.insert(standardizedPath).inserted {
+                uniqueCandidates.append(url)
+            }
+        }
+        return uniqueCandidates
+    }
+
+    static func mergedPythonPath(existingPythonPath: String?, sitePackagesURL: URL?) -> String? {
+        let existingEntries = (existingPythonPath ?? "")
+            .split(separator: ":")
+            .map(String.init)
+            .filter { $0.isEmpty == false }
+        var entries: [String] = []
+        if let sitePackagesURL {
+            entries.append(sitePackagesURL.path)
+        }
+        entries.append(contentsOf: existingEntries)
+        if entries.isEmpty {
+            return nil
+        }
+
+        var uniqueEntries: [String] = []
+        var seen = Set<String>()
+        for entry in entries {
+            if seen.insert(entry).inserted {
+                uniqueEntries.append(entry)
+            }
+        }
+        return uniqueEntries.joined(separator: ":")
+    }
+
+    static func listeningProcessIdentifiers(onPort port: Int) -> [Int32] {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = [
+            "-c",
+            "lsof -nP -iTCP:\(port) -sTCP:LISTEN -t 2>/dev/null"
+        ]
+
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            return []
+        }
+
+        guard process.terminationStatus == 0 || process.terminationStatus == 1 else {
+            return []
+        }
+
+        let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        guard let output = String(data: data, encoding: .utf8) else {
+            return []
+        }
+        return listeningProcessIdentifiers(from: output)
+    }
+
+    static func listeningProcessIdentifiers(from output: String) -> [Int32] {
+        var pids = Set<Int32>()
+        for line in output.split(whereSeparator: \.isNewline) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let pid = Int32(trimmed) else {
+                continue
+            }
+            pids.insert(pid)
+        }
+        return pids.sorted()
+    }
+
+    static func terminateProcess(pid: Int32) {
+        kill(pid, SIGTERM)
     }
 
     private func locateProjectRoot() -> URL? {

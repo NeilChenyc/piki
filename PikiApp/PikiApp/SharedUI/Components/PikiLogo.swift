@@ -1,10 +1,29 @@
 import SwiftUI
 
 struct PikiLogo: View {
+    enum Style {
+        case navigation
+        case hero
+
+        var height: CGFloat {
+            switch self {
+            case .navigation: 78.4
+            case .hero: 120
+            }
+        }
+    }
+
+    let style: Style
+
+    init(style: Style = .navigation) {
+        self.style = style
+    }
+
     var body: some View {
         Image("BrandLogo", bundle: brandLogoBundle)
             .resizable()
-            .aspectRatio(contentMode: .fit)
+            .scaledToFit()
+            .frame(height: style.height)
             .accessibilityLabel("Piki")
     }
 
@@ -18,8 +37,10 @@ struct PikiLogo: View {
 }
 
 #Preview {
-    PikiLogo()
-        .frame(width: 160, height: 64)
-        .padding()
-        .background(Color.white)
+    VStack(spacing: 24) {
+        PikiLogo(style: .navigation)
+        PikiLogo(style: .hero)
+    }
+    .padding()
+    .background(Theme.primaryPanelBackground)
 }

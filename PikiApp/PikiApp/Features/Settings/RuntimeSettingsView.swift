@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct RuntimeSettingsView: View {
+    private let topCardMinHeight: CGFloat = 190
+
     @Environment(AppState.self) private var appState
     @Environment(RuntimeSettingsViewModel.self) private var viewModel
 
@@ -17,7 +19,9 @@ struct RuntimeSettingsView: View {
                 presetsSection
             }
             .padding(24)
+            .padding(.top, 16)
         }
+        .background(Theme.primaryPanelBackground)
         .task {
             await viewModel.load(appState: appState)
         }
@@ -34,7 +38,7 @@ struct RuntimeSettingsView: View {
             Text("设置")
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
-            Text("管理运行时配置、切换配置模板、设置知识仓库路径。")
+            Text("管理运行时配置、切换大模型 API 配置模板、设置知识仓库路径。")
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.textSecondary)
         }
@@ -48,7 +52,7 @@ struct RuntimeSettingsView: View {
                 Circle()
                     .fill(statusColor)
                     .frame(width: 8, height: 8)
-                Text("当前运行时")
+                Text("当前接入大模型 API")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
@@ -66,7 +70,7 @@ struct RuntimeSettingsView: View {
             }
         }
         .padding(18)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: topCardMinHeight, alignment: .topLeading)
         .cardStyle()
     }
 
@@ -75,7 +79,7 @@ struct RuntimeSettingsView: View {
     private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("配置模板")
+                Text("大模型 API 配置模板")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
@@ -141,7 +145,10 @@ struct RuntimeSettingsView: View {
                         .truncationMode(.middle)
                 }
                 Button("选择路径...") { chooseVault() }
+                    .controlSize(.large)
             }
+
+            Spacer(minLength: 0)
 
             HStack(spacing: 12) {
                 Button {
@@ -154,6 +161,7 @@ struct RuntimeSettingsView: View {
                         Text("初始化仓库")
                     }
                 }
+                .controlSize(.large)
                 .disabled(appState.vaultPath == nil || viewModel.isInitializingVault)
 
                 if let msg = viewModel.vaultInitMessage {
@@ -164,7 +172,7 @@ struct RuntimeSettingsView: View {
             }
         }
         .padding(18)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: topCardMinHeight, alignment: .topLeading)
         .cardStyle()
     }
 
@@ -208,7 +216,7 @@ struct RuntimeSettingsView: View {
 
     private func bannerView(_ state: RuntimeSettingsViewModel.BannerState) -> some View {
         let (bgColor, fgColor, message): (Color, Color, String) = switch state {
-        case .none: (Theme.surfaceSecondary, Theme.textSecondary, "")
+        case .none: (Theme.subtleFill, Theme.textSecondary, "")
         case .info(let m): (Theme.selection, Theme.textSecondary, m)
         case .success(let m): (Theme.accentLight, Theme.accentDark, m)
         case .error(let m): (Color.red.opacity(0.08), Theme.error, m)
