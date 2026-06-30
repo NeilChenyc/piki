@@ -13,7 +13,7 @@ struct LintCTACard: View {
                 Text("轻量维护")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
-                Text("Run lint 用来重新检查结构、链接、新鲜度和知识缺口；Apply low-risk fixes 只处理当前支持的低风险自动修复。")
+                Text("Run lint 用来重新检查结构、链接和复查状态；Apply low-risk fixes 只处理当前支持的低风险自动修复。")
                     .font(.system(size: 12))
                     .foregroundStyle(.white.opacity(0.82))
                     .lineLimit(3)

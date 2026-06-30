@@ -5,21 +5,13 @@ struct QuickActionsView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            QuickActionChip(
-                title: "提个问题",
-                icon: "questionmark.circle",
-                action: { onAction(.ask) }
-            )
-            QuickActionChip(
-                title: "添加素材",
-                icon: "doc.badge.plus",
-                action: { onAction(.ingest) }
-            )
-            QuickActionChip(
-                title: "运行健康检查",
-                icon: "heart.text.square",
-                action: { onAction(.healthCheck) }
-            )
+            ForEach(QuickAction.allCases, id: \.self) { item in
+                QuickActionChip(
+                    title: item.title,
+                    icon: item.icon,
+                    action: { onAction(item) }
+                )
+            }
             Spacer()
         }
     }

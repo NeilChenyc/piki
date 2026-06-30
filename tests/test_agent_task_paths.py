@@ -104,3 +104,83 @@ def test_lint_report_main_path_uses_agent_task_output(tmp_path: Path):
     assert task["status"] == "completed"
     assert task["output"]["lint_result"]["scanned_files"] >= 3
     assert "missing_index_entry" in task["output"]["lint_result"]["issue_counts"]
+
+
+def test_health_check_prompt_is_promoted_to_run_lint_when_runtime_unconfigured(tmp_path: Path):
+    vault_path = make_query_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            enable_agent_runtime=False,
+        ),
+        store=store,
+    )
+    client = TestClient(app)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "请帮我做一次知识库健康检查，并告诉我结构上有什么问题。",
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["action_context"]["action"] == "run_lint"
+    assert task["output"]["lint_result"]["scanned_files"] >= 3
+
+
+def test_health_check_prompt_with_selected_paths_is_not_promoted_to_run_lint(tmp_path: Path):
+    vault_path = make_query_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            enable_agent_runtime=False,
+        ),
+        store=store,
+    )
+    client = TestClient(app)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "请帮我做一次知识库健康检查。",
+            "selected_paths": [str(tmp_path / "attachment.md")],
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "failed"
+    assert "Claude Agent runtime is not configured" in task["summary"]
+
+
+def test_run_vault_lint_prompt_is_promoted_to_run_lint_when_runtime_unconfigured(tmp_path: Path):
+    vault_path = make_query_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            enable_agent_runtime=False,
+        ),
+        store=store,
+    )
+    client = TestClient(app)
+
+    response = client.post(
+        "/tasks",
+        json={
+            "vault_path": str(vault_path),
+            "user_input": "Run vault lint",
+        },
+    )
+
+    assert response.status_code == 200
+    task = client.get(f"/tasks/{response.json()['task_id']}").json()
+    assert task["status"] == "completed"
+    assert task["output"]["action_context"]["action"] == "run_lint"

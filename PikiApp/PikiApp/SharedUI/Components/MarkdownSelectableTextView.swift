@@ -14,28 +14,50 @@ struct MarkdownSelectableTextView: NSViewRepresentable {
         Coordinator(onOpenWikiLink: onOpenWikiLink)
     }
 
-    func makeNSView(context: Context) -> NSTextView {
-        let textView = NSTextView(frame: .zero)
-        Self.configure(textView)
+    func makeNSView(context: Context) -> NSScrollView {
+        let scrollView = Self.makeContainerScrollView()
+        let textView = Self.makeConfiguredTextView()
         textView.delegate = context.coordinator
         updateTextView(textView, coordinator: context.coordinator)
+        scrollView.documentView = textView
+        return scrollView
+    }
+
+    static func makeContainerScrollView() -> NSScrollView {
+        let scrollView = NSScrollView()
+        scrollView.drawsBackground = false
+        scrollView.borderType = .noBorder
+        scrollView.hasVerticalScroller = false
+        scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
+        return scrollView
+    }
+
+    static func makeConfiguredTextView() -> NSTextView {
+        let textView = NSTextView(frame: .zero)
+        Self.configure(textView)
         return textView
     }
 
-    func updateNSView(_ textView: NSTextView, context: Context) {
+    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        guard let textView = scrollView.documentView as? NSTextView else { return }
         context.coordinator.onOpenWikiLink = onOpenWikiLink
         updateTextView(textView, coordinator: context.coordinator)
     }
 
-    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSTextView, context: Context) -> CGSize? {
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSScrollView, context: Context) -> CGSize? {
+        guard let textView = nsView.documentView as? NSTextView else {
+            return nil
+        }
+
         let width = proposal.width ?? nsView.bounds.width
         let resolvedWidth = max(width, 1)
 
-        if let textContainer = nsView.textContainer, let layoutManager = nsView.layoutManager {
+        if let textContainer = textView.textContainer, let layoutManager = textView.layoutManager {
             textContainer.containerSize = NSSize(width: resolvedWidth, height: .greatestFiniteMagnitude)
             layoutManager.ensureLayout(for: textContainer)
             let usedRect = layoutManager.usedRect(for: textContainer)
-            let height = ceil(usedRect.height + nsView.textContainerInset.height * 2)
+            let height = ceil(usedRect.height + textView.textContainerInset.height * 2)
             return CGSize(width: resolvedWidth, height: height)
         }
 

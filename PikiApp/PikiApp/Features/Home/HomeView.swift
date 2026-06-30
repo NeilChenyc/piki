@@ -77,7 +77,9 @@ struct HomeView: View {
     }
 
     private var chatStateView: some View {
-        HStack(spacing: 0) {
+        @Bindable var viewModel = viewModel
+
+        return HStack(spacing: 0) {
             VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -120,6 +122,7 @@ struct HomeView: View {
                 }
 
                 ChatInputView(
+                    text: $viewModel.inputText,
                     placeholder: inputPlaceholder,
                     isDisabled: isInputDisabled,
                     showsStopButton: viewModel.isSending,
@@ -127,6 +130,14 @@ struct HomeView: View {
                     style: .docked,
                     helperText: nil,
                     autofocus: true,
+                    externalRequest: viewModel.chatInputExternalRequest,
+                    onExternalRequestHandled: {
+                        viewModel.consumeChatInputExternalRequest()
+                    },
+                    onRequestFileUpload: nil,
+                    onRequestPodcastPrompt: {
+                        viewModel.preparePodcastPrompt()
+                    },
                     onSend: { text, files in
                         viewModel.sendMessage(text, appState: appState, selectedFiles: files)
                     },
@@ -159,7 +170,9 @@ struct HomeView: View {
     }
 
     private var emptyStateView: some View {
-        VStack {
+        @Bindable var viewModel = viewModel
+
+        return VStack {
             Spacer(minLength: 48)
 
             VStack(spacing: 36) {
@@ -167,6 +180,7 @@ struct HomeView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     ChatInputView(
+                        text: $viewModel.inputText,
                         placeholder: inputPlaceholder,
                         isDisabled: isInputDisabled,
                         showsStopButton: viewModel.isSending,
@@ -174,6 +188,14 @@ struct HomeView: View {
                         style: .hero,
                         helperText: emptyStateHint,
                         autofocus: true,
+                        externalRequest: viewModel.chatInputExternalRequest,
+                        onExternalRequestHandled: {
+                            viewModel.consumeChatInputExternalRequest()
+                        },
+                        onRequestFileUpload: nil,
+                        onRequestPodcastPrompt: {
+                            viewModel.preparePodcastPrompt()
+                        },
                         onSend: { text, files in
                             viewModel.sendMessage(text, appState: appState, selectedFiles: files)
                         },

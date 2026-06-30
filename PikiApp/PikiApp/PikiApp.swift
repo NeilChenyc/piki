@@ -44,6 +44,7 @@ struct PikiApp: App {
                     appState.serviceManager = manager
                     appDelegate.serviceManager = manager
                     await manager.start()
+                    await appState.prewarmHealthLintIfNeeded()
                 }
         }
         .windowStyle(.hiddenTitleBar)

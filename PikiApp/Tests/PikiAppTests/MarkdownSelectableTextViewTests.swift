@@ -17,4 +17,18 @@ struct MarkdownSelectableTextViewTests {
         #expect(textView.textContainer?.widthTracksTextView == true)
         #expect(textView.linkTextAttributes?[.underlineStyle] != nil)
     }
+
+    @MainActor
+    @Test
+    func embedsConfiguredTextViewInsideScrollContainer() {
+        let scrollView = MarkdownSelectableTextView.makeContainerScrollView()
+        let textView = MarkdownSelectableTextView.makeConfiguredTextView()
+        scrollView.documentView = textView
+
+        #expect(scrollView.drawsBackground == false)
+        #expect(scrollView.hasVerticalScroller == false)
+        #expect(scrollView.documentView is NSTextView)
+        #expect(textView.isSelectable)
+        #expect(textView.isEditable == false)
+    }
 }

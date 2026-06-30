@@ -13,8 +13,8 @@ struct DocumentMarkdownView: View {
         MarkdownDocumentPresentation.prepare(source: content, mode: presentationMode)
     }
 
-    private var blocks: [DocumentMarkdownBlock] {
-        DocumentMarkdownBlockBuilder.make(
+    private var segments: [MarkdownDisplaySegment] {
+        DocumentMarkdownSegmentBuilder.make(
             document: preparedDocument,
             baseURL: baseURL
         )
@@ -39,18 +39,17 @@ struct DocumentMarkdownView: View {
 
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(blocks.enumerated()), id: \.offset) { index, block in
-                    DocumentMarkdownBlockView(
-                        block: block,
+                ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
+                    DocumentMarkdownSegmentView(
+                        segment: segment,
                         style: style,
-                        baseURL: baseURL,
                         onOpenWikiLink: onOpenWikiLink
                     )
 
-                    if let spacing = block.spacingAfter {
+                    if let spacing = segment.spacingAfter {
                         Color.clear
                             .frame(height: style.scaled(spacing))
-                    } else if index < blocks.count - 1 {
+                    } else if index < segments.count - 1 {
                         Color.clear
                             .frame(height: style.scaled(12))
                     }
@@ -61,6 +60,39 @@ struct DocumentMarkdownView: View {
         }
         .scrollIndicators(.visible)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+}
+
+private struct DocumentMarkdownSegmentView: View {
+    let segment: MarkdownDisplaySegment
+    let style: DocumentMarkdownStyle
+    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
+
+    var body: some View {
+        switch segment.kind {
+        case .textCluster(let cluster):
+            MarkdownSelectableTextView(
+                attributedText: style.scaled(cluster.attributedText, baseFontSize: 13),
+                onOpenWikiLink: onOpenWikiLink
+            )
+
+        case .specialBlock(let specialBlock):
+            switch specialBlock.kind {
+            case .table(let payload):
+                DocumentTableBlockView(
+                    payload: payload,
+                    style: style,
+                    onOpenWikiLink: onOpenWikiLink
+                )
+
+            case .image(let image):
+                DocumentImageBlockView(image: image, style: style)
+
+            case .divider:
+                Divider()
+                    .overlay(Theme.border)
+            }
+        }
     }
 }
 
@@ -93,125 +125,6 @@ struct MessageMarkdownView: View {
             onOpenWikiLink(target)
             return .handled
         })
-    }
-}
-
-private struct DocumentMarkdownBlockView: View {
-    let block: DocumentMarkdownBlock
-    let style: DocumentMarkdownStyle
-    let baseURL: URL?
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        switch block.kind {
-        case .metadata(let items):
-            DocumentMetadataStrip(items: items, style: style)
-
-        case .heading(let payload):
-            DocumentHeadingView(payload: payload, style: style)
-
-        case .text(let payload):
-            DocumentTextBlockView(
-                payload: payload,
-                style: style,
-                onOpenWikiLink: onOpenWikiLink
-            )
-
-        case .table(let payload):
-            DocumentTableBlockView(
-                payload: payload,
-                style: style,
-                onOpenWikiLink: onOpenWikiLink
-            )
-
-        case .codeBlock(let payload):
-            DocumentCodeBlockView(payload: payload, style: style)
-
-        case .image(let image):
-            DocumentImageBlockView(image: image, style: style)
-
-        case .divider:
-            Divider()
-                .overlay(Theme.border)
-        }
-    }
-}
-
-private struct DocumentMetadataStrip: View {
-    let items: [MarkdownDocumentPresentation.MetadataItem]
-    let style: DocumentMarkdownStyle
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: style.scaled(8)) {
-            ForEach(items, id: \.key) { item in
-                HStack(alignment: .firstTextBaseline, spacing: style.scaled(12)) {
-                    Text(item.key)
-                        .font(.system(size: style.metadataFontSize, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Theme.textTertiary)
-                        .frame(width: style.scaled(78), alignment: .leading)
-
-                    Text(item.value)
-                        .font(.system(size: style.metadataFontSize))
-                        .foregroundStyle(Theme.textSecondary)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-        }
-    }
-}
-
-private struct DocumentHeadingView: View {
-    let payload: DocumentHeadingPayload
-    let style: DocumentMarkdownStyle
-
-    var body: some View {
-        Text(payload.text)
-            .font(font)
-            .foregroundStyle(Theme.textPrimary)
-            .lineSpacing(style.scaled(payload.lineSpacing))
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var font: Font {
-        switch payload.level {
-        case 1:
-            return .system(size: style.h1FontSize, weight: .bold)
-        case 2:
-            return .system(size: style.h2FontSize, weight: .semibold)
-        case 3:
-            return .system(size: style.h3FontSize, weight: .semibold)
-        default:
-            return .system(size: style.bodyFontSize + style.scaled(1), weight: .semibold)
-        }
-    }
-}
-
-private struct DocumentTextBlockView: View {
-    let payload: DocumentTextBlockPayload
-    let style: DocumentMarkdownStyle
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        switch payload.style {
-        case .blockquote:
-            HStack(alignment: .top, spacing: style.scaled(10)) {
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(Theme.border)
-                    .frame(width: style.scaled(3))
-                MarkdownSelectableTextView(
-                    attributedText: style.scaled(payload.attributedText, baseFontSize: 13),
-                    onOpenWikiLink: onOpenWikiLink
-                )
-            }
-
-        case .body:
-            MarkdownSelectableTextView(
-                attributedText: style.scaled(payload.attributedText, baseFontSize: 13),
-                onOpenWikiLink: onOpenWikiLink
-            )
-        }
     }
 }
 
@@ -267,40 +180,6 @@ private struct DocumentTableBlockView: View {
                 .fill(Theme.border)
                 .frame(height: 0.7)
         }
-    }
-}
-
-private struct DocumentCodeBlockView: View {
-    let payload: DocumentCodeBlockPayload
-    let style: DocumentMarkdownStyle
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if let language = payload.language, !language.isEmpty {
-                Text(language.uppercased())
-                    .font(.system(size: style.metadataFontSize, weight: .semibold))
-                    .foregroundStyle(Theme.textTertiary)
-                    .padding(.horizontal, style.scaled(12))
-                    .padding(.vertical, style.scaled(7))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Theme.surfaceSecondary)
-            }
-
-            ScrollView(.horizontal, showsIndicators: true) {
-                Text(payload.code)
-                    .font(.system(size: style.codeFontSize, design: .monospaced))
-                    .foregroundStyle(Theme.textPrimary)
-                    .padding(style.scaled(12))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-            }
-        }
-        .background(Theme.cardBackground)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Theme.border, lineWidth: 0.7)
-        )
-        .clipShape(.rect(cornerRadius: 8))
     }
 }
 
@@ -483,226 +362,545 @@ private struct DocumentMarkdownStyle {
     }
 }
 
+struct MarkdownDisplaySegment: Equatable {
+    let kind: Kind
+    let spacingAfter: CGFloat?
+
+    enum Kind: Equatable {
+        case textCluster(MarkdownTextCluster)
+        case specialBlock(MarkdownSpecialBlock)
+    }
+}
+
+struct MarkdownTextCluster: Equatable {
+    let attributedText: NSAttributedString
+
+    static func == (lhs: MarkdownTextCluster, rhs: MarkdownTextCluster) -> Bool {
+        lhs.attributedText.isEqual(to: rhs.attributedText)
+    }
+}
+
+struct MarkdownSpecialBlock: Equatable {
+    let kind: Kind
+
+    enum Kind: Equatable {
+        case table(DocumentTableBlockPayload)
+        case image(MarkdownImage)
+        case divider
+    }
+}
+
+private struct MarkdownSegmentAccumulator {
+    private(set) var segments: [MarkdownDisplaySegment] = []
+    private var pendingText = NSMutableAttributedString()
+    private var pendingSpacingAfter: CGFloat?
+
+    mutating func appendText(_ attributedText: NSAttributedString, spacingAfter: CGFloat) {
+        guard attributedText.length > 0 else { return }
+        if pendingText.length > 0 {
+            pendingText.append(NSAttributedString(string: "\n\n"))
+        }
+        pendingText.append(attributedText)
+        pendingSpacingAfter = spacingAfter
+    }
+
+    mutating func appendSpecial(_ kind: MarkdownSpecialBlock.Kind, spacingAfter: CGFloat?) {
+        flushTextCluster()
+        segments.append(
+            MarkdownDisplaySegment(
+                kind: .specialBlock(MarkdownSpecialBlock(kind: kind)),
+                spacingAfter: spacingAfter
+            )
+        )
+    }
+
+    mutating func finish() -> [MarkdownDisplaySegment] {
+        flushTextCluster()
+        return segments
+    }
+
+    private mutating func flushTextCluster() {
+        guard pendingText.length > 0 else { return }
+        segments.append(
+            MarkdownDisplaySegment(
+                kind: .textCluster(
+                    MarkdownTextCluster(
+                        attributedText: NSAttributedString(attributedString: pendingText)
+                    )
+                ),
+                spacingAfter: pendingSpacingAfter
+            )
+        )
+        pendingText = NSMutableAttributedString()
+        pendingSpacingAfter = nil
+    }
+}
+
+private enum MarkdownAttributedTextFactory {
+    static func metadata(_ items: [MarkdownDocumentPresentation.MetadataItem]) -> NSAttributedString {
+        let text = NSMutableAttributedString()
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 5
+        paragraphStyle.defaultTabInterval = 96
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 96)]
+
+        for (index, item) in items.enumerated() {
+            if index > 0 {
+                text.append(NSAttributedString(string: "\n"))
+            }
+
+            let line = NSMutableAttributedString()
+            line.append(
+                NSAttributedString(
+                    string: "\(item.key)\t",
+                    attributes: [
+                        .font: NSFont.monospacedSystemFont(ofSize: 10.5, weight: .medium),
+                        .foregroundColor: NSColor.secondaryLabelColor,
+                        .paragraphStyle: paragraphStyle,
+                    ]
+                )
+            )
+            line.append(
+                NSAttributedString(
+                    string: item.value,
+                    attributes: [
+                        .font: NSFont.systemFont(ofSize: 10.5),
+                        .foregroundColor: NSColor.tertiaryLabelColor,
+                        .paragraphStyle: paragraphStyle,
+                    ]
+                )
+            )
+            text.append(line)
+        }
+
+        return text
+    }
+
+    static func heading(_ text: String, level: Int, color: NSColor, isMessage: Bool) -> NSAttributedString {
+        let size: CGFloat
+        let weight: NSFont.Weight
+        switch level {
+        case 1:
+            size = isMessage ? 22 : 24
+            weight = .bold
+        case 2:
+            size = isMessage ? 18 : 20
+            weight = .semibold
+        case 3:
+            size = isMessage ? 15 : 16
+            weight = .semibold
+        default:
+            size = 13
+            weight = .semibold
+        }
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = level == 1 ? 2 : 3
+        return NSAttributedString(
+            string: text,
+            attributes: [
+                .font: NSFont.systemFont(ofSize: size, weight: weight),
+                .foregroundColor: color,
+                .paragraphStyle: paragraphStyle,
+            ]
+        )
+    }
+
+    static func body(_ source: String, fontSize: CGFloat, foregroundColor: Color) -> NSAttributedString {
+        inlineMarkdownText(
+            source,
+            font: .system(size: fontSize),
+            foregroundColor: foregroundColor
+        )
+    }
+
+    static func list(_ items: [MarkdownListItem], fontSize: CGFloat, foregroundColor: Color) -> NSAttributedString {
+        body(
+            items.map(markdownListItemText).joined(separator: "\n"),
+            fontSize: fontSize,
+            foregroundColor: foregroundColor
+        )
+    }
+
+    static func quote(_ blocks: [RenderedMarkdownBlock], fontSize: CGFloat) -> NSAttributedString {
+        let quoteText = blocks
+            .compactMap(flattenBlockquoteText)
+            .joined(separator: "\n\n")
+        let attributed = body(quoteText, fontSize: fontSize, foregroundColor: Theme.textSecondary)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = 16
+        paragraphStyle.headIndent = 16
+        paragraphStyle.lineSpacing = 3
+
+        let mutable = NSMutableAttributedString(
+            string: "│ ",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: fontSize, weight: .semibold),
+                .foregroundColor: NSColor.separatorColor,
+                .paragraphStyle: paragraphStyle,
+            ]
+        )
+        let quotedContent = NSMutableAttributedString(attributedString: attributed)
+        quotedContent.addAttributes([
+            .foregroundColor: NSColor.secondaryLabelColor,
+            .paragraphStyle: paragraphStyle,
+        ], range: NSRange(location: 0, length: quotedContent.length))
+        mutable.append(quotedContent)
+        return mutable
+    }
+
+    static func codeBlock(language: String?, code: String, fontSize: CGFloat) -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 3
+        paragraphStyle.paragraphSpacing = 2
+
+        let mutable = NSMutableAttributedString()
+        if let language, !language.isEmpty {
+            mutable.append(
+                NSAttributedString(
+                    string: "\(language.uppercased())\n",
+                    attributes: [
+                        .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
+                        .foregroundColor: NSColor.tertiaryLabelColor,
+                        .paragraphStyle: paragraphStyle,
+                    ]
+                )
+            )
+        }
+
+        mutable.append(
+            NSAttributedString(
+                string: code,
+                attributes: [
+                    .font: NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular),
+                    .foregroundColor: NSColor.labelColor,
+                    .backgroundColor: NSColor.controlBackgroundColor,
+                    .paragraphStyle: paragraphStyle,
+                ]
+            )
+        )
+        return mutable
+    }
+
+    static func htmlBlock(_ html: String, fontSize: CGFloat) -> NSAttributedString {
+        codeBlock(language: "html", code: html, fontSize: fontSize)
+    }
+
+    static func tablePayload(_ table: MarkdownTable, foregroundColor: Color) -> DocumentTableBlockPayload {
+        DocumentTableBlockPayload(
+            headers: table.headers.map {
+                inlineMarkdownText(
+                    $0,
+                    font: .system(size: 12, weight: .semibold),
+                    foregroundColor: Theme.textPrimary
+                )
+            },
+            rows: table.rows.map { row in
+                row.map {
+                    inlineMarkdownText(
+                        $0,
+                        font: .system(size: 12),
+                        foregroundColor: foregroundColor
+                    )
+                }
+            }
+        )
+    }
+
+    static func inlineMarkdownText(_ source: String, font: Font, foregroundColor: Color) -> NSAttributedString {
+        (try? MarkdownInlineTextStyler.makeNSAttributedString(
+            from: source,
+            font: font,
+            foregroundColor: foregroundColor
+        )) ?? NSAttributedString(
+            string: source,
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 13),
+                .foregroundColor: NSColor.labelColor,
+            ]
+        )
+    }
+
+    static func markdownListItemText(_ item: MarkdownListItem) -> String {
+        let indent = String(repeating: "    ", count: item.level)
+        let marker: String
+        if let checkbox = item.checkbox {
+            marker = checkbox == .checked ? "[x]" : "[ ]"
+        } else {
+            marker = item.isOrdered ? item.marker : "•"
+        }
+        return "\(indent)\(marker) \(item.text)"
+    }
+
+    static func flattenBlockquoteText(_ block: RenderedMarkdownBlock) -> String? {
+        switch block {
+        case .paragraph(let text):
+            return text
+        case .heading(_, let text):
+            return text
+        case .list(let items):
+            return items.map(markdownListItemText).joined(separator: "\n")
+        case .codeBlock(let language, let code):
+            let prefix = (language?.isEmpty == false ? "\(language!.uppercased())\n" : "")
+            return prefix + code
+        case .html(let html):
+            return html
+        case .blockquote(let nested):
+            return nested.compactMap(flattenBlockquoteText).joined(separator: "\n\n")
+        case .table(let table):
+            let header = table.headers.joined(separator: " | ")
+            let body = table.rows.map { $0.joined(separator: " | ") }.joined(separator: "\n")
+            return ([header, body].filter { !$0.isEmpty }).joined(separator: "\n")
+        case .thematicBreak:
+            return nil
+        case .image(let image):
+            return image.alt.isEmpty ? image.source : image.alt
+        }
+    }
+}
+
+@MainActor
+private enum DocumentMarkdownSegmentBuilder {
+    static func make(
+        document: MarkdownDocumentPresentation.PreparedDocument,
+        baseURL: URL?
+    ) -> [MarkdownDisplaySegment] {
+        var accumulator = MarkdownSegmentAccumulator()
+
+        if !document.metadata.isEmpty {
+            accumulator.appendText(MarkdownAttributedTextFactory.metadata(document.metadata), spacingAfter: 28)
+        }
+
+        if document.shouldRenderTitleInsideDocument, let title = document.resolvedDisplayTitle {
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.heading(
+                    title,
+                    level: 1,
+                    color: NSColor.labelColor,
+                    isMessage: false
+                ),
+                spacingAfter: 22
+            )
+        }
+
+        let blocks = MarkdownDocumentRenderer.parse(document.bodyMarkdown, baseURL: baseURL)
+        for block in blocks {
+            append(block, to: &accumulator)
+        }
+
+        return accumulator.finish()
+    }
+
+    private static func append(_ block: RenderedMarkdownBlock, to accumulator: inout MarkdownSegmentAccumulator) {
+        switch block {
+        case .heading(let level, let text):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.heading(
+                    text,
+                    level: level,
+                    color: NSColor.labelColor,
+                    isMessage: false
+                ),
+                spacingAfter: headingSpacingAfter(level)
+            )
+        case .paragraph(let text):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.body(text, fontSize: 13, foregroundColor: Theme.textPrimary),
+                spacingAfter: 14
+            )
+        case .blockquote(let blocks):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.quote(blocks, fontSize: 13),
+                spacingAfter: 16
+            )
+        case .list(let items):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.list(items, fontSize: 13, foregroundColor: Theme.textPrimary),
+                spacingAfter: 14
+            )
+        case .codeBlock(let language, let code):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.codeBlock(language: language, code: code, fontSize: 12),
+                spacingAfter: 18
+            )
+        case .html(let html):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.htmlBlock(html, fontSize: 12),
+                spacingAfter: 18
+            )
+        case .table(let table):
+            accumulator.appendSpecial(
+                .table(MarkdownAttributedTextFactory.tablePayload(table, foregroundColor: Theme.textSecondary)),
+                spacingAfter: 18
+            )
+        case .thematicBreak:
+            accumulator.appendSpecial(.divider, spacingAfter: 18)
+        case .image(let image):
+            accumulator.appendSpecial(.image(image), spacingAfter: 18)
+        }
+    }
+
+    private static func headingSpacingAfter(_ level: Int) -> CGFloat {
+        switch level {
+        case 1:
+            return 20
+        case 2:
+            return 14
+        case 3:
+            return 10
+        default:
+            return 8
+        }
+    }
+}
+
+@MainActor
+private enum MessageMarkdownSegmentBuilder {
+    static func make(content: String, foregroundColor: Color) -> [MarkdownDisplaySegment] {
+        var accumulator = MarkdownSegmentAccumulator()
+        let blocks = MarkdownDocumentRenderer.parse(content, baseURL: nil)
+        for block in blocks {
+            append(block, foregroundColor: foregroundColor, to: &accumulator)
+        }
+        return accumulator.finish()
+    }
+
+    private static func append(
+        _ block: RenderedMarkdownBlock,
+        foregroundColor: Color,
+        to accumulator: inout MarkdownSegmentAccumulator
+    ) {
+        switch block {
+        case .heading(let level, let text):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.heading(
+                    text,
+                    level: level,
+                    color: NSColor.labelColor,
+                    isMessage: true
+                ),
+                spacingAfter: level <= 2 ? 10 : 6
+            )
+        case .paragraph(let text):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.body(text, fontSize: 13, foregroundColor: foregroundColor),
+                spacingAfter: 10
+            )
+        case .blockquote(let blocks):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.quote(blocks, fontSize: 13),
+                spacingAfter: 12
+            )
+        case .list(let items):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.list(items, fontSize: 13, foregroundColor: foregroundColor),
+                spacingAfter: 10
+            )
+        case .codeBlock(let language, let code):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.codeBlock(language: language, code: code, fontSize: 12),
+                spacingAfter: 12
+            )
+        case .html(let html):
+            accumulator.appendText(
+                MarkdownAttributedTextFactory.htmlBlock(html, fontSize: 12),
+                spacingAfter: 12
+            )
+        case .table(let table):
+            accumulator.appendSpecial(
+                .table(MarkdownAttributedTextFactory.tablePayload(table, foregroundColor: Theme.textSecondary)),
+                spacingAfter: 12
+            )
+        case .thematicBreak:
+            accumulator.appendSpecial(.divider, spacingAfter: 8)
+        case .image(let image):
+            accumulator.appendSpecial(.image(image), spacingAfter: 12)
+        }
+    }
+}
+
 private struct MessageMarkdownBlocksView: View {
     let content: String
     let foregroundColor: Color
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
-    private var blocks: [RenderedMarkdownBlock] {
-        MarkdownDocumentRenderer.parse(content, baseURL: nil)
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
-                MessageMarkdownBlockView(
-                    block: block,
-                    foregroundColor: foregroundColor,
-                    onOpenWikiLink: onOpenWikiLink
-                )
-            }
-        }
-    }
-}
-
-private struct MessageMarkdownBlockView: View {
-    let block: RenderedMarkdownBlock
-    let foregroundColor: Color
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    var body: some View {
-        switch block {
-        case .heading(let level, let text):
-            InlineMarkdownText(
-                text,
-                font: headingFont(level),
-                foregroundColor: foregroundColor,
-                onOpenWikiLink: onOpenWikiLink
-            )
-            .padding(.top, level <= 2 ? 8 : 4)
-            .padding(.bottom, 2)
-
-        case .paragraph(let text):
-            InlineMarkdownText(
-                text,
-                font: .system(size: 13),
-                foregroundColor: foregroundColor,
-                onOpenWikiLink: onOpenWikiLink
-            )
-
-        case .blockquote(let blocks):
-            HStack(alignment: .top, spacing: 10) {
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(Theme.border)
-                    .frame(width: 3)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(blocks.enumerated()), id: \.offset) { _, nestedBlock in
-                        MessageMarkdownBlockView(
-                            block: nestedBlock,
-                            foregroundColor: Theme.textSecondary,
-                            onOpenWikiLink: onOpenWikiLink
-                        )
-                    }
-                }
-            }
-            .padding(.vertical, 4)
-
-        case .list(let items):
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(items) { item in
-                    HStack(alignment: .top, spacing: 10) {
-                        listMarker(for: item)
-                        VStack(alignment: .leading, spacing: 0) {
-                            InlineMarkdownText(
-                                item.text,
-                                font: .system(size: 13),
-                                foregroundColor: foregroundColor,
-                                onOpenWikiLink: onOpenWikiLink
-                            )
-                            .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(.top, 1)
-                    }
-                    .padding(.leading, CGFloat(item.level) * 18)
-                }
-            }
-
-        case .codeBlock(let language, let code):
-            MessageCodeBlockView(language: language, code: code)
-
-        case .table(let table):
-            MessageMarkdownTableView(table: table)
-
-        case .thematicBreak:
-            Rectangle()
-                .fill(Theme.border)
-                .frame(height: 1)
-                .padding(.vertical, 8)
-
-        case .html(let html):
-            MessageCodeBlockView(language: "html", code: html)
-
-        case .image(let image):
-            MessageMarkdownImageView(image: image)
-        }
-    }
-
-    @ViewBuilder
-    private func listMarker(for item: MarkdownListItem) -> some View {
-        if let checkbox = item.checkbox {
-            Image(systemName: checkbox == .checked ? "checkmark.square.fill" : "square")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(checkbox == .checked ? Theme.success : Theme.textTertiary)
-                .frame(width: 18, alignment: .trailing)
-                .padding(.top, 1)
-        } else {
-            Text(item.marker)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Theme.textTertiary)
-                .frame(width: item.isOrdered ? 28 : 16, alignment: .trailing)
-                .padding(.top, 1)
-        }
-    }
-
-    private func headingFont(_ level: Int) -> Font {
-        switch level {
-        case 1: .system(size: 22, weight: .bold)
-        case 2: .system(size: 18, weight: .semibold)
-        case 3: .system(size: 15, weight: .semibold)
-        default: .system(size: 13, weight: .semibold)
-        }
-    }
-}
-
-private struct InlineMarkdownText: View {
-    let source: String
-    let font: Font
-    let foregroundColor: Color
-    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
-
-    init(_ source: String, font: Font, foregroundColor: Color, onOpenWikiLink: ((WikiLinkTarget) -> Void)? = nil) {
-        self.source = source
-        self.font = font
-        self.foregroundColor = foregroundColor
-        self.onOpenWikiLink = onOpenWikiLink
-    }
-
-    var body: some View {
-        if let attributedText {
-            MarkdownSelectableTextView(
-                attributedText: attributedText,
-                onOpenWikiLink: onOpenWikiLink
-            )
-        } else {
-            Text(source)
-                .font(font)
-                .foregroundStyle(foregroundColor)
-                .lineSpacing(3)
-                .textSelection(.enabled)
-        }
-    }
-
-    private var attributedText: NSAttributedString? {
-        try? MarkdownInlineTextStyler.makeNSAttributedString(
-            from: source,
-            font: font,
+    private var segments: [MarkdownDisplaySegment] {
+        MessageMarkdownSegmentBuilder.make(
+            content: content,
             foregroundColor: foregroundColor
         )
     }
-}
-
-private struct MessageCodeBlockView: View {
-    let language: String?
-    let code: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let language, !language.isEmpty {
-                Text(language.uppercased())
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(Theme.textTertiary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Theme.surfaceSecondary)
-            }
+            ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
+                MessageMarkdownSegmentView(
+                    segment: segment,
+                    onOpenWikiLink: onOpenWikiLink
+                )
 
-            ScrollView(.horizontal, showsIndicators: true) {
-                Text(code)
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Theme.textPrimary)
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
+                if let spacing = segment.spacingAfter {
+                    Color.clear
+                        .frame(height: spacing)
+                } else if index < segments.count - 1 {
+                    Color.clear
+                        .frame(height: 10)
+                }
             }
         }
-        .background(Theme.cardBackground)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Theme.border, lineWidth: 0.7)
-        )
-        .clipShape(.rect(cornerRadius: 8))
+    }
+}
+
+private struct MessageMarkdownSegmentView: View {
+    let segment: MarkdownDisplaySegment
+    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
+
+    var body: some View {
+        switch segment.kind {
+        case .textCluster(let cluster):
+            MarkdownSelectableTextView(
+                attributedText: cluster.attributedText,
+                onOpenWikiLink: onOpenWikiLink
+            )
+
+        case .specialBlock(let specialBlock):
+            switch specialBlock.kind {
+            case .table(let payload):
+                MessageMarkdownTableView(
+                    payload: payload,
+                    onOpenWikiLink: onOpenWikiLink
+                )
+
+            case .image(let image):
+                MessageMarkdownImageView(image: image)
+
+            case .divider:
+                Rectangle()
+                    .fill(Theme.border)
+                    .frame(height: 1)
+                    .padding(.vertical, 8)
+            }
+        }
     }
 }
 
 private struct MessageMarkdownTableView: View {
-    let table: MarkdownTable
+    let payload: DocumentTableBlockPayload
+    let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
                 GridRow {
-                    ForEach(table.headers.indices, id: \.self) { column in
-                        tableCell(table.headers[column], isHeader: true)
+                    ForEach(payload.headers.indices, id: \.self) { column in
+                        tableCell(payload.headers[column], isHeader: true)
                     }
                 }
 
-                ForEach(table.rows.indices, id: \.self) { rowIndex in
+                ForEach(payload.rows.indices, id: \.self) { rowIndex in
                     GridRow {
-                        ForEach(table.headers.indices, id: \.self) { column in
-                            let value = column < table.rows[rowIndex].count ? table.rows[rowIndex][column] : ""
-                            tableCell(value, isHeader: false)
+                        ForEach(payload.rows[rowIndex].indices, id: \.self) { column in
+                            tableCell(payload.rows[rowIndex][column], isHeader: false)
                         }
                     }
                 }
@@ -716,11 +914,10 @@ private struct MessageMarkdownTableView: View {
         }
     }
 
-    private func tableCell(_ value: String, isHeader: Bool) -> some View {
-        InlineMarkdownText(
-            value,
-            font: .system(size: 12, weight: isHeader ? .semibold : .regular),
-            foregroundColor: isHeader ? Theme.textPrimary : Theme.textSecondary
+    private func tableCell(_ value: NSAttributedString, isHeader: Bool) -> some View {
+        MarkdownSelectableTextView(
+            attributedText: value,
+            onOpenWikiLink: onOpenWikiLink
         )
         .frame(minWidth: 110, maxWidth: 240, alignment: .leading)
         .padding(.horizontal, 10)
@@ -812,41 +1009,6 @@ private struct MessageMarkdownImageView: View {
     }
 }
 
-struct DocumentMarkdownBlock: Equatable {
-    let kind: Kind
-    let spacingAfter: CGFloat?
-
-    enum Kind: Equatable {
-        case metadata([MarkdownDocumentPresentation.MetadataItem])
-        case heading(DocumentHeadingPayload)
-        case text(DocumentTextBlockPayload)
-        case table(DocumentTableBlockPayload)
-        case codeBlock(DocumentCodeBlockPayload)
-        case image(MarkdownImage)
-        case divider
-    }
-}
-
-struct DocumentHeadingPayload: Equatable {
-    let level: Int
-    let text: String
-    let lineSpacing: CGFloat
-}
-
-struct DocumentTextBlockPayload: Equatable {
-    enum Style: Equatable {
-        case body
-        case blockquote
-    }
-
-    let attributedText: NSAttributedString
-    let style: Style
-
-    static func == (lhs: DocumentTextBlockPayload, rhs: DocumentTextBlockPayload) -> Bool {
-        lhs.style == rhs.style && lhs.attributedText.isEqual(to: rhs.attributedText)
-    }
-}
-
 struct DocumentTableBlockPayload: Equatable {
     let headers: [NSAttributedString]
     let rows: [[NSAttributedString]]
@@ -859,196 +1021,6 @@ struct DocumentTableBlockPayload: Equatable {
             guard zip(leftRow, rightRow).allSatisfy({ $0.isEqual(to: $1) }) else { return false }
         }
         return true
-    }
-}
-
-struct DocumentCodeBlockPayload: Equatable {
-    let language: String?
-    let code: String
-}
-
-@MainActor
-private enum DocumentMarkdownBlockBuilder {
-    static func make(
-        document: MarkdownDocumentPresentation.PreparedDocument,
-        baseURL: URL?
-    ) -> [DocumentMarkdownBlock] {
-        var result: [DocumentMarkdownBlock] = []
-
-        if !document.metadata.isEmpty {
-            result.append(
-                DocumentMarkdownBlock(
-                    kind: .metadata(document.metadata),
-                    spacingAfter: 28
-                )
-            )
-        }
-
-        if document.shouldRenderTitleInsideDocument, let title = document.resolvedDisplayTitle {
-            result.append(
-                DocumentMarkdownBlock(
-                    kind: .heading(
-                        DocumentHeadingPayload(level: 1, text: title, lineSpacing: 2)
-                    ),
-                    spacingAfter: 22
-                )
-            )
-        }
-
-        let blocks = MarkdownDocumentRenderer.parse(document.bodyMarkdown, baseURL: baseURL)
-        for block in blocks {
-            if let converted = map(block) {
-                result.append(converted)
-            }
-        }
-
-        return result
-    }
-
-    private static func map(_ block: RenderedMarkdownBlock) -> DocumentMarkdownBlock? {
-        switch block {
-        case .heading(let level, let text):
-            return DocumentMarkdownBlock(
-                kind: .heading(
-                    DocumentHeadingPayload(
-                        level: level,
-                        text: text,
-                        lineSpacing: level == 1 ? 2 : 3
-                    )
-                ),
-                spacingAfter: headingSpacingAfter(level)
-            )
-
-        case .paragraph(let text):
-            return textBlock(text, style: .body, spacingAfter: 14)
-
-        case .blockquote(let blocks):
-            let quoteText = blocks
-                .compactMap(flattenBlockquoteText)
-                .joined(separator: "\n\n")
-            return textBlock(quoteText, style: .blockquote, spacingAfter: 16)
-
-        case .list(let items):
-            let listText = items.map(renderListItem).joined(separator: "\n")
-            return textBlock(listText, style: .body, spacingAfter: 14)
-
-        case .codeBlock(let language, let code):
-            return DocumentMarkdownBlock(
-                kind: .codeBlock(DocumentCodeBlockPayload(language: language, code: code)),
-                spacingAfter: 18
-            )
-
-        case .table(let table):
-            return DocumentMarkdownBlock(
-                kind: .table(
-                    DocumentTableBlockPayload(
-                        headers: table.headers.map { inlineMarkdownText($0) },
-                        rows: table.rows.map { row in row.map(inlineMarkdownText) }
-                    )
-                ),
-                spacingAfter: 18
-            )
-
-        case .thematicBreak:
-            return DocumentMarkdownBlock(
-                kind: .divider,
-                spacingAfter: 18
-            )
-
-        case .html(let html):
-            return DocumentMarkdownBlock(
-                kind: .codeBlock(DocumentCodeBlockPayload(language: "html", code: html)),
-                spacingAfter: 18
-            )
-
-        case .image(let image):
-            return DocumentMarkdownBlock(
-                kind: .image(image),
-                spacingAfter: 18
-            )
-        }
-    }
-
-    private static func textBlock(
-        _ text: String,
-        style: DocumentTextBlockPayload.Style,
-        spacingAfter: CGFloat
-    ) -> DocumentMarkdownBlock? {
-        let attributed = inlineMarkdownText(text)
-        guard attributed.length > 0 else { return nil }
-        return DocumentMarkdownBlock(
-            kind: .text(
-                DocumentTextBlockPayload(
-                    attributedText: attributed,
-                    style: style
-                )
-            ),
-            spacingAfter: spacingAfter
-        )
-    }
-
-    private static func flattenBlockquoteText(_ block: RenderedMarkdownBlock) -> String? {
-        switch block {
-        case .paragraph(let text):
-            return text
-        case .heading(_, let text):
-            return text
-        case .list(let items):
-            return items.map(renderListItem).joined(separator: "\n")
-        case .codeBlock(let language, let code):
-            let prefix = (language?.isEmpty == false ? "\(language!.uppercased())\n" : "")
-            return prefix + code
-        case .html(let html):
-            return html
-        case .blockquote(let nested):
-            return nested.compactMap(flattenBlockquoteText).joined(separator: "\n\n")
-        case .table(let table):
-            let header = table.headers.joined(separator: " | ")
-            let body = table.rows.map { $0.joined(separator: " | ") }.joined(separator: "\n")
-            return ([header, body].filter { !$0.isEmpty }).joined(separator: "\n")
-        case .thematicBreak:
-            return nil
-        case .image(let image):
-            return image.alt.isEmpty ? image.source : image.alt
-        }
-    }
-
-    private static func renderListItem(_ item: MarkdownListItem) -> String {
-        let indent = String(repeating: "    ", count: item.level)
-        let marker: String
-        if let checkbox = item.checkbox {
-            marker = checkbox == .checked ? "[x]" : "[ ]"
-        } else {
-            marker = item.isOrdered ? item.marker : "•"
-        }
-        return "\(indent)\(marker) \(item.text)"
-    }
-
-    private static func inlineMarkdownText(_ source: String) -> NSAttributedString {
-        (try? MarkdownInlineTextStyler.makeNSAttributedString(
-            from: source,
-            font: .system(size: 13),
-            foregroundColor: Theme.textPrimary
-        )) ?? NSAttributedString(
-            string: source,
-            attributes: [
-                .font: NSFont.systemFont(ofSize: 13),
-                .foregroundColor: NSColor.labelColor,
-            ]
-        )
-    }
-
-    private static func headingSpacingAfter(_ level: Int) -> CGFloat {
-        switch level {
-        case 1:
-            return 20
-        case 2:
-            return 14
-        case 3:
-            return 10
-        default:
-            return 8
-        }
     }
 }
 
@@ -1259,12 +1231,12 @@ private extension String {
 #if DEBUG
 @MainActor
 enum DocumentMarkdownDebug {
-    static func blocks(
+    static func segments(
         for content: String,
         mode: MarkdownDocumentPresentation.Mode,
         baseURL: URL? = nil
-    ) -> [DocumentMarkdownBlock] {
-        DocumentMarkdownBlockBuilder.make(
+    ) -> [MarkdownDisplaySegment] {
+        DocumentMarkdownSegmentBuilder.make(
             document: MarkdownDocumentPresentation.prepare(source: content, mode: mode),
             baseURL: baseURL
         )

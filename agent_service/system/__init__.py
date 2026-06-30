@@ -23,6 +23,7 @@ from agent_service.system.source_intake import (
     write_source_manifest,
 )
 from agent_service.system.source_scan import scan_sources_for_updates
+from agent_service.workflows.podcast import PodcastWorkflowError, run_podcast_transcription, validate_episode_url
 
 __all__ = [
     "DeterministicActionExecutor",
@@ -38,12 +39,15 @@ __all__ = [
     "extract_title",
     "hash_file",
     "process_ingest_queue",
+    "PodcastWorkflowError",
     "read_source_manifest",
     "render_canonical_source",
     "retry_ingest_queue_item",
     "run_journal_rollback",
+    "run_podcast_transcription",
     "run_source_intake",
     "run_wiki_lint",
     "scan_sources_for_updates",
+    "validate_episode_url",
     "write_source_manifest",
 ]

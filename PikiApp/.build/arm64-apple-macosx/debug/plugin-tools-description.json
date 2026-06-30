@@ -1742,6 +1742,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppStateAutomaticLintTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift"
         },
         {
@@ -1763,6 +1767,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeQuickActionTests.swift"
         },
         {
           "kind" : "file",
@@ -1830,12 +1838,14 @@
       "moduleOutputPath" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/Modules/PikiAppTests.swiftmodule",
       "objects" : [
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppNavigationTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppStateAutomaticLintTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/BrandLogoAssetTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatBubbleDisplayStateTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/ChatInputLayoutTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/DocumentMarkdownBlockBuilderTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HealthLintCachingTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeDisplayStateTests.swift.o",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeQuickActionTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeTemplateActionTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeTraceStateTests.swift.o",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/InboxViewModelTests.swift.o",
@@ -1929,6 +1939,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppStateAutomaticLintTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/BrandLogoAssetTests.swift.o"
         },
         {
@@ -1950,6 +1964,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeDisplayStateTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeQuickActionTests.swift.o"
         },
         {
           "kind" : "file",
@@ -2007,12 +2025,14 @@
       "prepareForIndexing" : false,
       "sources" : [
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppStateAutomaticLintTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HealthLintCachingTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift",
+        "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeQuickActionTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTemplateActionTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift",
         "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift",
@@ -2414,12 +2434,14 @@
       "pikiapp",
       "-c",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppStateAutomaticLintTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HealthLintCachingTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift",
+      "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeQuickActionTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTemplateActionTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift",
       "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift",
@@ -4258,6 +4280,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/AppStateAutomaticLintTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/BrandLogoAssetTests.swift.o"
         },
         {
@@ -4279,6 +4305,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeDisplayStateTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/.build/arm64-apple-macosx/debug/PikiAppTests.build/HomeQuickActionTests.swift.o"
         },
         {
           "kind" : "file",
@@ -4480,6 +4510,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppStateAutomaticLintTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift"
         },
         {
@@ -4501,6 +4535,10 @@
         {
           "kind" : "file",
           "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeQuickActionTests.swift"
         },
         {
           "kind" : "file",

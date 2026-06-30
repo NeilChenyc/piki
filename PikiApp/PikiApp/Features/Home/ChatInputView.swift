@@ -6,6 +6,10 @@ enum ChatInputStyle {
     case docked
 }
 
+enum ChatInputExternalRequest: Equatable {
+    case openLocalFilePicker
+}
+
 struct ChatInputMetrics {
     let style: ChatInputStyle
 
@@ -71,8 +75,9 @@ struct ChatInputMetrics {
 }
 
 struct ChatInputView: View {
-    @State private var text: String = ""
+    @Binding var text: String
     @State private var selectedFiles: [URL] = []
+    @State private var showsAttachmentOptions = false
     @FocusState private var isFocused: Bool
     let placeholder: String
     let isDisabled: Bool
@@ -81,8 +86,44 @@ struct ChatInputView: View {
     let style: ChatInputStyle
     let helperText: String?
     let autofocus: Bool
+    let externalRequest: ChatInputExternalRequest?
+    let onExternalRequestHandled: (() -> Void)?
+    let onRequestFileUpload: (() -> Void)?
+    let onRequestPodcastPrompt: (() -> Void)?
     let onSend: (String, [URL]) -> Void
     let onStop: () -> Void
+
+    init(
+        text: Binding<String>,
+        placeholder: String,
+        isDisabled: Bool,
+        showsStopButton: Bool,
+        isStopping: Bool,
+        style: ChatInputStyle,
+        helperText: String?,
+        autofocus: Bool,
+        externalRequest: ChatInputExternalRequest?,
+        onExternalRequestHandled: (() -> Void)?,
+        onRequestFileUpload: (() -> Void)?,
+        onRequestPodcastPrompt: (() -> Void)?,
+        onSend: @escaping (String, [URL]) -> Void,
+        onStop: @escaping () -> Void
+    ) {
+        self._text = text
+        self.placeholder = placeholder
+        self.isDisabled = isDisabled
+        self.showsStopButton = showsStopButton
+        self.isStopping = isStopping
+        self.style = style
+        self.helperText = helperText
+        self.autofocus = autofocus
+        self.externalRequest = externalRequest
+        self.onExternalRequestHandled = onExternalRequestHandled
+        self.onRequestFileUpload = onRequestFileUpload
+        self.onRequestPodcastPrompt = onRequestPodcastPrompt
+        self.onSend = onSend
+        self.onStop = onStop
+    }
 
     private var metrics: ChatInputMetrics {
         ChatInputMetrics(style: style)
@@ -151,6 +192,23 @@ struct ChatInputView: View {
                 .disabled(isDisabled)
                 .buttonStyle(.plain)
                 .help("Choose a file")
+                .confirmationDialog(
+                    "选择导入方式",
+                    isPresented: $showsAttachmentOptions,
+                    titleVisibility: .visible
+                ) {
+                    Button("上传本地文件") {
+                        if let onRequestFileUpload {
+                            onRequestFileUpload()
+                        } else {
+                            presentFilePanel()
+                        }
+                    }
+                    Button("上传播客-自动转录") {
+                        onRequestPodcastPrompt?()
+                    }
+                    Button("取消", role: .cancel) {}
+                }
 
                 Spacer(minLength: 0)
 
@@ -198,6 +256,14 @@ struct ChatInputView: View {
             Task {
                 await addFiles(from: providers)
             }
+        }
+        .onChange(of: externalRequest) { _, newValue in
+            guard let newValue else { return }
+            switch newValue {
+            case .openLocalFilePicker:
+                presentFilePanel()
+            }
+            onExternalRequestHandled?()
         }
     }
 
@@ -290,6 +356,10 @@ struct ChatInputView: View {
     }
 
     private func chooseFile() {
+        showsAttachmentOptions = true
+    }
+
+    private func presentFilePanel() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
         panel.canChooseDirectories = false

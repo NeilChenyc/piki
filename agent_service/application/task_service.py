@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import threading
 
 from agent_service.diagnostics import runtime_log
@@ -31,6 +32,7 @@ class TaskService:
         self._run_controls_lock = threading.Lock()
 
     def create_task(self, request: TaskCreateRequest) -> TaskCreateResponse:
+        request = _normalize_task_request(request)
         runtime_log(
             "task_service",
             "create_task_start",
@@ -152,3 +154,56 @@ class TaskService:
     def _unregister_run_control(self, task_id: str) -> None:
         with self._run_controls_lock:
             self._run_controls.pop(task_id, None)
+
+
+_INGEST_KEYWORDS = (
+    "ingest",
+    "摄入",
+    "整理进知识库",
+    "上传文件",
+    "处理这个文件",
+)
+
+_HEALTH_PATTERNS = (
+    re.compile(r"^\s*lint\s*$", re.IGNORECASE),
+    re.compile(r"^\s*run\s+lint\s*$", re.IGNORECASE),
+    re.compile(r"^\s*run\s+vault\s+lint\s*$", re.IGNORECASE),
+    re.compile(r"^\s*health\s+check\s*$", re.IGNORECASE),
+    re.compile(r"\bhealth\s+check\b", re.IGNORECASE),
+    re.compile(r"\brun\s+vault\s+lint\b", re.IGNORECASE),
+    re.compile(r"\brun\s+lint\b", re.IGNORECASE),
+    re.compile(r"健康检查"),
+    re.compile(r"运行\s*lint", re.IGNORECASE),
+    re.compile(r"跑\s*lint", re.IGNORECASE),
+    re.compile(r"检查.*知识库.*(?:健康|结构)"),
+    re.compile(r"(?:知识库|vault|wiki).*(?:健康|结构).*(?:检查|lint)", re.IGNORECASE),
+)
+
+
+def _normalize_task_request(request: TaskCreateRequest) -> TaskCreateRequest:
+    if request.selected_paths or request.mode != "normal":
+        return request
+
+    action = str(request.action_context.get("action") or "").strip()
+    if action:
+        return request
+
+    if _looks_like_ingest_request(request.user_input):
+        return request
+
+    if not _looks_like_health_check_request(request.user_input):
+        return request
+
+    return request.model_copy(update={"action_context": {**request.action_context, "action": "run_lint"}})
+
+
+def _looks_like_ingest_request(user_input: str) -> bool:
+    normalized = user_input.casefold()
+    return any(keyword in normalized for keyword in _INGEST_KEYWORDS)
+
+
+def _looks_like_health_check_request(user_input: str) -> bool:
+    normalized = " ".join(user_input.strip().split())
+    if not normalized:
+        return False
+    return any(pattern.search(normalized) for pattern in _HEALTH_PATTERNS)

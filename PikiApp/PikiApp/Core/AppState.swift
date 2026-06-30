@@ -15,6 +15,7 @@ final class AppState {
     var serviceErrorMessage: String?
     var serviceHealth: ServiceHealth?
     var cachedLintResult: CachedLintResult?
+    private var autoLintPrewarmedVaultPaths: Set<String> = []
 
     @ObservationIgnored var runtimeService: RuntimeServiceProtocol
     @ObservationIgnored var serviceManager: LocalServiceManager?
@@ -95,6 +96,20 @@ final class AppState {
 
     func cacheLintResult(_ result: LintResultDTO, receivedAt: Date = Date()) {
         cachedLintResult = CachedLintResult(result: result, receivedAt: receivedAt)
+    }
+
+    func prewarmHealthLintIfNeeded() async {
+        guard isConnected else { return }
+        guard let vaultPath = vaultPath?.path(percentEncoded: false) else { return }
+        guard autoLintPrewarmedVaultPaths.contains(vaultPath) == false else { return }
+
+        autoLintPrewarmedVaultPaths.insert(vaultPath)
+        do {
+            let result = try await runtimeService.runLint(vaultPath: vaultPath)
+            cacheLintResult(result)
+        } catch {
+            autoLintPrewarmedVaultPaths.remove(vaultPath)
+        }
     }
 
     private func persistConfig() {

@@ -6,7 +6,7 @@ import Testing
 struct DocumentMarkdownBlockBuilderTests {
     @MainActor
     @Test
-    func buildsMetadataHeadingAndTableAsSeparateBlocks() {
+    func buildsMetadataHeadingAndTableAsOrderedSegments() {
         let source = """
         ---
         title: LightAutoDS-Tab
@@ -24,39 +24,40 @@ struct DocumentMarkdownBlockBuilderTests {
         | Generator | 生成代码 |
         """
 
-        let blocks = DocumentMarkdownDebug.blocks(
+        let segments = DocumentMarkdownDebug.segments(
             for: source,
-            mode: .documentPage(displayTitle: "LightAutoDS-Tab: 面向表格数据的多 AutoML 智能体系统")
+            mode: MarkdownDocumentPresentation.Mode.documentPage(
+                displayTitle: "LightAutoDS-Tab: 面向表格数据的多 AutoML 智能体系统"
+            )
         )
 
-        #expect(blocks.count >= 4)
+        #expect(segments.count == 2)
 
-        guard case .metadata(let metadata) = blocks[0].kind else {
-            Issue.record("expected metadata as first block")
+        guard case .textCluster(let cluster) = segments[0].kind else {
+            Issue.record("expected text cluster as first segment")
             return
         }
-        #expect(metadata.map(\.key) == ["type", "created"])
+        #expect(cluster.attributedText.string.contains("type"))
+        #expect(cluster.attributedText.string.contains("created"))
+        #expect(cluster.attributedText.string.contains("LightAutoDS-Tab: 面向表格数据的多 AutoML 智能体系统"))
+        #expect(cluster.attributedText.string.contains("这是第一段。"))
 
-        guard case .heading(let heading) = blocks[1].kind else {
-            Issue.record("expected heading as second block")
+        guard case .specialBlock(let specialBlock) = segments[1].kind else {
+            Issue.record("expected special block as second segment")
             return
         }
-        #expect(heading.level == 1)
-        #expect(heading.text == "LightAutoDS-Tab: 面向表格数据的多 AutoML 智能体系统")
 
-        #expect(
-            blocks.contains { block in
-                if case .table(let table) = block.kind {
-                    return table.headers.count == 2 && table.rows.count == 2
-                }
-                return false
-            }
-        )
+        if case .table(let table) = specialBlock.kind {
+            #expect(table.headers.count == 2)
+            #expect(table.rows.count == 2)
+        } else {
+            Issue.record("expected table special block")
+        }
     }
 
     @MainActor
     @Test
-    func injectsDisplayTitleAsHeadingBlockWhenBodyHasNoHeading() {
+    func injectsDisplayTitleIntoLeadingTextClusterWhenBodyHasNoHeading() {
         let source = """
         ---
         title: 页面标题
@@ -66,27 +67,25 @@ struct DocumentMarkdownBlockBuilderTests {
         第一段正文
         """
 
-        let blocks = DocumentMarkdownDebug.blocks(
+        let segments = DocumentMarkdownDebug.segments(
             for: source,
-            mode: .documentPage(displayTitle: "页面标题")
+            mode: MarkdownDocumentPresentation.Mode.documentPage(displayTitle: "页面标题")
         )
 
-        #expect(blocks.count >= 3)
+        #expect(segments.count == 1)
 
-        guard case .metadata = blocks[0].kind else {
-            Issue.record("expected metadata block first")
+        guard case .textCluster(let cluster) = segments[0].kind else {
+            Issue.record("expected text cluster")
             return
         }
-        guard case .heading(let heading) = blocks[1].kind else {
-            Issue.record("expected injected heading block second")
-            return
-        }
-        #expect(heading.text == "页面标题")
+        #expect(cluster.attributedText.string.contains("kind"))
+        #expect(cluster.attributedText.string.contains("页面标题"))
+        #expect(cluster.attributedText.string.contains("第一段正文"))
     }
 
     @MainActor
     @Test
-    func buildsBlockquoteDividerAndTableAsDedicatedBlocks() {
+    func buildsBlockquoteAndDividerInsideTextClusterAndKeepsTableDedicated() {
         let source = """
         ---
         title: 测试页面
@@ -104,37 +103,40 @@ struct DocumentMarkdownBlockBuilderTests {
         | Planner | 制定方案 |
         """
 
-        let blocks = DocumentMarkdownDebug.blocks(
+        let segments = DocumentMarkdownDebug.segments(
             for: source,
-            mode: .documentPage(displayTitle: "测试页面")
+            mode: MarkdownDocumentPresentation.Mode.documentPage(displayTitle: "测试页面")
         )
 
-        #expect(
-            blocks.contains { block in
-                if case .text(let payload) = block.kind {
-                    return payload.style == .blockquote
-                }
-                return false
-            }
-        )
+        #expect(segments.count == 3)
 
-        #expect(
-            blocks.contains { block in
-                if case .divider = block.kind {
-                    return true
-                }
-                return false
-            }
-        )
+        guard case .textCluster(let leadingCluster) = segments[0].kind else {
+            Issue.record("expected leading text cluster")
+            return
+        }
+        #expect(leadingCluster.attributedText.string.contains("来源：arXiv 2507.13413v1"))
 
-        #expect(
-            blocks.contains { block in
-                if case .table(let table) = block.kind {
-                    return table.headers.count == 2 && table.rows.count == 1
-                }
-                return false
-            }
-        )
+        guard case .specialBlock(let dividerBlock) = segments[1].kind else {
+            Issue.record("expected divider special block")
+            return
+        }
+        if case .divider = dividerBlock.kind {
+            let matchedDivider = true
+            #expect(matchedDivider)
+        } else {
+            Issue.record("expected divider special block")
+        }
+
+        guard case .specialBlock(let tableBlock) = segments[2].kind else {
+            Issue.record("expected trailing table special block")
+            return
+        }
+        if case .table(let table) = tableBlock.kind {
+            #expect(table.headers.count == 2)
+            #expect(table.rows.count == 1)
+        } else {
+            Issue.record("expected table special block")
+        }
     }
 
     @MainActor
@@ -162,5 +164,89 @@ struct DocumentMarkdownBlockBuilderTests {
 
         #expect(items.count == 1)
         #expect(items.first == "第一段\n\n第二段")
+    }
+
+    @MainActor
+    @Test
+    func mergesAdjacentTextualDocumentBlocksIntoSingleCluster() {
+        let segments = DocumentMarkdownDebug.segments(
+            for: """
+            ---
+            title: 页面标题
+            type: note
+            ---
+
+            # 页面标题
+
+            第一段正文。
+
+            - 列表项一
+            - 列表项二
+
+            > 一段引用
+
+            ```swift
+            print("hello")
+            ```
+            """,
+            mode: .documentPage(displayTitle: "页面标题")
+        )
+
+        #expect(segments.count == 1)
+
+        guard case .textCluster(let cluster) = segments[0].kind else {
+            Issue.record("expected a single text cluster")
+            return
+        }
+
+        #expect(cluster.attributedText.string.contains("页面标题"))
+        #expect(cluster.attributedText.string.contains("第一段正文。"))
+        #expect(cluster.attributedText.string.contains("列表项一"))
+        #expect(cluster.attributedText.string.contains("一段引用"))
+        #expect(cluster.attributedText.string.contains("print(\"hello\")"))
+    }
+
+    @MainActor
+    @Test
+    func tableBreaksDocumentIntoSeparateTextClusters() {
+        let segments = DocumentMarkdownDebug.segments(
+            for: """
+            # 标题
+
+            表格前正文。
+
+            | 列一 | 列二 |
+            | --- | --- |
+            | A | B |
+
+            表格后正文。
+            """,
+            mode: .plain
+        )
+
+        #expect(segments.count == 3)
+
+        guard case .textCluster(let leadingCluster) = segments[0].kind else {
+            Issue.record("expected first segment to be a text cluster")
+            return
+        }
+        guard case .specialBlock(let specialBlock) = segments[1].kind else {
+            Issue.record("expected second segment to be a special block")
+            return
+        }
+        guard case .textCluster(let trailingCluster) = segments[2].kind else {
+            Issue.record("expected third segment to be a text cluster")
+            return
+        }
+
+        #expect(leadingCluster.attributedText.string.contains("表格前正文。"))
+        #expect(trailingCluster.attributedText.string.contains("表格后正文。"))
+
+        if case .table(let table) = specialBlock.kind {
+            #expect(table.headers.count == 2)
+            #expect(table.rows.count == 1)
+        } else {
+            Issue.record("expected special block to contain a table")
+        }
     }
 }

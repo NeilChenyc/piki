@@ -60,7 +60,7 @@ final class HealthViewModel {
 
     func rerunLint(appState: AppState) {
         Task {
-            await reload(appState: appState, mode: .manualLint)
+            await runLint(appState: appState)
         }
     }
 
@@ -106,6 +106,31 @@ final class HealthViewModel {
         } else {
             clearLintState()
             errorMessage = "当前仅展示本地知识库概览；lint 暂时不可用。"
+        }
+    }
+
+    private func runLint(appState: AppState) async {
+        guard appState.isConnected else {
+            errorMessage = "当前无法执行健康检查，请稍后重试。"
+            return
+        }
+
+        guard let vaultURL = appState.vaultPath else {
+            resetForMissingVault()
+            return
+        }
+
+        let vaultPath = vaultURL.path(percentEncoded: false)
+        isLintRunning = true
+        errorMessage = nil
+        defer { isLintRunning = false }
+
+        do {
+            let result = try await appState.runtimeService.runLint(vaultPath: vaultPath)
+            appState.cacheLintResult(result)
+            await applyLintResult(result, vaultURL: vaultURL)
+        } catch {
+            errorMessage = "健康检查执行失败，请稍后重试。"
         }
     }
 
@@ -376,8 +401,7 @@ struct HealthDimension: Identifiable {
     static let placeholder: [HealthDimension] = [
         HealthDimension(id: "integrity", title: "结构完整性", issueCount: nil, status: .unknown, subtitle: "frontmatter、标题、重复"),
         HealthDimension(id: "links", title: "导航与链接", issueCount: nil, status: .unknown, subtitle: "断链、孤立页、索引"),
-        HealthDimension(id: "freshness", title: "新鲜度", issueCount: nil, status: .unknown, subtitle: "过期待复查页面"),
-        HealthDimension(id: "coverage", title: "覆盖度 / 缺口", issueCount: nil, status: .unknown, subtitle: "薄页、知识缺口"),
+        HealthDimension(id: "freshness", title: "复查状态", issueCount: nil, status: .unknown, subtitle: "仅基于 check_after"),
     ]
 
     static func fromLintResult(_ result: LintResultDTO) -> [HealthDimension] {
@@ -388,9 +412,6 @@ struct HealthDimension: Identifiable {
             ["broken_link", "orphan_page", "missing_index_entry"].contains($0.kind)
         }.count
         let freshnessCount = result.issues.filter { $0.kind == "stale_page" }.count
-        let coverageCount = result.issues.filter {
-            ["thin_page", "knowledge_gap"].contains($0.kind)
-        }.count
 
         return [
             HealthDimension(
@@ -409,17 +430,10 @@ struct HealthDimension: Identifiable {
             ),
             HealthDimension(
                 id: "freshness",
-                title: "新鲜度",
+                title: "复查状态",
                 issueCount: freshnessCount,
                 status: .fromCount(freshnessCount),
-                subtitle: "过期待复查页面"
-            ),
-            HealthDimension(
-                id: "coverage",
-                title: "覆盖度 / 缺口",
-                issueCount: coverageCount,
-                status: .fromCount(coverageCount),
-                subtitle: "薄页、知识缺口"
+                subtitle: "仅基于 check_after"
             ),
         ]
     }

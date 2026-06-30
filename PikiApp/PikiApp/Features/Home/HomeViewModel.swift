@@ -9,11 +9,17 @@ enum HomeTemplateAction {
 @Observable
 @MainActor
 final class HomeViewModel {
+    static let healthCheckPrompt =
+        "请对当前 vault 运行 health check，并总结运行时连通性、配置状态、潜在风险和建议的下一步。"
+    static let podcastPrompt =
+        "我想上传一集播客并自动转录。请先等我提供单集链接；收到后按播客转录流程先完成完整转录，再整理进知识库。"
+
     private let logger = Logger(subsystem: "com.piki.app", category: "HomeViewModel")
 
     var messages: [ChatMessage] = []
     var recentActivity: [ActivityEntry] = []
     var inputText: String = ""
+    var chatInputExternalRequest: ChatInputExternalRequest?
     var isSending = false
     var isStopping = false
     var statusText: String?
@@ -127,11 +133,19 @@ final class HomeViewModel {
         switch action {
         case .ask:
             break
-        case .ingest:
-            break
+        case .uploadFile:
+            chatInputExternalRequest = .openLocalFilePicker
         case .healthCheck:
-            break
+            inputText = Self.healthCheckPrompt
         }
+    }
+
+    func preparePodcastPrompt() {
+        inputText = Self.podcastPrompt
+    }
+
+    func consumeChatInputExternalRequest() {
+        chatInputExternalRequest = nil
     }
 
     func submitTemplateAction(_ action: HomeTemplateAction, appState: AppState) {
@@ -179,6 +193,7 @@ final class HomeViewModel {
                     vaultPath: vaultPath.path(percentEncoded: false),
                     userInput: effectiveText,
                     selectedPaths: bufferedSelectedPaths,
+                    actionContext: taskActionContext(for: effectiveText, selectedFiles: selectedFiles),
                     conversationId: conversationId,
                     asyncMode: true
                 )
@@ -550,6 +565,32 @@ final class HomeViewModel {
         return bufferedPaths
     }
 
+    private func taskActionContext(for text: String, selectedFiles: [URL]) -> [String: String] {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !selectedFiles.isEmpty {
+            return ["action": "ingest_file"]
+        }
+        if let url = detectPodcastEpisodeURL(in: trimmed) {
+            return [
+                "action": "podcast_transcribe",
+                "podcast_url": url,
+            ]
+        }
+        return [:]
+    }
+
+    private func detectPodcastEpisodeURL(in text: String) -> String? {
+        guard !text.isEmpty else { return nil }
+        let pattern = #"https://www\.xiaoyuzhoufm\.com/episode/[A-Za-z0-9]+"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        guard let match = regex.firstMatch(in: text, range: range),
+              let matchRange = Range(match.range, in: text) else {
+            return nil
+        }
+        return String(text[matchRange])
+    }
+
     private func appendTraceDelta(id: String, key: String, title: String, delta: String) {
         mutateMessage(id: id) { message in
             if let index = message.traceItems.firstIndex(where: { $0.key == key }) {
@@ -899,6 +940,22 @@ private extension Date {
     }
 }
 
-enum QuickAction {
-    case ask, ingest, healthCheck
+enum QuickAction: CaseIterable {
+    case uploadFile, ask, healthCheck
+
+    var title: String {
+        switch self {
+        case .uploadFile: return "上传文件"
+        case .ask: return "提个问题"
+        case .healthCheck: return "运行健康检查"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .uploadFile: return "doc.badge.plus"
+        case .ask: return "questionmark.circle"
+        case .healthCheck: return "heart.text.square"
+        }
+    }
 }

@@ -1,10 +1,12 @@
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppNavigationTests.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/AppStateAutomaticLintTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/BrandLogoAssetTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatBubbleDisplayStateTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/ChatInputLayoutTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/DocumentMarkdownBlockBuilderTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HealthLintCachingTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeDisplayStateTests.swift
+/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeQuickActionTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTemplateActionTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/HomeTraceStateTests.swift
 /Users/a99/localDocuments/codeBase/ideaWorkplace/piki/PikiApp/Tests/PikiAppTests/InboxViewModelTests.swift

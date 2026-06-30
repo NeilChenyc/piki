@@ -2,7 +2,6 @@ import SwiftUI
 
 struct HealthView: View {
     @Environment(AppState.self) private var appState
-    @Environment(HomeViewModel.self) private var homeViewModel
     @Environment(HealthViewModel.self) private var viewModel
 
     private let overviewColumns = [
@@ -45,7 +44,7 @@ struct HealthView: View {
                             }
                         }
 
-                        section(title: "健康摘要", subtitle: "结构、链接、新鲜度与覆盖度的轻量总览") {
+                        section(title: "健康摘要", subtitle: "结构、链接与复查状态的轻量总览") {
                             LazyVGrid(columns: dimensionColumns, spacing: 16) {
                                 ForEach(viewModel.healthDimensions) { dimension in
                                     HealthDimensionCard(dimension: dimension)
@@ -66,7 +65,7 @@ struct HealthView: View {
                             isFixRunning: viewModel.isFixRunning,
                             canApplyFixes: viewModel.canApplyFixes,
                             onRunLint: {
-                                homeViewModel.submitTemplateAction(.runLintAndFix, appState: appState)
+                                viewModel.rerunLint(appState: appState)
                             },
                             onApplyFixes: {
                                 viewModel.applyFixes(appState: appState)

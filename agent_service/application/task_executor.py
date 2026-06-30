@@ -9,12 +9,13 @@ from agent_service.application.events import EventPublisher
 from agent_service.application.task_control import TaskRunControl
 from agent_service.application.task_router import TaskPlan
 from agent_service.config import ServiceConfig
-from agent_service.context import assemble_agent_task_input, assemble_baseline_context
+from agent_service.context import AgentTaskInput, assemble_agent_task_input, assemble_baseline_context
 from agent_service.models import EventType, FileSnapshot, TaskCreateRequest, TaskStatus
 from agent_service.runtime import PikiWikiAgentRunner
 from agent_service.store import SQLiteStore
 from agent_service.system import DeterministicActionExecutor
 from agent_service.vault import Vault, VaultAccessError
+from agent_service.workflows.ingest import build_ingest_user_prompt, read_source_meta
 
 
 class TaskExecutor:
@@ -52,7 +53,38 @@ class TaskExecutor:
         if action_context.get("action") == "clear_inbox_item":
             self._execute_source_clear(task_id=task_id, request=request, vault=vault)
             return
-        if not self.runner.can_run(self.config) and self.system_actions.execute(task_id=task_id, request=request):
+        if action_context.get("action") == "run_lint" and self.system_actions.execute(task_id=task_id, request=request):
+            runtime_log("task_executor", "system_actions_handled", extra={"task_id": task_id, "action": "run_lint"})
+            return
+        podcast_result = None
+        if action_context.get("action") == "podcast_transcribe":
+            handled, podcast_result = self.system_actions.execute(task_id=task_id, request=request, return_payload=True)
+            if handled and podcast_result is None:
+                runtime_log("task_executor", "podcast_preprocess_failed", extra={"task_id": task_id})
+                return
+            if handled:
+                runtime_log(
+                    "task_executor",
+                    "podcast_preprocess_completed",
+                    extra={"task_id": task_id, "source_path": podcast_result.get("source_path")},
+                )
+                request = TaskCreateRequest(
+                    vault_path=request.vault_path,
+                    user_input=_build_podcast_ingest_prompt(
+                        source_path=podcast_result["source_path"],
+                        source_title=podcast_result["source_title"],
+                    ),
+                    selected_paths=[],
+                    action_context={
+                        "action": "podcast_transcribe",
+                        "podcast_url": podcast_result["episode_url"],
+                        "podcast_source_path": podcast_result["source_path"],
+                    },
+                    conversation_id=request.conversation_id,
+                    mode=request.mode,
+                    async_mode=request.async_mode,
+                )
+        elif not self.runner.can_run(self.config) and self.system_actions.execute(task_id=task_id, request=request):
             runtime_log("task_executor", "system_actions_handled", extra={"task_id": task_id})
             return
         self._execute_agent(
@@ -79,6 +111,7 @@ class TaskExecutor:
             request=request,
             conversation_messages=conversation_messages,
         )
+        task_input = _decorate_agent_input_for_ingest_if_needed(task_input=task_input, vault=vault)
         if not self.runner.can_run(self.config):
             error = "Claude Agent runtime is not configured."
             self.events.task_failed(task_id, error)
@@ -260,6 +293,7 @@ class TaskExecutor:
         _, context_contents = assemble_baseline_context(vault)
         conversation_messages = self.store.get_conversation_messages(conversation_id, limit=10)
         task_input = assemble_agent_task_input(request=request, conversation_messages=conversation_messages)
+        task_input = _decorate_agent_input_for_ingest_if_needed(task_input=task_input, vault=vault)
         agent_result = self.runner.run_task(
             config=self.config,
             store=self.store,
@@ -391,3 +425,26 @@ def _should_keep_task_cancelled(*, store: SQLiteStore, task_id: str, run_control
         return store.get_task(task_id).status == TaskStatus.CANCELLED
     except KeyError:
         return False
+
+
+def _build_podcast_ingest_prompt(*, source_path: str, source_title: str) -> str:
+    return (
+        "请继续处理这集播客，先确认转录结果已经完整生成，"
+        f"然后把 canonical source `{source_path}` 正式整理进知识库。\n\n"
+        f"来源标题：{source_title}\n"
+        "/wiki:ingest"
+    )
+
+
+def _decorate_agent_input_for_ingest_if_needed(*, task_input: AgentTaskInput, vault: Vault) -> AgentTaskInput:
+    source_path = str(task_input.action_context.get("podcast_source_path") or "").strip()
+    if not source_path:
+        return task_input
+    source_meta = read_source_meta(vault, source_path)
+    ingest_prompt = build_ingest_user_prompt(source_path=source_path, source_meta=source_meta)
+    return AgentTaskInput(
+        user_input=ingest_prompt,
+        selected_paths=task_input.selected_paths,
+        action_context=task_input.action_context,
+        conversation_messages=task_input.conversation_messages,
+    )
