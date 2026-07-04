@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piki Hero SVG — 当前 vs AI增强 对比</title>
+<style>
+  :root {
+    --bg: #f8fafb;
+    --card: #fff;
+    --text: #1a1a2e;
+    --text-secondary: #64748b;
+    --accent: #4CAF50;
+    --accent-dark: #2E7D32;
+    --blue: #2196F3;
+    --purple: #7C4DFF;
+    --amber: #FF9800;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #f0f4f1 0%, #e8f5e9 50%, #f5f5f5 100%);
+    min-height: 100vh;
+    color: var(--text);
+    padding: 40px 20px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+
+  .compare-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+
+  .compare-card__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .compare-card__badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .compare-card__badge--current {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .compare-card__badge--enhanced {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+  }
+
+  .compare-card__title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .compare-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+  .tag {
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .svg-wrapper {
+    background: #fafcfb;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+    overflow: hidden;
+    border: 1px dashed #e2e8f0;
+  }
+
+  .enhance-list {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .enhance-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+  }
+  .enhance-item::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* Scroll-triggered animation */
+  .svg-wrapper {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .svg-wrapper.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Enhanced SVG animations */
+  @keyframes particle-float {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+    20%  { opacity: 0.6; }
+    50%  { transform: translate(var(--dx, 15px), var(--dy, -20px)) scale(1.4); opacity: 0; }
+  }
+
+  @keyframes node-pulse {
+    0%, 100% { r: 3; opacity: 0.3; }
+    50%  { r: 5; opacity: 0.6; }
+  }
+
+  @keyframes card-breathe {
+    0%, 100% { filter: drop-shadow(0 4px 12px rgba(76,175,80,0.08)); }
+    50%  { filter: drop-shadow(0 8px 24px rgba(76,175,80,0.15)); }
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { stop-color: #4CAF50; }
+    50%  { stop-color: #66BB6A; }
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { r: 1.3; opacity: 0.5; }
+    50%  { r: 2.2; opacity: 0.9; }
+  }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 48px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .footer-note a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Piki Hero SVG — 当前 vs AI增强 效果对比</h1>
+  <p>左侧为当前线上版本，右侧为 AI 生成增强版本</p>
+</div>
+
+<div class="compare-grid">
+
+  <!-- 当前版本 -->
+  <div class="compare-card">
+    <div class="compare-card__header">
+      <span class="compare-card__badge compare-card__badge--current">当前线上版</span>
+      <span class="compare-card__title">碎片笔记 → Wiki 书本</span>
+    </div>
+    <div class="compare-card__tags">
+      <span class="tag">纯手写 SVG</span>
+      <span class="tag">平面白卡</span>
+      <span class="tag">CSS @keyframes</span>
+      <span class="tag">IntersectionObserver</span>
+    </div>
+    <div class="svg-wrapper" id="current-visual">
+      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+        <defs>
+          <filter id="h-shadow" x="-10%" y="-10%" width="130%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.06"/>
+          </filter>
+          <filter id="h-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <linearGradient id="h-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4CAF50"/>
+            <stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <radialGradient id="h-ambient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.07"/>
+            <stop offset="60%" stop-color="#4CAF50" stop-opacity="0.02"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="h-dots" width="28" height="28" patternUnits="userSpaceOnUse">
+            <circle cx="14" cy="14" r="0.8" fill="#4CAF50" opacity="0.07"/>
+          </pattern>
+          <linearGradient id="h-line-grad-1" x1="0" y1="0" x2="1" y2="0.6">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.2"/>
+          </linearGradient>
+        </defs>
+
+        <rect x="0" y="0" width="480" height="290" fill="url(#h-dots)"/>
+        <circle cx="240" cy="145" r="180" fill="url(#h-ambient)"/>
+
+        <!-- 5 个碎片卡片 -->
+        <g transform="translate(0,0)">
+          <rect x="20" y="22" width="76" height="52" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
+          <rect x="33" y="36" width="48" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="33" y="44" width="36" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="33" y="52" width="42" height="2.5" rx="1" fill="#e0e0e0"/>
+          <text x="58" y="68" text-anchor="middle" font-size="9" fill="#999" font-weight="500">架构设计笔记</text>
+        </g>
+        <g transform="translate(0,0)">
+          <rect x="383" y="204" width="76" height="50" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
+          <rect x="396" y="218" width="44" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="396" y="226" width="52" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="396" y="234" width="36" height="2.5" rx="1" fill="#e0e0e0"/>
+          <text x="421" y="248" text-anchor="middle" font-size="9" fill="#999" font-weight="500">设计原则汇总</text>
+        </g>
+        <g transform="translate(0,0)">
+          <rect x="14" y="210" width="70" height="46" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
+          <rect x="27" y="224" width="40" height="2" rx="1" fill="#e0e0e0"/>
+          <rect x="27" y="232" width="48" height="2" rx="1" fill="#e0e0e0"/>
+          <rect x="27" y="240" width="30" height="2" rx="1" fill="#e0e0e0"/>
+          <text x="49" y="252" text-anchor="middle" font-size="9" fill="#999" font-weight="500">历史研究摘录</text>
+        </g>
+        <g transform="translate(0,0)">
+          <rect x="378" y="14" width="72" height="50" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
+          <rect x="391" y="28" width="42" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="391" y="36" width="30" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="391" y="44" width="36" height="2.5" rx="1" fill="#e0e0e0"/>
+          <text x="414" y="58" text-anchor="middle" font-size="9" fill="#999" font-weight="500">商业案例分析</text>
+        </g>
+        <g transform="translate(0,0)">
+          <rect x="178" y="6" width="84" height="44" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
+          <rect x="191" y="18" width="26" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="223" y="18" width="28" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="191" y="28" width="22" height="2.5" rx="1" fill="#e0e0e0"/>
+          <rect x="219" y="28" width="32" height="2.5" rx="1" fill="#e0e0e0"/>
+          <text x="220" y="44" text-anchor="middle" font-size="9" fill="#999" font-weight="500">读书笔记</text>
+        </g>
+
+        <!-- 中央书本 -->
+        <g filter="url(#h-glow)">
+          <rect x="148" y="90" width="88" height="118" rx="4" fill="white" stroke="#d0d0d0" stroke-width="1"/>
+          <rect x="239" y="90" width="88" height="118" rx="4" fill="white" stroke="#d0d0d0" stroke-width="1"/>
+          <rect x="236" y="90" width="6" height="118" fill="#e8e8e8"/>
+          <rect x="163" y="108" width="55" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="163" y="118" width="45" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="163" y="128" width="52" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="163" y="138" width="40" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="163" y="148" width="50" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="163" y="158" width="36" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="163" y="168" width="48" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="108" width="55" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="118" width="42" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="128" width="50" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="138" width="32" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="148" width="46" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="158" width="38" height="2" rx="1" fill="#e8e8e8"/>
+          <rect x="254" y="168" width="52" height="2" rx="1" fill="#e8e8e8"/>
+          <text x="238" y="222" text-anchor="middle" font-size="10" fill="#999">我的知识 Wiki</text>
+        </g>
+
+        <!-- 连接线 -->
+        <line x1="58" y1="74" x2="192" y2="112" stroke="url(#h-grad)" stroke-width="1.5" stroke-dasharray="4,4" stroke-linecap="round"/>
+        <line x1="414" y1="64" x2="282" y2="112" stroke="url(#h-grad)" stroke-width="1.5" stroke-dasharray="4,4" stroke-linecap="round"/>
+        <line x1="49" y1="210" x2="192" y2="178" stroke="url(#h-grad)" stroke-width="1.5" stroke-dasharray="4,4" stroke-linecap="round"/>
+        <line x1="421" y1="204" x2="282" y2="178" stroke="url(#h-grad)" stroke-width="1.5" stroke-dasharray="4,4" stroke-linecap="round"/>
+        <line x1="220" y1="50" x2="238" y2="90" stroke="url(#h-grad)" stroke-width="1.5" stroke-dasharray="4,4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="enhance-list">
+      <div class="enhance-item">平面白色卡片</div>
+      <div class="enhance-item">细灰描边</div>
+      <div class="enhance-item">单色绿色渐变</div>
+      <div class="enhance-item">简单虚线连线</div>
+      <div class="enhance-item">基础投影</div>
+      <div class="enhance-item">CSS 入场动画</div>
+    </div>
+  </div>
+
+  <!-- AI增强版本 -->
+  <div class="compare-card">
+    <div class="compare-card__header">
+      <span class="compare-card__badge compare-card__badge--enhanced">AI 增强版</span>
+      <span class="compare-card__title">知识流动 + Agent 中枢</span>
+    </div>
+    <div class="compare-card__tags">
+      <span class="tag">磨砂玻璃质感</span>
+      <span class="tag">多层渐变+发光</span>
+      <span class="tag">流程动画叙事</span>
+      <span class="tag">粒子动效</span>
+      <span class="tag">丰富色彩系统</span>
+    </div>
+    <div class="svg-wrapper" id="enhanced-visual">
+      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+        <defs>
+          <!-- 磨砂玻璃滤镜 -->
+          <filter id="e-glass">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0" result="shape"/>
+          </filter>
+
+          <!-- 强投影 -->
+          <filter id="e-shadow-lg" x="-20%" y="-20%" width="140%" height="160%">
+            <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+          </filter>
+          <filter id="e-shadow-md" x="-15%" y="-15%" width="130%" height="150%">
+            <feDropShadow dx="0" dy="3" stdDeviation="8" flood-color="#000" flood-opacity="0.06"/>
+          </filter>
+
+          <!-- Agent 核心发光 -->
+          <filter id="e-core-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+            <feColorMatrix in="blur" type="matrix"
+              values="0 0 0 0 0.3
+                      0 0 0 0 0.69
+                      0 0 0 0 0.31
+                      0 0 0 0.5 0" result="colored"/>
+            <feMerge>
+              <feMergeNode in="colored"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+
+          <!-- 渐变定义 -->
+          <linearGradient id="e-grad-green" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4CAF50"/>
+            <stop offset="50%" stop-color="#66BB6A"/>
+            <stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <linearGradient id="e-grad-blue" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#42A5F5"/>
+            <stop offset="100%" stop-color="#1E88E5"/>
+          </linearGradient>
+          <linearGradient id="e-grad-purple" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#AB47BC"/>
+            <stop offset="100%" stop-color="#7B1FA2"/>
+          </linearGradient>
+          <linearGradient id="e-grad-amber" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFA726"/>
+            <stop offset="100%" stop-color="#F57C00"/>
+          </linearGradient>
+
+          <!-- 流动光线渐变 -->
+          <linearGradient id="e-flow-green" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0"/>
+            <stop offset="40%" stop-color="#66BB6A" stop-opacity="0.7"/>
+            <stop offset="60%" stop-color="#81C784" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </linearGradient>
+
+          <!-- 卡片渐变背景 -->
+          <linearGradient id="e-card-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#f8fdf8" stop-opacity="0.9"/>
+          </linearGradient>
+
+          <!-- 环境光 -->
+          <radialGradient id="e-ambient-1" cx="30%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.08"/>
+            <stop offset="50%" stop-color="#4CAF50" stop-opacity="0.03"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="e-ambient-2" cx="70%" cy="70%" r="50%">
+            <stop offset="0%" stop-color="#2196F3" stop-opacity="0.05"/>
+            <stop offset="100%" stop-color="#2196F3" stop-opacity="0"/>
+          </radialGradient>
+
+          <!-- 点阵背景 -->
+          <pattern id="e-dots" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="12" cy="12" r="0.8" fill="#4CAF50" opacity="0.06"/>
+          </pattern>
+
+          <!-- 噪点纹理 -->
+          <filter id="e-noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+            <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+            <feComponentTransfer in="gray" result="dimmed">
+              <feFuncA type="linear" slope="0.03"/>
+            </feComponentTransfer>
+          </filter>
+        </defs>
+
+        <!-- 背景层 -->
+        <rect x="0" y="0" width="480" height="290" fill="#FAFCFB"/>
+        <rect x="0" y="0" width="480" height="290" fill="url(#e-dots)"/>
+        <circle cx="140" cy="80" r="160" fill="url(#e-ambient-1)"/>
+        <circle cx="360" cy="220" r="140" fill="url(#e-ambient-2)"/>
+
+        <!-- === 左侧：输入源区域 === -->
+        <!-- 碎片 1：聊天记录 -->
+        <g class="e-frag e-frag-1">
+          <rect x="18" y="18" width="82" height="58" rx="10" fill="url(#e-card-grad)" stroke="#e0e8e0" stroke-width="1" filter="url(#e-shadow-md)"/>
+          <!-- 聊天气泡图标 -->
+          <ellipse cx="38" cy="50" rx="10" ry="7" fill="#E8F5E9" stroke="#C8E6C9" stroke-width="0.8"/>
+          <polygon points="30,54 34,60 40,54" fill="#E8F5E9" stroke="#C8E6C9" stroke-width="0.5"/>
+          <rect x="50" y="36" width="36" height="3" rx="1.5" fill="#E0E0E0"/>
+          <rect x="50" y="43" width="28" height="3" rx="1.5" fill="#E8E8E8"/>
+          <rect x="50" y="50" width="32" height="3" rx="1.5" fill="#E8E8E8"/>
+          <text x="59" y="71" text-anchor="middle" font-size="8.5" fill="#888" font-weight="500">聊天记录</text>
+        </g>
+
+        <!-- 碎片 2：Markdown 文件 -->
+        <g class="e-frag e-frag-2">
+          <rect x="12" y="200" width="78" height="56" rx="10" fill="url(#e-card-grad)" stroke="#e0e8e0" stroke-width="1" filter="url(#e-shadow-md)"/>
+          <!-- Markdown 文件图标 -->
+          <rect x="30" y="218" width="16" height="12" rx="2" fill="#E3F2FD" stroke="#BBDEFB" stroke-width="0.8"/>
+          <text x="38" y="227" text-anchor="middle" font-size="7" fill="#1976D2" font-weight="700">.md</text>
+          <rect x="50" y="218" width="28" height="2.5" rx="1" fill="#E0E0E0"/>
+          <rect x="50" y="224" width="22" height="2.5" rx="1" fill="#E8E8E8"/>
+          <rect x="50" y="230" width="18" height="2.5" rx="1" fill="#E8E8E8"/>
+          <text x="51" y="252" text-anchor="middle" font-size="8.5" fill="#888" font-weight="500">Markdown</text>
+        </g>
+
+        <!-- 碎片 3：截图/图片 -->
+        <g class="e-frag e-frag-3">
+          <rect x="170" y="6" width="78" height="52" rx="10" fill="url(#e-card-grad)" stroke="#e0e8e0" stroke-width="1" filter="url(#e-shadow-md)"/>
+          <!-- 图片图标 -->
+          <rect x="185" y="18" width="18" height="14" rx="3" fill="#FFF3E0" stroke="#FFE0B2" stroke-width="0.8"/>
+          <circle cx="190" cy="22" r="1.5" fill="#FFB74D"/>
+          <polygon points="185,32 192,27 199,32" fill="#FFE0B2"/>
+          <rect x="207" y="18" width="28" height="2.5" rx="1" fill="#E0E0E0"/>
+          <rect x="207" y="24" width="22" height="2.5" rx="1" fill="#E8E8E8"/>
+          <text x="209" y="54" text-anchor="middle" font-size="8.5" fill="#888" font-weight="500">截图/图片</text>
+        </g>
+
+        <!-- 碎片 4：语音/播客 -->
+        <g class="e-frag e-frag-4">
+          <rect x="370" y="14" width="80" height="54" rx="10" fill="url(#e-card-grad)" stroke="#e0e8e0" stroke-width="1" filter="url(#e-shadow-md)"/>
+          <!-- 语音波形图标 -->
+          <rect x="388" y="30" width="2.5" height="8" rx="1.2" fill="#CE93D8"/>
+          <rect x="393" y="26" width="2.5" height="14" rx="1.2" fill="#AB47BC"/>
+          <rect x="398" y="22" width="2.5" height="20" rx="1.2" fill="#9C27B0"/>
+          <rect x="403" y="24" width="2.5" height="16" rx="1.2" fill="#AB47BC"/>
+          <rect x="408" y="28" width="2.5" height="10" rx="1.2" fill="#CE93D8"/>
+          <rect x="418" y="22" width="22" height="2.5" rx="1" fill="#E0E0E0"/>
+          <rect x="418" y="30" width="16" height="2.5" rx="1" fill="#E8E8E8"/>
+          <text x="410" y="64" text-anchor="middle" font-size="8.5" fill="#888" font-weight="500">语音/播客</text>
+        </g>
+
+        <!-- 碎片 5：网页文章 -->
+        <g class="e-frag e-frag-5">
+          <rect x="368" y="204" width="82" height="54" rx="10" fill="url(#e-card-grad)" stroke="#e0e8e0" stroke-width="1" filter="url(#e-shadow-md)"/>
+          <!-- 网页图标 -->
+          <rect x="383" y="220" width="16" height="12" rx="2" fill="#E8F5E9" stroke="#C8E6C9" stroke-width="0.8"/>
+          <line x1="386" y1="224" x2="396" y2="224" stroke="#81C784" stroke-width="1.2"/>
+          <line x1="386" y1="228" x2="393" y2="228" stroke="#A5D6A7" stroke-width="1.2"/>
+          <rect x="406" y="220" width="30" height="2.5" rx="1" fill="#E0E0E0"/>
+          <rect x="406" y="226" width="22" height="2.5" rx="1" fill="#E8E8E8"/>
+          <text x="409" y="254" text-anchor="middle" font-size="8.5" fill="#888" font-weight="500">网页文章</text>
+        </g>
+
+        <!-- === 中间：流动光线 === -->
+        <g class="e-flow">
+          <!-- 从各个碎片到 Agent 核心的光线 -->
+          <path d="M 100,48 Q 170,60 195,110" stroke="url(#e-flow-green)" stroke-width="2" fill="none" stroke-linecap="round" class="e-flow-line"/>
+          <path d="M 52,228 Q 130,210 195,180" stroke="url(#e-flow-green)" stroke-width="2" fill="none" stroke-linecap="round" class="e-flow-line"/>
+          <path d="M 208,32 Q 215,65 218,105" stroke="url(#e-flow-green)" stroke-width="2" fill="none" stroke-linecap="round" class="e-flow-line"/>
+          <path d="M 410,40 Q 345,65 305,108" stroke="url(#e-flow-green)" stroke-width="2" fill="none" stroke-linecap="round" class="e-flow-line"/>
+          <path d="M 410,230 Q 345,210 305,180" stroke="url(#e-flow-green)" stroke-width="2" fill="none" stroke-linecap="round" class="e-flow-line"/>
+
+          <!-- 流动粒子 -->
+          <circle cx="140" cy="80" r="2" fill="#81C784" opacity="0.7" class="e-particle">
+            <animate attributeName="cx" values="140;170;200" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="80;92;115" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;0.7;0" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="380" cy="60" r="2" fill="#81C784" opacity="0.7" class="e-particle">
+            <animate attributeName="cx" values="380;340;295" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="60;80;108" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;0.7;0" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="380" cy="240" r="2" fill="#81C784" opacity="0.7" class="e-particle">
+            <animate attributeName="cx" values="380;340;295" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="240;220;180" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;0.7;0" dur="3s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+
+        <!-- === 中央：Agent 核心 === -->
+        <g class="e-core">
+          <!-- 外环发光 -->
+          <circle cx="248" cy="145" r="42" fill="none" stroke="#4CAF50" stroke-width="1.5" stroke-dasharray="8,4" opacity="0.3">
+            <animateTransform attributeName="transform" type="rotate" from="0 248 145" to="360 248 145" dur="12s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="248" cy="145" r="36" fill="none" stroke="#81C784" stroke-width="1" stroke-dasharray="4,8" opacity="0.25">
+            <animateTransform attributeName="transform" type="rotate" from="360 248 145" to="0 248 145" dur="8s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- 核心圆 -->
+          <circle cx="248" cy="145" r="26" fill="url(#e-grad-green)" filter="url(#e-core-glow)" opacity="0.9"/>
+          <circle cx="248" cy="145" r="26" fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+
+          <!-- 核心内图标：齿轮/星形 -->
+          <g transform="translate(248,145)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity="0.9">
+            <line x1="0" y1="-10" x2="0" y2="-15"/>
+            <line x1="0" y1="10" x2="0" y2="15"/>
+            <line x1="-10" y1="0" x2="-15" y2="0"/>
+            <line x1="10" y1="0" x2="15" y2="0"/>
+            <line x1="-7" y1="-7" x2="-10.5" y2="-10.5"/>
+            <line x1="7" y1="7" x2="10.5" y2="10.5"/>
+            <line x1="7" y1="-7" x2="10.5" y2="-10.5"/>
+            <line x1="-7" y1="7" x2="-10.5" y2="10.5"/>
+            <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite"/>
+          </g>
+
+          <!-- 脉冲环 -->
+          <circle cx="248" cy="145" r="26" fill="none" stroke="#66BB6A" stroke-width="2" opacity="0">
+            <animate attributeName="r" values="26;50" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.4;0" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="248" cy="145" r="26" fill="none" stroke="#81C784" stroke-width="1.5" opacity="0">
+            <animate attributeName="r" values="26;44" dur="2.5s" begin="1.25s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.3;0" dur="2.5s" begin="1.25s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+
+        <!-- === 右侧：输出 Wiki 结构 === -->
+        <g class="e-output">
+          <!-- 知识卡片框架 -->
+          <rect x="294" y="86" width="130" height="122" rx="12" fill="url(#e-card-grad)" stroke="#C8E6C9" stroke-width="1.5" filter="url(#e-shadow-lg)"/>
+
+          <!-- 卡片标题 -->
+          <rect x="314" y="100" width="16" height="2.5" rx="1.2" fill="#4CAF50"/>
+          <rect x="334" y="100" width="40" height="2.5" rx="1.2" fill="#A5D6A7"/>
+          <text x="314" y="96" font-size="9" fill="#4CAF50" font-weight="700">我的知识 Wiki</text>
+
+          <!-- 知识树节点 -->
+          <!-- 节点 1 -->
+          <circle cx="320" cy="122" r="3.5" fill="url(#e-grad-green)"/>
+          <rect x="328" y="119" width="36" height="2" rx="1" fill="#C8E6C9"/>
+          <text x="334" y="117" font-size="7.5" fill="#666">架构设计</text>
+          <!-- 子节点 -->
+          <circle cx="318" cy="136" r="2" fill="#81C784" opacity="0.6"/>
+          <rect x="325" y="134" width="28" height="1.5" rx="0.8" fill="#E0E0E0"/>
+          <text x="332" y="133" font-size="6.5" fill="#999">微服务</text>
+
+          <!-- 节点 2 -->
+          <circle cx="320" cy="150" r="3.5" fill="url(#e-grad-blue)"/>
+          <rect x="328" y="147" width="36" height="2" rx="1" fill="#BBDEFB"/>
+          <text x="334" y="145" font-size="7.5" fill="#666">商业分析</text>
+          <circle cx="318" cy="164" r="2" fill="#64B5F6" opacity="0.6"/>
+          <rect x="325" y="162" width="24" height="1.5" rx="0.8" fill="#E0E0E0"/>
+          <text x="332" y="161" font-size="6.5" fill="#999">SWOT</text>
+
+          <!-- 节点 3 -->
+          <circle cx="320" cy="178" r="3.5" fill="url(#e-grad-purple)"/>
+          <rect x="328" y="175" width="36" height="2" rx="1" fill="#E1BEE7"/>
+          <text x="334" y="173" font-size="7.5" fill="#666">设计原则</text>
+          <circle cx="318" cy="192" r="2" fill="#CE93D8" opacity="0.6"/>
+          <rect x="325" y="190" width="22" height="1.5" rx="0.8" fill="#E0E0E0"/>
+          <text x="332" y="189" font-size="6.5" fill="#999">DRY</text>
+
+          <!-- 连接线 -->
+          <line x1="320" y1="132" x2="320" y2="138" stroke="#C8E6C9" stroke-width="0.8"/>
+          <line x1="320" y1="160" x2="320" y2="166" stroke="#BBDEFB" stroke-width="0.8"/>
+          <line x1="320" y1="188" x2="320" y2="194" stroke="#E1BEE7" stroke-width="0.8"/>
+
+          <!-- 节点之间的主干连接 -->
+          <line x1="320" y1="126" x2="320" y2="146" stroke="#E8E8E8" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="320" y1="154" x2="320" y2="174" stroke="#E8E8E8" stroke-width="1" stroke-dasharray="3,2"/>
+
+          <!-- 流动指示器 -->
+          <g opacity="0.5">
+            <circle r="1.5" fill="#4CAF50">
+              <animate attributeName="cy" values="118;130;142;154;166;178;190;200" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="cx" values="320;325;330;325;320;325;330;320" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0;0.8;0.8;0.8;0.8;0.8;0.8;0" dur="3s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+        </g>
+
+        <!-- 装饰性环境粒子 -->
+        <circle cx="100" cy="130" r="1.2" fill="#A5D6A7" opacity="0">
+          <animate attributeName="opacity" values="0;0.4;0" dur="4s" repeatCount="indefinite" begin="0s"/>
+          <animate attributeName="cy" values="130;120;130" dur="4s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <circle cx="430" cy="100" r="1" fill="#81C784" opacity="0">
+          <animate attributeName="opacity" values="0;0.3;0" dur="5s" repeatCount="indefinite" begin="1.5s"/>
+          <animate attributeName="cy" values="100;90;100" dur="5s" repeatCount="indefinite" begin="1.5s"/>
+        </circle>
+        <circle cx="140" cy="250" r="1.2" fill="#A5D6A7" opacity="0">
+          <animate attributeName="opacity" values="0;0.35;0" dur="4.5s" repeatCount="indefinite" begin="2s"/>
+        </circle>
+
+        <!-- 标签 -->
+        <text x="248" y="210" text-anchor="middle" font-size="8.5" fill="#999" font-weight="500">
+          AI Agent 自动编译
+        </text>
+      </svg>
+    </div>
+    <div class="enhance-list">
+      <div class="enhance-item">磨砂玻璃卡片</div>
+      <div class="enhance-item">四色分区系统</div>
+      <div class="enhance-item">流动粒子路径</div>
+      <div class="enhance-item">Agent 核心脉冲动画</div>
+      <div class="enhance-item">知识树生长结构</div>
+      <div class="enhance-item">多层投影+发光</div>
+      <div class="enhance-item">SMIL 内置动画</div>
+      <div class="enhance-item">彩色图标系统</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note" style="margin-top:40px">
+  <p><strong>关键差异：</strong></p>
+  <p>
+    当前版 5 张白卡 + 灰线 → 书本 | 
+    AI增强版 5 种输入源（带彩色图标）+ 流动光线 → Agent核心（动画） → Wiki知识树（结构化输出）
+  </p>
+  <p style="margin-top:12px; font-size:13px;">
+    增强版同时展示了 <strong>输入→处理→输出</strong> 的完整产品叙事，而非仅"碎片汇合"。
+  </p>
+</div>
+
+<script>
+// Simple scroll-triggered reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.svg-wrapper').forEach(el => observer.observe(el));
+
+// Trigger animation after a short delay for demo purposes
+setTimeout(() => {
+  document.querySelectorAll('.svg-wrapper').forEach(el => el.classList.add('visible'));
+}, 300);
+</script>
+
+</body>
+</html>
