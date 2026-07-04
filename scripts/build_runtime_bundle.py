@@ -64,18 +64,56 @@ def download_and_extract_python(url: str, target: Path) -> None:
 def install_packages(python_root: Path, site_packages: Path) -> None:
     python = python_root / "bin" / "python3"
     subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip"], check=True)
-    subprocess.run(
-        [
-            str(python),
-            "-m",
-            "pip",
-            "install",
-            "--target",
-            str(site_packages),
-            str(ROOT),
-        ],
-        check=True,
-    )
+    with tempfile.TemporaryDirectory() as tmpdir:
+        staged_source = prepare_clean_source_tree(Path(tmpdir))
+        subprocess.run(
+            [
+                str(python),
+                "-m",
+                "pip",
+                "install",
+                "--target",
+                str(site_packages),
+                str(staged_source),
+            ],
+            check=True,
+        )
+
+
+def prepare_clean_source_tree(destination_root: Path) -> Path:
+    staged_root = destination_root / "piki-source"
+    shutil.copytree(ROOT, staged_root, ignore=_ignore_workspace_artifacts)
+    return staged_root
+
+
+def _ignore_workspace_artifacts(current_dir: str, names: list[str]) -> set[str]:
+    current_path = Path(current_dir)
+    try:
+        relative = current_path.relative_to(ROOT)
+    except ValueError:
+        relative = Path()
+
+    ignored = {
+        name
+        for name in names
+        if name in {
+            ".git",
+            ".venv",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+            "__pycache__",
+            "build",
+            "dist",
+            "outputs",
+            "piki.egg-info",
+        }
+    }
+
+    if relative == Path("PikiApp"):
+        ignored.update({"build", ".build"})
+
+    return ignored
 
 
 def write_metadata(arch: str) -> None:
