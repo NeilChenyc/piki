@@ -4,13 +4,15 @@ import SVGVisual from '../components/SVGVisual.astro';
 ---
 <section class="hero">
   <div class="container text-center">
-    <h1 class="hero__title">你的 LLM Wiki</h1>
+    <div class="hero__brand fade-in">
+      <img src="/brand-logo.png" alt="Piki" class="hero__logo" width="600" height="400" />
+    </div>
+    <p class="hero__tagline">你的 LLM Wiki 客户端</p>
     <p class="hero__subtitle">
       AI 维护你的个人知识库。你只管输入和提问。
     </p>
-    <p class="hero__meta">本地 Markdown · AI 驱动 · 完全属于你</p>
     <div class="hero__cta">
-      <Button href="#download">免费下载 macOS 版</Button>
+      <Button href="https://github.com/NeilChenyc/piki/releases/tag/v0.1.0-beta.1">免费下载 macOS 版</Button>
     </div>
     <SVGVisual alt="碎片信息编译为结构化 Wiki">
       <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
@@ -201,9 +203,10 @@ import SVGVisual from '../components/SVGVisual.astro';
 
 <style is:global>
   .hero { padding: var(--space-3xl) 0 var(--space-2xl); }
-  .hero__title { margin-bottom: var(--space-md); }
-  .hero__subtitle { font-size: 19px; color: var(--color-text-secondary); max-width: 480px; margin: 0 auto var(--space-sm); line-height: 1.7; }
-  .hero__meta { font-size: 14px; color: var(--color-text-tertiary); letter-spacing: 0.03em; margin-bottom: var(--space-lg); }
+  .hero__brand { margin-bottom: var(--space-sm); }
+  .hero__logo { height: 220px; width: auto; display: block; margin: 0 auto; }
+  .hero__tagline { font-size: 20px; color: var(--color-text-secondary); font-weight: 500; margin-bottom: var(--space-xs); }
+  .hero__subtitle { font-size: 17px; color: var(--color-text-tertiary); max-width: 440px; margin: 0 auto var(--space-lg); line-height: 1.7; }
   .hero__cta { margin-bottom: var(--space-xl); }
 
   /* Spring easing */

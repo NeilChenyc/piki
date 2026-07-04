@@ -138,16 +138,15 @@ import SVGVisual from '../components/SVGVisual.astro';
   .f3-drift1 .f3-drift-marker { transform: translateY(-34px); }
   .f3-drift2 .f3-drift-marker { transform: translateY(34px); }
 
-  /* Scanner reaches x=260 at ~1.73s = 57.8% of 3s */
+  /* Drift node 1 (history): scanner pulls it down at ~1.73s, then stays aligned until scanner returns to origin */
   .svg-visual.visible .f3-drift1 .f3-drift-marker {
     animation: f3-drift1-cycle var(--f3-cycle) ease-in-out infinite;
     animation-delay: var(--f3-loop-delay);
   }
   @keyframes f3-drift1-cycle {
-    0%, 52%   { transform: translateY(-34px); }      /* deviated above baseline */
-    57%, 68%  { transform: translateY(0); }           /* scanner pulls it down */
-    73%, 90%  { transform: translateY(0); }           /* stays aligned */
-    95%, 100% { transform: translateY(-34px); }       /* drifts again */
+    0%, 55%   { transform: translateY(-34px); }      /* deviated above baseline */
+    58%, 99%  { transform: translateY(0); }             /* scanner pulls it down, stays aligned */
+    100%      { transform: translateY(-34px); }        /* drifts again only when scanner returns to origin */
   }
 
   /* Scanner reaches x=360 at ~2.40s = 80.0% of 3s */
@@ -161,14 +160,13 @@ import SVGVisual from '../components/SVGVisual.astro';
     93%, 100% { transform: translateY(0); }           /* stays aligned */
   }
 
-  /* Alert ring: only while deviated */
+  /* Alert ring: only while deviated (not while aligned) */
   .svg-visual.visible .f3-drift1 .f3-alert { animation: f3-alert-1 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
   .svg-visual.visible .f3-drift2 .f3-alert { animation: f3-alert-2 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
   @keyframes f3-alert-1 {
     0%, 4%   { opacity: 0; }
-    8%, 50%  { opacity: 0.85; }
-    54%, 92% { opacity: 0; }
-    96%, 100% { opacity: 0.85; }
+    8%, 55%  { opacity: 0.85; }
+    60%, 100% { opacity: 0; }
   }
   @keyframes f3-alert-2 {
     0%, 4%   { opacity: 0; }
@@ -180,9 +178,9 @@ import SVGVisual from '../components/SVGVisual.astro';
   .svg-visual.visible .f3-drift1 .f3-repair { animation: f3-repair-1 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
   .svg-visual.visible .f3-drift2 .f3-repair { animation: f3-repair-2 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
   @keyframes f3-repair-1 {
-    0%, 54%  { opacity: 0; }
-    57%, 68% { opacity: 0.8; }
-    71%, 100% { opacity: 0; }
+    0%, 56%  { opacity: 0; }
+    58%, 70% { opacity: 0.8; }
+    72%, 100% { opacity: 0; }
   }
   @keyframes f3-repair-2 {
     0%, 76%  { opacity: 0; }

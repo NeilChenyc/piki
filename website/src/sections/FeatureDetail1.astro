@@ -6,7 +6,7 @@ import SVGVisual from '../components/SVGVisual.astro';
     <div class="feature-text fade-in">
       <h2>一个入口，说完就等结果</h2>
       <p class="text-secondary">不区分查询和编辑。说你要什么，Agent 自己判断执行。</p>
-      <blockquote class="feature__quote">"帮我把最近读的几本思维方法论的书，提取出可复用的框架和模型。"</blockquote>
+      <blockquote class="feature__quote">"帮我把新的笔记知识记下来并整理好。"</blockquote>
       <p class="text-secondary">你也可以直接拖入文件，Agent 自动识别内容类型并归入合适位置。</p>
     </div>
     <SVGVisual alt="一句话触发 Agent 多步处理">
@@ -79,7 +79,7 @@ import SVGVisual from '../components/SVGVisual.astro';
         <!-- Input bubble -->
         <g class="f1-bubble" filter="url(#f1-glow)">
           <rect x="100" y="14" width="280" height="42" rx="14" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.5"/>
-          <text x="240" y="40" text-anchor="middle" font-size="12" fill="#2E7D32" font-weight="500">提取读书笔记中的方法论框架</text>
+          <text x="240" y="40" text-anchor="middle" font-size="12" fill="#2E7D32" font-weight="500">记入新的笔记知识</text>
           <rect class="f1-cursor" x="340" y="30" width="2" height="14" rx="1" fill="#4CAF50"/>
           <polygon points="228,56 240,70 252,56" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.5"/>
         </g>
@@ -106,7 +106,7 @@ import SVGVisual from '../components/SVGVisual.astro';
           <circle cx="69" cy="187" r="2.5" fill="none" stroke="#1E88E5" stroke-width="1"/>
           <line x1="71" y1="189" x2="73" y2="191" stroke="#1E88E5" stroke-width="1" stroke-linecap="round"/>
           <text x="90" y="193" text-anchor="middle" font-size="10" fill="#333" font-weight="500">搜索</text>
-          <text x="90" y="213" text-anchor="middle" font-size="8.5" fill="#999">匹配已有笔记</text>
+          <text x="90" y="213" text-anchor="middle" font-size="8.5" fill="#999">找到潜在联系</text>
         </g>
 
         <!-- Step 2: Extract -->
@@ -114,8 +114,8 @@ import SVGVisual from '../components/SVGVisual.astro';
           <rect x="136" y="168" width="88" height="58" rx="10" fill="url(#f1-card)" stroke="#e8e8e8" stroke-width="1" filter="url(#f1-shadow)"/>
           <circle cx="160" cy="188" r="9" fill="#E8F5E9" stroke="url(#f1-grad-extract)" stroke-width="1.3"/>
           <path d="M 157,190 L 160,185 L 163,190 M 160,185 L 160,192" fill="none" stroke="#2E7D32" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <text x="180" y="193" text-anchor="middle" font-size="10" fill="#333" font-weight="500">提取</text>
-          <text x="180" y="213" text-anchor="middle" font-size="8.5" fill="#999">写入 concepts/</text>
+          <text x="180" y="193" text-anchor="middle" font-size="10" fill="#333" font-weight="500">拆解</text>
+          <text x="180" y="213" text-anchor="middle" font-size="8.5" fill="#999">写入所有相应目录</text>
         </g>
 
         <!-- Step 3: Link -->
