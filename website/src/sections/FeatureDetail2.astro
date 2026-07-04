@@ -7,25 +7,39 @@ import SVGVisual from '../components/SVGVisual.astro';
       <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="f2-shadow" x="-15%" y="-15%" width="130%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.07"/>
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.05"/>
+            <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.05"/>
           </filter>
-          <filter id="f2-hub-glow">
-            <feGaussianBlur stdDeviation="5" result="blur"/>
-            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          <filter id="f2-hub-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feColorMatrix in="blur" type="matrix"
+              values="0 0 0 0 0.29
+                      0 0 0 0 0.69
+                      0 0 0 0 0.31
+                      0 0 0 0.3 0" result="colored"/>
+            <feMerge>
+              <feMergeNode in="colored"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
           </filter>
           <linearGradient id="f2-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#2E7D32"/>
+            <stop offset="0%" stop-color="#66BB6A"/>
+            <stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <linearGradient id="f2-card" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#fafafa"/>
           </linearGradient>
           <radialGradient id="f2-amb-l" cx="25%" cy="50%" r="40%">
-            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.04"/>
-            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#9E9E9E" stop-opacity="0.04"/>
+            <stop offset="100%" stop-color="#9E9E9E" stop-opacity="0"/>
           </radialGradient>
           <radialGradient id="f2-amb-r" cx="75%" cy="50%" r="45%">
-            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.06"/>
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.07"/>
             <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
           </radialGradient>
           <pattern id="f2-dots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.05"/>
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.04"/>
           </pattern>
         </defs>
 
@@ -34,67 +48,74 @@ import SVGVisual from '../components/SVGVisual.astro';
         <circle cx="375" cy="145" r="160" fill="url(#f2-amb-r)"/>
 
         <!-- Phase labels -->
-        <g class="f2-label f2-l1"><text x="30" y="22" font-size="10" fill="#aaa">初次积累</text></g>
+        <g class="f2-label f2-l1"><text x="30" y="22" font-size="10" fill="#bbb" font-weight="500">初次积累</text></g>
 
-        <!-- Phase 1: Sparse -->
-        <circle class="f2-sn f2-s0" cx="68" cy="130" r="18" fill="white" stroke="#ddd" stroke-width="1.5" filter="url(#f2-shadow)"/>
-        <text class="f2-sn f2-s0" x="68" y="134" text-anchor="middle" font-size="10" fill="#888">技术创新史</text>
+        <!-- Phase 1: Sparse — only 3 nodes, barely connected -->
+        <rect class="f2-sn f2-s0" x="50" y="122" width="56" height="26" rx="9" fill="url(#f2-card)" stroke="#ddd" stroke-width="1.5" filter="url(#f2-shadow)"/>
+        <text class="f2-sn f2-s0" x="78" y="139" text-anchor="middle" font-size="9" fill="#999">技术创新史</text>
 
-        <circle class="f2-sn f2-s1" cx="155" cy="62" r="14" fill="white" stroke="#ddd" stroke-width="1.2" filter="url(#f2-shadow)"/>
-        <text class="f2-sn f2-s1" x="155" y="66" text-anchor="middle" font-size="9" fill="#bbb">半导体演进</text>
+        <rect class="f2-sn f2-s1" x="132" y="57" width="56" height="22" rx="8" fill="url(#f2-card)" stroke="#ddd" stroke-width="1.2" filter="url(#f2-shadow)"/>
+        <text class="f2-sn f2-s1" x="160" y="72" text-anchor="middle" font-size="8.5" fill="#bbb">半导体演进</text>
 
-        <circle class="f2-sn f2-s2" cx="175" cy="172" r="15" fill="white" stroke="#ddd" stroke-width="1.2" filter="url(#f2-shadow)"/>
-        <text class="f2-sn f2-s2" x="175" y="176" text-anchor="middle" font-size="9" fill="#bbb">商业模式变革</text>
+        <rect class="f2-sn f2-s2" x="133" y="194" width="64" height="22" rx="8" fill="url(#f2-card)" stroke="#ddd" stroke-width="1.2" filter="url(#f2-shadow)"/>
+        <text class="f2-sn f2-s2" x="165" y="209" text-anchor="middle" font-size="8.5" fill="#bbb">商业模式变革</text>
 
-        <circle class="f2-sn f2-s3" cx="50" cy="225" r="12" fill="white" stroke="#ddd" stroke-width="1.2" filter="url(#f2-shadow)"/>
-        <text class="f2-sn f2-s3" x="50" y="229" text-anchor="middle" font-size="8" fill="#bbb">关键人物</text>
-
-        <line class="f2-se" x1="82" y1="120" x2="141" y2="74" stroke="#ddd" stroke-width="1"/>
-        <line class="f2-se" x1="86" y1="138" x2="161" y2="163" stroke="#ddd" stroke-width="1"/>
-        <line class="f2-se" x1="57" y1="146" x2="52" y2="213" stroke="#ddd" stroke-width="1"/>
+        <!-- Sparse edges: thin, broken -->
+        <line class="f2-se f2-se1" x1="90" y1="124" x2="146" y2="79" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+        <line class="f2-se f2-se2" x1="92" y1="146" x2="149" y2="194" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
 
         <!-- Arrow -->
         <g class="f2-arrow">
-          <path d="M 198,140 L 258,140" stroke="#bbb" stroke-width="2" stroke-dasharray="6,4"/>
-          <polygon points="258,135 266,140 258,145" fill="#bbb"/>
+          <path d="M 205,140 L 265,140" stroke="#bbb" stroke-width="2" stroke-dasharray="6,4"/>
+          <polygon points="265,135 273,140 265,145" fill="#bbb"/>
         </g>
 
-        <g class="f2-label f2-l2"><text x="295" y="22" font-size="10" fill="#4CAF50">持续编译后</text></g>
+        <g class="f2-label f2-l2"><text x="295" y="22" font-size="10" fill="#4CAF50" font-weight="600">持续编译后</text></g>
 
-        <!-- Phase 2: Dense -->
-        <circle class="f2-dn f2-d0" cx="375" cy="135" r="24" fill="white" stroke="url(#f2-grad)" stroke-width="2.5" filter="url(#f2-hub-glow)"/>
-        <text class="f2-dn f2-d0" x="375" y="131" text-anchor="middle" font-size="11" fill="#2E7D32" font-weight="600">信息技术</text>
-        <text class="f2-dn f2-d0" x="375" y="148" text-anchor="middle" font-size="8" fill="#4CAF50">革命史</text>
+        <!-- Phase 2: Dense network -->
 
-        <circle class="f2-dn f2-d1" cx="298" cy="52" r="16" fill="white" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d1" x="298" y="56" text-anchor="middle" font-size="9" fill="#333">芯片技术</text>
+        <!-- Hub with rotating ring -->
+        <g class="f2-hub-ring">
+          <circle cx="375" cy="135" r="34" fill="none" stroke="#4CAF50" stroke-width="1" stroke-dasharray="6,4" opacity="0.25"/>
+        </g>
 
-        <circle class="f2-dn f2-d2" cx="458" cy="58" r="16" fill="white" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d2" x="458" y="62" text-anchor="middle" font-size="9" fill="#333">软件工程</text>
+        <rect class="f2-dn f2-d0" x="343" y="118" width="64" height="34" rx="14" fill="url(#f2-card)" stroke="url(#f2-grad)" stroke-width="2.5" filter="url(#f2-hub-glow)"/>
+        <text class="f2-dn f2-d0" x="375" y="139" text-anchor="middle" font-size="10.5" fill="#2E7D32" font-weight="600">AI 技术潮</text>
 
-        <circle class="f2-dn f2-d3" cx="315" cy="230" r="15" fill="white" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d3" x="315" y="234" text-anchor="middle" font-size="9" fill="#333">企业变革</text>
+        <!-- Sub-nodes: color-coded by category -->
+        <rect class="f2-dn f2-d1" x="271" y="42" width="48" height="26" rx="9" fill="url(#f2-card)" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d1" x="295" y="60" text-anchor="middle" font-size="9" fill="#333">芯片技术</text>
 
-        <circle class="f2-dn f2-d4" cx="448" cy="225" r="15" fill="white" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d4" x="448" y="229" text-anchor="middle" font-size="9" fill="#333">政策影响</text>
+        <rect class="f2-dn f2-d2" x="421" y="47" width="48" height="26" rx="9" fill="url(#f2-card)" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d2" x="445" y="65" text-anchor="middle" font-size="9" fill="#333">软件工程</text>
 
-        <circle class="f2-dn f2-d5" cx="275" cy="140" r="11" fill="white" stroke="#C8E6C9" stroke-width="1.3" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d5" x="275" y="144" text-anchor="middle" font-size="7" fill="#888">人物志</text>
+        <rect class="f2-dn f2-d3" x="291" y="222" width="48" height="26" rx="9" fill="url(#f2-card)" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d3" x="315" y="240" text-anchor="middle" font-size="9" fill="#333">企业变革</text>
 
-        <circle class="f2-dn f2-d6" cx="476" cy="140" r="11" fill="white" stroke="#C8E6C9" stroke-width="1.3" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d6" x="476" y="144" text-anchor="middle" font-size="7" fill="#888">书摘</text>
+        <rect class="f2-dn f2-d4" x="416" y="217" width="48" height="26" rx="9" fill="url(#f2-card)" stroke="url(#f2-grad)" stroke-width="1.8" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d4" x="440" y="235" text-anchor="middle" font-size="9" fill="#333">政策影响</text>
 
-        <circle class="f2-dn f2-d7" cx="375" cy="262" r="12" fill="white" stroke="#C8E6C9" stroke-width="1.3" filter="url(#f2-shadow)"/>
-        <text class="f2-dn f2-d7" x="375" y="266" text-anchor="middle" font-size="7" fill="#888">阅读来源</text>
+        <!-- Leaf nodes: smaller, lighter -->
+        <rect class="f2-dn f2-d5" x="257" y="134" width="36" height="22" rx="7" fill="url(#f2-card)" stroke="#C8E6C9" stroke-width="1.3" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d5" x="275" y="149" text-anchor="middle" font-size="7" fill="#888">人物志</text>
 
-        <!-- Dense edges -->
-        <line class="f2-de" x1="311" y1="64" x2="354" y2="116" stroke="#4CAF50" stroke-width="1.3" opacity="0.6"/>
-        <line class="f2-de" x1="442" y1="71" x2="394" y2="116" stroke="#4CAF50" stroke-width="1.3" opacity="0.6"/>
-        <line class="f2-de" x1="330" y1="217" x2="364" y2="155" stroke="#4CAF50" stroke-width="1.3" opacity="0.6"/>
-        <line class="f2-de" x1="432" y1="212" x2="394" y2="155" stroke="#4CAF50" stroke-width="1.3" opacity="0.6"/>
-        <line class="f2-de" x1="285" y1="138" x2="351" y2="135" stroke="#C8E6C9" stroke-width="0.9"/>
-        <line class="f2-de" x1="399" y1="135" x2="465" y2="138" stroke="#C8E6C9" stroke-width="0.9"/>
-        <line class="f2-de" x1="375" y1="159" x2="375" y2="250" stroke="#C8E6C9" stroke-width="0.9"/>
+        <rect class="f2-dn f2-d6" x="443" y="134" width="34" height="22" rx="7" fill="url(#f2-card)" stroke="#C8E6C9" stroke-width="1.3" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d6" x="460" y="149" text-anchor="middle" font-size="7" fill="#888">书摘</text>
+
+        <rect class="f2-dn f2-d7" x="358" y="254" width="34" height="22" rx="7" fill="url(#f2-card)" stroke="#C8E6C9" stroke-width="1.3" filter="url(#f2-shadow)"/>
+        <text class="f2-dn f2-d7" x="375" y="269" text-anchor="middle" font-size="7" fill="#888">来源</text>
+
+        <!-- Dense edges: varying weight = varying connection strength -->
+        <line class="f2-de f2-de1" x1="310" y1="56" x2="351" y2="120" stroke="#4CAF50" stroke-width="1.5" opacity="0.6"/>
+        <line class="f2-de f2-de2" x1="423" y1="61" x2="392" y2="122" stroke="#4CAF50" stroke-width="1.5" opacity="0.6"/>
+        <line class="f2-de f2-de3" x1="316" y1="225" x2="363" y2="152" stroke="#4CAF50" stroke-width="1.3" opacity="0.5"/>
+        <line class="f2-de f2-de4" x1="421" y1="222" x2="391" y2="150" stroke="#4CAF50" stroke-width="1.3" opacity="0.5"/>
+        <line class="f2-de f2-de5" x1="289" y1="145" x2="343" y2="137" stroke="#C8E6C9" stroke-width="1" opacity="0.7"/>
+        <line class="f2-de f2-de6" x1="407" y1="137" x2="443" y2="144" stroke="#C8E6C9" stroke-width="1" opacity="0.7"/>
+        <line class="f2-de f2-de7" x1="375" y1="152" x2="375" y2="254" stroke="#C8E6C9" stroke-width="1" opacity="0.7"/>
+        <!-- Cross connections: thin, showing network density -->
+        <line class="f2-de f2-de8" x1="296" y1="52" x2="310" y2="221" stroke="#A5D6A7" stroke-width="0.8" opacity="0.3"/>
+        <line class="f2-de f2-de9" x1="438" y1="58" x2="432" y2="215" stroke="#A5D6A7" stroke-width="0.8" opacity="0.3"/>
       </svg>
     </SVGVisual>
     <div class="feature-text fade-in">
@@ -112,7 +133,9 @@ import SVGVisual from '../components/SVGVisual.astro';
   .feature__path { margin-top: var(--space-md); }
   .feature__path code { font-family: var(--font-mono); font-size: 14px; color: var(--color-accent-dark); background: var(--color-accent-light); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); }
 
-  .f2-sn, .f2-dn, .f2-label, .f2-arrow { transform-box: fill-box; transform-origin: center center; }
+  :root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  .f2-sn, .f2-dn, .f2-label, .f2-arrow, .f2-hub-ring { transform-box: fill-box; transform-origin: center center; }
 
   .f2-label, .f2-arrow { opacity: 0; }
   .svg-visual.visible .f2-l1 { animation: f2-fade 0.4s ease-out forwards; animation-delay: 0.1s; }
@@ -120,18 +143,23 @@ import SVGVisual from '../components/SVGVisual.astro';
 
   .f2-sn, .f2-se { opacity: 0; }
   .svg-visual.visible .f2-s0 { animation: f2-pop 0.45s var(--spring) forwards; animation-delay: 0.2s; }
-  .svg-visual.visible .f2-s1 { animation: f2-pop 0.45s var(--spring) forwards; animation-delay: 0.35s; }
-  .svg-visual.visible .f2-s2 { animation: f2-pop 0.45s var(--spring) forwards; animation-delay: 0.5s; }
-  .svg-visual.visible .f2-s3 { animation: f2-pop 0.45s var(--spring) forwards; animation-delay: 0.65s; }
+  .svg-visual.visible .f2-s1 { animation: f2-pop 0.45s var(--spring) forwards; animation-delay: 0.4s; }
+  .svg-visual.visible .f2-s2 { animation: f2-pop 0.45s var(--spring) forwards; animation-delay: 0.6s; }
   @keyframes f2-pop { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
 
-  .svg-visual.visible .f2-se { animation: f2-fade 0.25s ease-out forwards; }
-  .svg-visual.visible .f2-se:nth-of-type(5) { animation-delay: 0.55s; }
-  .svg-visual.visible .f2-se:nth-of-type(6) { animation-delay: 0.7s; }
-  .svg-visual.visible .f2-se:nth-of-type(7) { animation-delay: 0.85s; }
+  .svg-visual.visible .f2-se1 { animation: f2-fade 0.25s ease-out forwards; animation-delay: 0.55s; }
+  .svg-visual.visible .f2-se2 { animation: f2-fade 0.25s ease-out forwards; animation-delay: 0.75s; }
 
   .svg-visual.visible .f2-arrow { animation: f2-fade 0.5s ease-out forwards; animation-delay: 1.1s; }
   .svg-visual.visible .f2-l2 { animation: f2-fade 0.4s ease-out forwards; animation-delay: 1.3s; }
+
+  /* Hub rotating ring */
+  .f2-hub-ring { opacity: 0; }
+  .svg-visual.visible .f2-hub-ring {
+    animation: f2-fade 0.5s ease-out forwards, f2-rotate 20s linear infinite;
+    animation-delay: 1.5s, 2s;
+  }
+  @keyframes f2-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
   .f2-dn, .f2-de { opacity: 0; }
   .svg-visual.visible .f2-d0 { animation: f2-pop 0.55s var(--spring) forwards; animation-delay: 1.5s; }
@@ -143,12 +171,13 @@ import SVGVisual from '../components/SVGVisual.astro';
   .svg-visual.visible .f2-d6 { animation: f2-pop 0.35s var(--spring) forwards; animation-delay: 2.4s; }
   .svg-visual.visible .f2-d7 { animation: f2-pop 0.35s var(--spring) forwards; animation-delay: 2.5s; }
 
-  .svg-visual.visible .f2-de { animation: f2-fade 0.2s ease-out forwards; }
-  .svg-visual.visible .f2-de:nth-of-type(18) { animation-delay: 2.0s; }
-  .svg-visual.visible .f2-de:nth-of-type(19) { animation-delay: 2.15s; }
-  .svg-visual.visible .f2-de:nth-of-type(20) { animation-delay: 2.3s; }
-  .svg-visual.visible .f2-de:nth-of-type(21) { animation-delay: 2.45s; }
-  .svg-visual.visible .f2-de:nth-of-type(22) { animation-delay: 2.6s; }
-  .svg-visual.visible .f2-de:nth-of-type(23) { animation-delay: 2.7s; }
-  .svg-visual.visible .f2-de:nth-of-type(24) { animation-delay: 2.8s; }
+  .svg-visual.visible .f2-de1 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.0s; }
+  .svg-visual.visible .f2-de2 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.15s; }
+  .svg-visual.visible .f2-de3 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.3s; }
+  .svg-visual.visible .f2-de4 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.45s; }
+  .svg-visual.visible .f2-de5 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.6s; }
+  .svg-visual.visible .f2-de6 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.7s; }
+  .svg-visual.visible .f2-de7 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.8s; }
+  .svg-visual.visible .f2-de8 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 2.9s; }
+  .svg-visual.visible .f2-de9 { animation: f2-fade 0.2s ease-out forwards; animation-delay: 3.0s; }
 </style>

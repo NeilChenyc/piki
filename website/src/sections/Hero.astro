@@ -15,29 +15,50 @@ import SVGVisual from '../components/SVGVisual.astro';
     <SVGVisual alt="碎片信息编译为结构化 Wiki">
       <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <!-- Soft drop shadow for cards -->
+          <!-- Layered card shadow: subtle + soft -->
           <filter id="h-shadow" x="-10%" y="-10%" width="130%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.06"/>
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.04"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.06"/>
           </filter>
           <!-- Glow for the central book -->
-          <filter id="h-glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="8" result="blur"/>
-            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          <filter id="h-glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="10" result="blur"/>
+            <feColorMatrix in="blur" type="matrix"
+              values="0 0 0 0 0.29
+                      0 0 0 0 0.69
+                      0 0 0 0 0.31
+                      0 0 0 0.35 0" result="colored"/>
+            <feMerge>
+              <feMergeNode in="colored"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
           </filter>
-          <!-- Brand green gradient -->
+          <!-- Multi-stop brand gradient -->
           <linearGradient id="h-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="var(--color-accent, #4CAF50)"/>
+            <stop offset="0%" stop-color="#66BB6A"/>
+            <stop offset="50%" stop-color="#4CAF50"/>
             <stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <!-- Card surface gradient -->
+          <linearGradient id="h-card" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#f9fdf9"/>
+          </linearGradient>
+          <!-- Flowing line gradient -->
+          <linearGradient id="h-flow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#66BB6A" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
           </linearGradient>
           <!-- Soft ambient glow -->
           <radialGradient id="h-ambient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.07"/>
-            <stop offset="60%" stop-color="#4CAF50" stop-opacity="0.02"/>
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.08"/>
+            <stop offset="50%" stop-color="#4CAF50" stop-opacity="0.02"/>
             <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
           </radialGradient>
           <!-- Dot grid pattern -->
           <pattern id="h-dots" width="28" height="28" patternUnits="userSpaceOnUse">
-            <circle cx="14" cy="14" r="0.8" fill="#4CAF50" opacity="0.07"/>
+            <circle cx="14" cy="14" r="0.8" fill="#4CAF50" opacity="0.06"/>
           </pattern>
         </defs>
 
@@ -46,78 +67,110 @@ import SVGVisual from '../components/SVGVisual.astro';
         <circle cx="240" cy="145" r="180" fill="url(#h-ambient)"/>
 
         <!-- Ambient floating accent circles -->
-        <circle class="h-amb-c" cx="80" cy="60" r="5" fill="#4CAF50" opacity="0.05"/>
-        <circle class="h-amb-c" cx="400" cy="220" r="4" fill="#4CAF50" opacity="0.04"/>
+        <circle class="h-amb-c" cx="80" cy="60" r="4" fill="#81C784" opacity="0"/>
+        <circle class="h-amb-c" cx="400" cy="220" r="3" fill="#81C784" opacity="0"/>
 
-        <!-- Layer 1: Main illustration -->
-        <!-- Fragment 1 -->
+        <!-- Layer 1: Fragment cards with type icons -->
+
+        <!-- Fragment 1: Book / article (top-left) -->
         <g class="h-frag h-f1">
-          <rect x="20" y="22" width="76" height="52" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
-          <rect x="33" y="36" width="48" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="33" y="44" width="36" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="33" y="52" width="42" height="2.5" rx="1" fill="#e0e0e0"/>
-          <text x="58" y="68" text-anchor="middle" font-size="9" fill="#999" font-weight="500">架构设计笔记</text>
+          <rect x="20" y="22" width="76" height="52" rx="8" fill="url(#h-card)" stroke="#e8eee8" stroke-width="1" filter="url(#h-shadow)"/>
+          <!-- Book icon -->
+          <path d="M 28,34 L 28,48 C 28,48 33,46 38,48 L 38,34 C 33,32 28,34 28,34 Z" fill="#FFF3E0" stroke="#FFB74D" stroke-width="0.7"/>
+          <path d="M 38,34 L 38,48 C 38,48 43,46 48,48 L 48,34 C 43,32 38,34 38,34 Z" fill="#FFF3E0" stroke="#FFB74D" stroke-width="0.7"/>
+          <line x1="38" y1="34" x2="38" y2="48" stroke="#FFB74D" stroke-width="0.7"/>
+          <!-- Text lines -->
+          <rect x="52" y="35" width="34" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="52" y="41" width="28" height="2" rx="1" fill="#EEEEEE"/>
+          <rect x="52" y="47" width="32" height="2" rx="1" fill="#EEEEEE"/>
+          <text x="58" y="68" text-anchor="middle" font-size="8" fill="#AAA" font-weight="500">书籍</text>
         </g>
 
-        <!-- Fragment 2 -->
+        <!-- Fragment 2: Web article (top-right) -->
         <g class="h-frag h-f2">
-          <rect x="378" y="14" width="72" height="50" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
-          <rect x="391" y="28" width="42" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="391" y="36" width="30" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="391" y="44" width="36" height="2.5" rx="1" fill="#e0e0e0"/>
-          <text x="414" y="58" text-anchor="middle" font-size="9" fill="#999" font-weight="500">商业案例分析</text>
+          <rect x="378" y="14" width="72" height="50" rx="8" fill="url(#h-card)" stroke="#e8eee8" stroke-width="1" filter="url(#h-shadow)"/>
+          <!-- Browser window icon -->
+          <rect x="390" y="26" width="14" height="10" rx="1.5" fill="#E3F2FD" stroke="#BBDEFB" stroke-width="0.6"/>
+          <line x1="392" y1="29" x2="402" y2="29" stroke="#90CAF9" stroke-width="0.8"/>
+          <line x1="392" y1="32" x2="399" y2="32" stroke="#BBDEFB" stroke-width="0.8"/>
+          <!-- Text lines -->
+          <rect x="410" y="27" width="30" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="410" y="32" width="24" height="2" rx="1" fill="#EEEEEE"/>
+          <text x="414" y="58" text-anchor="middle" font-size="8" fill="#AAA" font-weight="500">网页文章</text>
         </g>
 
-        <!-- Fragment 3 -->
+        <!-- Fragment 3: Markdown file (bottom-left) -->
         <g class="h-frag h-f3">
-          <rect x="14" y="210" width="70" height="46" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
-          <rect x="27" y="224" width="40" height="2" rx="1" fill="#e0e0e0"/>
-          <rect x="27" y="232" width="48" height="2" rx="1" fill="#e0e0e0"/>
-          <rect x="27" y="240" width="30" height="2" rx="1" fill="#e0e0e0"/>
-          <text x="49" y="252" text-anchor="middle" font-size="9" fill="#999" font-weight="500">历史研究摘录</text>
+          <rect x="14" y="210" width="70" height="46" rx="8" fill="url(#h-card)" stroke="#e8eee8" stroke-width="1" filter="url(#h-shadow)"/>
+          <!-- File icon -->
+          <rect x="26" y="222" width="13" height="10" rx="1.5" fill="#FFF8E1" stroke="#FFE0B2" stroke-width="0.6"/>
+          <text x="32.5" y="229" text-anchor="middle" font-size="6" fill="#FF8F00" font-weight="700">MD</text>
+          <!-- Text lines -->
+          <rect x="44" y="223" width="32" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="44" y="228" width="26" height="2" rx="1" fill="#EEEEEE"/>
+          <text x="49" y="252" text-anchor="middle" font-size="8" fill="#AAA" font-weight="500">Markdown</text>
         </g>
 
-        <!-- Fragment 4 -->
+        <!-- Fragment 4: Screenshot/image (bottom-right) -->
         <g class="h-frag h-f4">
-          <rect x="383" y="204" width="76" height="50" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
-          <rect x="396" y="218" width="44" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="396" y="226" width="52" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="396" y="234" width="36" height="2.5" rx="1" fill="#e0e0e0"/>
-          <text x="421" y="248" text-anchor="middle" font-size="9" fill="#999" font-weight="500">设计原则汇总</text>
+          <rect x="383" y="204" width="76" height="50" rx="8" fill="url(#h-card)" stroke="#e8eee8" stroke-width="1" filter="url(#h-shadow)"/>
+          <!-- Image icon -->
+          <rect x="394" y="216" width="14" height="10" rx="1.5" fill="#F3E5F5" stroke="#E1BEE7" stroke-width="0.6"/>
+          <circle cx="398" cy="220" r="1.2" fill="#CE93D8"/>
+          <polygon points="394,226 399,222 404,226" fill="#E1BEE7"/>
+          <!-- Text lines -->
+          <rect x="413" y="217" width="36" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="413" y="222" width="28" height="2" rx="1" fill="#EEEEEE"/>
+          <text x="421" y="248" text-anchor="middle" font-size="8" fill="#AAA" font-weight="500">截图/图片</text>
         </g>
 
-        <!-- Fragment 5 -->
+        <!-- Fragment 5: Audio/podcast (top-center) -->
         <g class="h-frag h-f5">
-          <rect x="178" y="6" width="84" height="44" rx="7" fill="white" stroke="#e8e8e8" stroke-width="1" filter="url(#h-shadow)"/>
-          <rect x="191" y="18" width="26" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="223" y="18" width="28" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="191" y="28" width="22" height="2.5" rx="1" fill="#e0e0e0"/>
-          <rect x="219" y="28" width="32" height="2.5" rx="1" fill="#e0e0e0"/>
-          <text x="220" y="44" text-anchor="middle" font-size="9" fill="#999" font-weight="500">读书笔记</text>
+          <rect x="178" y="6" width="84" height="44" rx="8" fill="url(#h-card)" stroke="#e8eee8" stroke-width="1" filter="url(#h-shadow)"/>
+          <!-- Audio waveform icon -->
+          <rect x="190" y="18" width="2" height="6" rx="1" fill="#CE93D8"/>
+          <rect x="194" y="15" width="2" height="12" rx="1" fill="#AB47BC"/>
+          <rect x="198" y="12" width="2" height="18" rx="1" fill="#9C27B0"/>
+          <rect x="202" y="14" width="2" height="14" rx="1" fill="#AB47BC"/>
+          <rect x="206" y="17" width="2" height="8" rx="1" fill="#CE93D8"/>
+          <!-- Text lines -->
+          <rect x="214" y="16" width="36" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="214" y="22" width="28" height="2" rx="1" fill="#EEEEEE"/>
+          <text x="220" y="44" text-anchor="middle" font-size="8" fill="#AAA" font-weight="500">语音/播客</text>
         </g>
 
         <!-- Center Wiki book with glow -->
         <g class="h-book" filter="url(#h-glow)">
-          <rect x="148" y="90" width="88" height="118" rx="4" fill="white" stroke="#d0d0d0" stroke-width="1"/>
-          <rect x="239" y="90" width="88" height="118" rx="4" fill="white" stroke="#d0d0d0" stroke-width="1"/>
-          <rect x="236" y="90" width="6" height="118" fill="#e8e8e8"/>
-          <!-- Left page -->
-          <rect x="163" y="108" width="55" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="163" y="118" width="45" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="163" y="128" width="52" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="163" y="138" width="40" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="163" y="148" width="50" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="163" y="158" width="36" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="163" y="168" width="48" height="2" rx="1" fill="#e8e8e8"/>
-          <!-- Right page -->
-          <rect x="254" y="108" width="55" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="254" y="118" width="42" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="254" y="128" width="50" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="254" y="138" width="32" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="254" y="148" width="46" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="254" y="158" width="38" height="2" rx="1" fill="#e8e8e8"/>
-          <rect x="254" y="168" width="52" height="2" rx="1" fill="#e8e8e8"/>
-          <text x="238" y="222" text-anchor="middle" font-size="10" fill="#999">我的知识 Wiki</text>
+          <!-- Book pages with subtle gradient -->
+          <rect x="148" y="90" width="88" height="118" rx="5" fill="url(#h-card)" stroke="#d8ddd8" stroke-width="1"/>
+          <rect x="239" y="90" width="88" height="118" rx="5" fill="url(#h-card)" stroke="#d8ddd8" stroke-width="1"/>
+          <!-- Spine -->
+          <rect x="236" y="90" width="6" height="118" fill="#e8eee8"/>
+          <!-- Left page: structured paragraph lines -->
+          <rect x="160" y="106" width="58" height="2.5" rx="1" fill="#C8E6C9"/>
+          <rect x="160" y="114" width="48" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="160" y="120" width="54" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="160" y="126" width="40" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="160" y="136" width="56" height="2.5" rx="1" fill="#C8E6C9"/>
+          <rect x="160" y="144" width="44" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="160" y="150" width="50" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="160" y="156" width="36" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="160" y="166" width="52" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="160" y="172" width="42" height="2" rx="1" fill="#E8E8E8"/>
+          <!-- Right page: structured paragraph lines -->
+          <rect x="252" y="106" width="58" height="2.5" rx="1" fill="#C8E6C9"/>
+          <rect x="252" y="114" width="46" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="252" y="120" width="52" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="252" y="126" width="38" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="252" y="136" width="56" height="2.5" rx="1" fill="#C8E6C9"/>
+          <rect x="252" y="144" width="42" height="2" rx="1" fill="#E0E0E0"/>
+          <rect x="252" y="150" width="50" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="252" y="156" width="36" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="252" y="166" width="48" height="2" rx="1" fill="#E8E8E8"/>
+          <rect x="252" y="172" width="44" height="2" rx="1" fill="#E8E8E8"/>
+          <!-- Wiki label -->
+          <rect x="210" y="186" width="56" height="12" rx="6" fill="#E8F5E9"/>
+          <text x="238" y="195" text-anchor="middle" font-size="8.5" fill="#2E7D32" font-weight="600">我的知识 Wiki</text>
         </g>
 
         <!-- Connecting lines with gradient stroke -->
@@ -136,6 +189,11 @@ import SVGVisual from '../components/SVGVisual.astro';
         <g class="h-line h-l5">
           <line x1="220" y1="50" x2="238" y2="90" stroke="url(#h-grad)" stroke-width="1.5" stroke-dasharray="60" stroke-dashoffset="60" stroke-linecap="round"/>
         </g>
+
+        <!-- Flowing particles along lines -->
+        <circle class="h-particle h-p1" cx="0" cy="0" r="2" fill="#81C784" opacity="0"/>
+        <circle class="h-particle h-p2" cx="0" cy="0" r="2" fill="#81C784" opacity="0"/>
+        <circle class="h-particle h-p3" cx="0" cy="0" r="2" fill="#81C784" opacity="0"/>
       </svg>
     </SVGVisual>
   </div>
@@ -151,7 +209,7 @@ import SVGVisual from '../components/SVGVisual.astro';
   /* Spring easing */
   :root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-  .h-frag, .h-book, .h-line, .h-amb-c { transform-box: fill-box; transform-origin: center center; }
+  .h-frag, .h-book, .h-line, .h-amb-c, .h-particle { transform-box: fill-box; transform-origin: center center; }
 
   /* Ambient floating */
   .h-amb-c { opacity: 0; }
@@ -163,7 +221,7 @@ import SVGVisual from '../components/SVGVisual.astro';
   }
   @keyframes h-float {
     0%, 100% { opacity: 0.03; transform: translate(0, 0); }
-    50%      { opacity: 0.1; transform: translate(8px, -6px); }
+    50%      { opacity: 0.12; transform: translate(8px, -6px); }
   }
 
   /* Fragment stagger-in with spring */
@@ -199,5 +257,35 @@ import SVGVisual from '../components/SVGVisual.astro';
   @keyframes h-draw {
     0%   { opacity: 1; stroke-dashoffset: inherit; }
     100% { stroke-dashoffset: 0; }
+  }
+
+  /* Flowing particles */
+  .h-particle { opacity: 0; }
+  .svg-visual.visible .h-p1 {
+    animation: h-flow-1 3s ease-in-out infinite; animation-delay: 1.5s;
+  }
+  .svg-visual.visible .h-p2 {
+    animation: h-flow-2 3.5s ease-in-out infinite; animation-delay: 2s;
+  }
+  .svg-visual.visible .h-p3 {
+    animation: h-flow-3 4s ease-in-out infinite; animation-delay: 2.5s;
+  }
+  @keyframes h-flow-1 {
+    0%   { opacity: 0; transform: translate(58px, 74px); }
+    20%  { opacity: 0.7; }
+    80%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(192px, 112px); }
+  }
+  @keyframes h-flow-2 {
+    0%   { opacity: 0; transform: translate(414px, 64px); }
+    20%  { opacity: 0.7; }
+    80%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(282px, 112px); }
+  }
+  @keyframes h-flow-3 {
+    0%   { opacity: 0; transform: translate(49px, 210px); }
+    20%  { opacity: 0.7; }
+    80%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(192px, 178px); }
   }
 </style>

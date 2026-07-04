@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FeatureDetail3 同步动效 Demo</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #fafafa; font-family: system-ui, -apple-system, sans-serif; }
+    .wrap { width: min(90vw, 640px); padding: 24px; }
+    h1 { font-size: 18px; color: #333; margin-bottom: 12px; text-align: center; }
+    p { font-size: 13px; color: #666; text-align: center; margin-bottom: 20px; }
+    .svg-visual { width: 100%; background: white; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); padding: 20px; box-sizing: border-box; }
+    .svg-visual svg { width: 100%; height: auto; display: block; }
+
+    :root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); --f3-cycle: 3s; --f3-loop-delay: 1.1s; }
+
+    .f3-scanner, .f3-scanner-core { transform-box: fill-box; transform-origin: left center; animation: f3-sweep var(--f3-cycle) linear infinite; animation-delay: var(--f3-loop-delay); }
+    @keyframes f3-sweep { 0% { transform: translateX(0); } 100% { transform: translateX(450px); } }
+
+    .f3-node { opacity: 0; transform-box: fill-box; transform-origin: center center; animation: f3-pop 0.45s var(--spring) forwards; }
+    .f3-n1 { animation-delay: 0.1s; }
+    .f3-n2 { animation-delay: 0.25s; }
+    .f3-drift1 { animation-delay: 0.4s; }
+    .f3-n4 { animation-delay: 0.55s; }
+    .f3-drift2 { animation-delay: 0.7s; }
+    @keyframes f3-pop { 0% { opacity: 0; transform: translateY(-12px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    .f3-drift-marker { transform-box: fill-box; transform-origin: center center; }
+    .f3-drift1 .f3-drift-marker { transform: translateY(-34px); animation: f3-drift1-cycle var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+    .f3-drift2 .f3-drift-marker { transform: translateY(34px); animation: f3-drift2-cycle var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+
+    @keyframes f3-drift1-cycle {
+      0%, 52%   { transform: translateY(-34px); }
+      57%, 68%  { transform: translateY(0); }
+      73%, 90%  { transform: translateY(0); }
+      95%, 100% { transform: translateY(-34px); }
+    }
+    @keyframes f3-drift2-cycle {
+      0%, 74%   { transform: translateY(34px); }
+      79%, 88%  { transform: translateY(0); }
+      93%, 100% { transform: translateY(0); }
+    }
+
+    .f3-drift1 .f3-alert { animation: f3-alert-1 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+    .f3-drift2 .f3-alert { animation: f3-alert-2 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+    @keyframes f3-alert-1 {
+      0%, 4%   { opacity: 0; }
+      8%, 50%  { opacity: 0.85; }
+      54%, 92% { opacity: 0; }
+      96%, 100% { opacity: 0.85; }
+    }
+    @keyframes f3-alert-2 {
+      0%, 4%   { opacity: 0; }
+      8%, 72%  { opacity: 0.85; }
+      76%, 100% { opacity: 0; }
+    }
+
+    .f3-drift1 .f3-repair { animation: f3-repair-1 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+    .f3-drift2 .f3-repair { animation: f3-repair-2 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+    @keyframes f3-repair-1 {
+      0%, 54%  { opacity: 0; }
+      57%, 68% { opacity: 0.8; }
+      71%, 100% { opacity: 0; }
+    }
+    @keyframes f3-repair-2 {
+      0%, 76%  { opacity: 0; }
+      79%, 88% { opacity: 0.8; }
+      91%, 100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>维基线：扫描线把偏离节点拉回基线</h1>
+    <p>所有动画共用 6 秒循环，扫描线为匀速线性移动，因此每次扫描都能准时对准节点。</p>
+    <div class="svg-visual">
+      <svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="f3-shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.05"/>
+            <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.04"/>
+          </filter>
+          <linearGradient id="f3-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.3"/>
+            <stop offset="30%" stop-color="#4CAF50" stop-opacity="0.9"/>
+            <stop offset="70%" stop-color="#4CAF50" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.3"/>
+          </linearGradient>
+          <linearGradient id="f3-scanner-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#4CAF50" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="f3-ambient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.05"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="f3-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.04"/>
+          </pattern>
+        </defs>
+
+        <rect width="480" height="260" fill="url(#f3-dots)"/>
+        <circle cx="240" cy="130" r="170" fill="url(#f3-ambient)"/>
+
+        <line x1="15" y1="130" x2="465" y2="130" stroke="url(#f3-grad)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="15" y1="134" x2="465" y2="134" stroke="#4CAF50" stroke-width="0.5" opacity="0.15" stroke-linecap="round"/>
+
+        <rect class="f3-scanner" x="0" y="30" width="3" height="200" fill="url(#f3-scanner-grad)" rx="1.5"/>
+        <line class="f3-scanner-core" x1="0" y1="30" x2="0" y2="230" stroke="#4CAF50" stroke-width="1" opacity="0.4"/>
+
+        <g class="f3-node f3-n1" filter="url(#f3-shadow)">
+          <circle cx="70" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="70" y="162" text-anchor="middle" font-size="9" fill="#888">架构笔记</text>
+        </g>
+        <g class="f3-node f3-n2" filter="url(#f3-shadow)">
+          <circle cx="180" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="180" y="162" text-anchor="middle" font-size="9" fill="#888">商业模式</text>
+        </g>
+        <g class="f3-node f3-n4" filter="url(#f3-shadow)">
+          <circle cx="420" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="420" y="162" text-anchor="middle" font-size="9" fill="#888">设计原则</text>
+        </g>
+
+        <g class="f3-node f3-drift1" filter="url(#f3-shadow)">
+          <g class="f3-drift-marker">
+            <circle cx="260" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+            <circle class="f3-alert" cx="260" cy="130" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+            <path class="f3-repair" d="M 260,105 L 260,118" fill="none" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+            <polygon class="f3-repair" points="257,116 260,122 263,116" fill="#4CAF50" opacity="0"/>
+          </g>
+          <text x="260" y="162" text-anchor="middle" font-size="9" fill="#888">历史脉络</text>
+        </g>
+
+        <g class="f3-node f3-drift2" filter="url(#f3-shadow)">
+          <g class="f3-drift-marker">
+            <circle cx="360" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+            <circle class="f3-alert" cx="360" cy="130" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+            <path class="f3-repair" d="M 360,155 L 360,142" fill="none" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+            <polygon class="f3-repair" points="357,144 360,138 363,144" fill="#4CAF50" opacity="0"/>
+          </g>
+          <text x="360" y="162" text-anchor="middle" font-size="9" fill="#888">知识索引</text>
+        </g>
+
+        <g class="f3-status">
+          <circle cx="240" cy="220" r="4" fill="#4CAF50" opacity="0.8"/>
+          <circle cx="240" cy="220" r="4" fill="none" stroke="#4CAF50" stroke-width="1" opacity="0.3">
+            <animate attributeName="r" values="4;8" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.4;0" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <text x="252" y="224" font-size="9" fill="#999">持续扫描中</text>
+        </g>
+        <text x="465" y="238" text-anchor="end" font-size="9" fill="#bbb">LLM Wiki 结构标准</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

@@ -4,67 +4,116 @@ import SVGVisual from '../components/SVGVisual.astro';
 <section class="section" id="data-sovereignty">
   <div class="container grid-2">
     <SVGVisual alt="本地 vs 云端数据归属对比">
-      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="s4-shadow" x="-15%" y="-15%" width="130%" height="150%">
-            <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.06"/>
+            <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#000" flood-opacity="0.05"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.05"/>
           </filter>
           <linearGradient id="s4-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#4CAF50"/><stop offset="100%" stop-color="#2E7D32"/>
+            <stop offset="0%" stop-color="#66BB6A"/>
+            <stop offset="100%" stop-color="#2E7D32"/>
+          </linearGradient>
+          <linearGradient id="s4-grad-red" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#EF5350"/>
+            <stop offset="100%" stop-color="#C62828"/>
+          </linearGradient>
+          <linearGradient id="s4-card-red" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFEBEE"/>
+            <stop offset="100%" stop-color="#FFCDD2"/>
+          </linearGradient>
+          <linearGradient id="s4-card-green" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#F1F8E9"/>
           </linearGradient>
           <radialGradient id="s4-amb-l" cx="25%" cy="50%" r="45%">
-            <stop offset="0%" stop-color="#EF5350" stop-opacity="0.04"/>
+            <stop offset="0%" stop-color="#EF5350" stop-opacity="0.06"/>
             <stop offset="100%" stop-color="#EF5350" stop-opacity="0"/>
           </radialGradient>
           <radialGradient id="s4-amb-r" cx="75%" cy="50%" r="45%">
-            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.06"/>
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.08"/>
             <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
           </radialGradient>
           <pattern id="s4-dots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.05"/>
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.04"/>
           </pattern>
         </defs>
 
-        <rect width="480" height="290" fill="url(#s4-dots)"/>
-        <circle cx="125" cy="130" r="140" fill="url(#s4-amb-l)"/>
-        <circle cx="385" cy="130" r="140" fill="url(#s4-amb-r)"/>
+        <rect width="480" height="260" fill="url(#s4-dots)"/>
+        <circle cx="125" cy="115" r="140" fill="url(#s4-amb-l)"/>
+        <circle cx="355" cy="115" r="140" fill="url(#s4-amb-r)"/>
 
-        <!-- LEFT: Cloud locked -->
+        <!-- LEFT: Locked cloud -->
         <g class="s4-cloud" filter="url(#s4-shadow)">
-          <path d="M 100,108 C 78,108 63,94 63,78 C 63,64 73,54 86,52 C 89,36 108,26 126,26 C 140,26 151,36 155,48 C 162,44 172,44 178,50 C 190,54 197,66 197,78 C 197,86 192,93 186,98" fill="#FFF5F5" stroke="#EF5350" stroke-width="1.5"/>
-          <rect x="118" y="64" width="14" height="12" rx="2" fill="#EF5350"/>
-          <path d="M 121,64 L 121,56 C 121,51 125,48 129,48 C 133,48 135,50 135,54" fill="none" stroke="#EF5350" stroke-width="1.5"/>
-          <rect x="90" y="84" width="26" height="18" rx="3" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.8"/>
-          <text x="103" y="96" text-anchor="middle" font-size="7" fill="#EF5350">.note</text>
-          <rect x="120" y="86" width="28" height="16" rx="3" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.8"/>
-          <text x="134" y="97" text-anchor="middle" font-size="7" fill="#EF5350">.json</text>
-          <rect x="105" y="107" width="24" height="15" rx="3" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.8"/>
-          <text x="117" y="117" text-anchor="middle" font-size="7" fill="#EF5350">.db</text>
-          <text x="125" y="178" text-anchor="middle" font-size="10" fill="#EF5350" font-weight="500">云端锁定</text>
-          <text x="125" y="194" text-anchor="middle" font-size="8" fill="#bbb">专有格式 · 账号绑定</text>
+          <!-- Clean cloud silhouette -->
+          <path d="M 78,108 C 66,108 56,99 56,87 C 56,77 63,69 73,67 C 76,55 90,48 104,48 C 116,48 126,55 130,65 C 136,62 144,62 150,67 C 159,70 164,78 164,87 C 164,96 158,104 150,108"
+                fill="url(#s4-card-red)" stroke="url(#s4-grad-red)" stroke-width="1.5"/>
+
+          <!-- Closed padlock -->
+          <g transform="translate(107, 73)">
+            <rect x="4" y="12" width="16" height="14" rx="2" fill="#EF5350"/>
+            <path d="M 8,12 L 8,7 C 8,3 11,0 15,0 C 19,0 22,3 22,7 L 22,12" fill="none" stroke="#EF5350" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="12" cy="19" r="2" fill="#FFCDD2"/>
+          </g>
+
+          <!-- Proprietary files -->
+          <rect x="74" y="96" width="30" height="16" rx="4" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.7"/>
+          <text x="89" y="107" text-anchor="middle" font-size="7" fill="#C62828" font-weight="600">.note</text>
+          <rect x="112" y="96" width="30" height="16" rx="4" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.7"/>
+          <text x="127" y="107" text-anchor="middle" font-size="7" fill="#C62828" font-weight="600">.json</text>
+          <rect x="93" y="116" width="30" height="16" rx="4" fill="#FFCDD2" stroke="#EF5350" stroke-width="0.7"/>
+          <text x="108" y="127" text-anchor="middle" font-size="7" fill="#C62828" font-weight="600">.db</text>
+
+          <text x="110" y="170" text-anchor="middle" font-size="11" fill="#EF5350" font-weight="600">云端锁定</text>
+          <text x="110" y="186" text-anchor="middle" font-size="9" fill="#bbb">专有格式 · 账号绑定</text>
         </g>
 
         <!-- Center arrow -->
         <g class="s4-arrow">
-          <path class="s4-line" d="M 200,108 L 274,108" stroke="url(#s4-grad)" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <polygon points="274,103 282,108 274,113" fill="#4CAF50"/>
+          <path class="s4-line" d="M 185,100 L 255,100" stroke="url(#s4-grad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <polygon points="255,94 265,100 255,106" fill="#4CAF50"/>
+          <circle class="s4-flow-dot" cx="185" cy="100" r="2.5" fill="#81C784" opacity="0"/>
         </g>
 
-        <!-- RIGHT: Local -->
+        <!-- RIGHT: Local folder -->
         <g class="s4-local" filter="url(#s4-shadow)">
-          <path d="M 318,95 L 318,74 C 318,67 323,60 330,60 L 358,60 C 365,60 368,67 368,74 L 371,74 L 371,95 Z" fill="#E8F5E9" stroke="url(#s4-grad)" stroke-width="1.5"/>
-          <rect x="326" y="79" width="24" height="18" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.8"/>
-          <text x="338" y="91" text-anchor="middle" font-size="7.5" fill="#2E7D32" font-weight="500">.md</text>
-          <rect x="355" y="77" width="24" height="18" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.8"/>
-          <text x="367" y="89" text-anchor="middle" font-size="7.5" fill="#2E7D32" font-weight="500">.md</text>
-          <rect x="384" y="82" width="24" height="18" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.8"/>
-          <text x="396" y="94" text-anchor="middle" font-size="7.5" fill="#2E7D32" font-weight="500">.md</text>
-          <text x="385" y="178" text-anchor="middle" font-size="10" fill="#4CAF50" font-weight="500">本地 Markdown</text>
-          <text x="385" y="194" text-anchor="middle" font-size="8" fill="#999">任何编辑器打开</text>
+          <!-- Folder back -->
+          <path d="M 295,82 L 295,70 C 295,64 300,60 306,60 L 332,60 C 338,60 342,64 342,70 L 342,82 Z"
+                fill="#C8E6C9" stroke="url(#s4-grad)" stroke-width="1.2"/>
+          <!-- Folder front -->
+          <path d="M 295,82 L 360,82 C 368,82 372,88 372,95 L 372,125 C 372,131 368,136 362,136 L 299,136 C 293,136 289,131 289,125 L 289,88 C 289,84 291,82 295,82 Z"
+                fill="url(#s4-card-green)" stroke="url(#s4-grad)" stroke-width="1.5"/>
+          <!-- Folder tab -->
+          <path d="M 295,82 L 295,74 C 295,70 299,68 303,68 L 322,68 L 322,82 Z" fill="#A5D6A7" stroke="url(#s4-grad)" stroke-width="1"/>
+
+          <!-- Open padlock -->
+          <g transform="translate(322, 88)">
+            <rect x="3" y="10" width="14" height="11" rx="1.5" fill="#4CAF50"/>
+            <path d="M 6,10 L 6,5 C 6,1 9,-2 13,-2 C 17,-2 19,1 19,5" fill="none" stroke="#4CAF50" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="10" cy="15" r="1.5" fill="#E8F5E9"/>
+          </g>
+
+          <!-- Markdown files in a row -->
+          <rect x="302" y="110" width="26" height="16" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.7"/>
+          <text x="315" y="121" text-anchor="middle" font-size="7" fill="#2E7D32" font-weight="700">.md</text>
+          <rect x="332" y="110" width="26" height="16" rx="3" fill="white" stroke="#4CAF50" stroke-width="0.7"/>
+          <text x="345" y="121" text-anchor="middle" font-size="7" fill="#2E7D32" font-weight="700">.md</text>
+
+          <text x="330" y="170" text-anchor="middle" font-size="11" fill="#4CAF50" font-weight="600">本地 Markdown</text>
+          <text x="330" y="186" text-anchor="middle" font-size="9" fill="#999">任何编辑器打开</text>
         </g>
 
-        <text x="125" y="250" text-anchor="middle" font-size="9" fill="#ccc">✕ 数据被服务商持有</text>
-        <text x="385" y="250" text-anchor="middle" font-size="9" fill="#2E7D32">✓ 数据在你电脑里</text>
+        <!-- Bottom conclusions -->
+        <g class="s4-conclusion-l">
+          <text x="110" y="232" text-anchor="middle" font-size="10" fill="#ccc">✕ 数据被服务商持有</text>
+        </g>
+        <g class="s4-conclusion-r">
+          <text x="330" y="232" text-anchor="middle" font-size="10" fill="#2E7D32" font-weight="500">✓ 数据在你电脑里</text>
+        </g>
+
+        <g class="s4-editors" opacity="0.5">
+          <text x="330" y="250" text-anchor="middle" font-size="8" fill="#aaa">Obsidian · VS Code · Vim · cat</text>
+        </g>
       </svg>
     </SVGVisual>
     <div class="feature-text fade-in">
@@ -86,7 +135,9 @@ import SVGVisual from '../components/SVGVisual.astro';
   .feature__tagline { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
   .feature__tag { font-size: 12px; color: var(--color-accent-dark); background: var(--color-accent-light); padding: 4px 10px; border-radius: 20px; font-weight: 500; }
 
-  .s4-cloud, .s4-local, .s4-arrow { transform-box: fill-box; transform-origin: center center; }
+  :root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  .s4-cloud, .s4-local, .s4-arrow, .s4-conclusion-l, .s4-conclusion-r, .s4-editors { transform-box: fill-box; transform-origin: center center; }
 
   .s4-cloud { opacity: 0; }
   .svg-visual.visible .s4-cloud { animation: s4-in 0.6s ease-out forwards; animation-delay: 0.1s; }
@@ -95,12 +146,29 @@ import SVGVisual from '../components/SVGVisual.astro';
   .s4-local { opacity: 0; }
   .svg-visual.visible .s4-local { animation: s4-in 0.6s ease-out forwards; animation-delay: 0.5s; }
 
-  .s4-line { stroke-dasharray: 74; stroke-dashoffset: 74; }
+  .s4-line { stroke-dasharray: 70; stroke-dashoffset: 70; }
   .s4-arrow { opacity: 0; }
   .svg-visual.visible .s4-arrow { animation: s4-in 0.4s ease-out forwards; animation-delay: 1.0s; }
   .svg-visual.visible .s4-line { animation: s4-draw 0.45s ease-out forwards; animation-delay: 1.0s; }
   @keyframes s4-draw { to { stroke-dashoffset: 0; } }
 
-  .svg-visual.visible .s4-local path:first-child { animation: s4-breathe 3s ease-in-out infinite; animation-delay: 1.5s; }
-  @keyframes s4-breathe { 0%, 100% { fill: #E8F5E9; } 50% { fill: #C8E6C9; } }
+  .s4-flow-dot { opacity: 0; }
+  .svg-visual.visible .s4-flow-dot {
+    animation: s4-flow 2s ease-in-out infinite;
+    animation-delay: 1.5s;
+  }
+  @keyframes s4-flow {
+    0%   { opacity: 0; transform: translateX(0); }
+    20%  { opacity: 0.8; }
+    80%  { opacity: 0.8; }
+    100% { opacity: 0; transform: translateX(70px); }
+  }
+
+  .svg-visual.visible .s4-local path:nth-of-type(2) { animation: s4-breathe 3s ease-in-out infinite; animation-delay: 1.5s; }
+  @keyframes s4-breathe { 0%, 100% { fill: url(#s4-card-green); } 50% { fill: #C8E6C9; } }
+
+  .s4-conclusion-l, .s4-conclusion-r, .s4-editors { opacity: 0; }
+  .svg-visual.visible .s4-conclusion-l { animation: s4-in 0.5s ease-out forwards; animation-delay: 1.2s; }
+  .svg-visual.visible .s4-conclusion-r { animation: s4-in 0.5s ease-out forwards; animation-delay: 1.4s; }
+  .svg-visual.visible .s4-editors { animation: s4-in 0.5s ease-out forwards; animation-delay: 1.8s; }
 </style>

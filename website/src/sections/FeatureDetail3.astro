@@ -15,62 +15,94 @@ import SVGVisual from '../components/SVGVisual.astro';
       <p class="text-secondary">发现即自动修复。不评分，不报警，不间断。你的 Wiki 永远在轨道上。</p>
     </div>
     <SVGVisual alt="轨道维基线持续对齐">
-      <svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="f3-shadow" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.06"/>
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.05"/>
+            <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.04"/>
           </filter>
           <linearGradient id="f3-grad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.5"/>
-            <stop offset="50%" stop-color="#4CAF50" stop-opacity="1"/>
-            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.5"/>
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.3"/>
+            <stop offset="30%" stop-color="#4CAF50" stop-opacity="0.9"/>
+            <stop offset="70%" stop-color="#4CAF50" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.3"/>
+          </linearGradient>
+          <linearGradient id="f3-scanner-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#4CAF50" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
           </linearGradient>
           <radialGradient id="f3-ambient" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.05"/>
             <stop offset="100%" stop-color="#4CAF50" stop-opacity="0"/>
           </radialGradient>
           <pattern id="f3-dots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.05"/>
+            <circle cx="13" cy="13" r="0.7" fill="#4CAF50" opacity="0.04"/>
           </pattern>
         </defs>
 
-        <rect width="480" height="290" fill="url(#f3-dots)"/>
-        <circle cx="240" cy="170" r="180" fill="url(#f3-ambient)"/>
+        <rect width="480" height="260" fill="url(#f3-dots)"/>
+        <circle cx="240" cy="130" r="170" fill="url(#f3-ambient)"/>
 
-        <!-- Baseline track with glow -->
-        <line x1="15" y1="170" x2="465" y2="170" stroke="url(#f3-grad)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Baseline track -->
+        <line x1="15" y1="130" x2="465" y2="130" stroke="url(#f3-grad)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="15" y1="134" x2="465" y2="134" stroke="#4CAF50" stroke-width="0.5" opacity="0.15" stroke-linecap="round"/>
 
-        <!-- Scanner bar -->
-        <rect class="f3-scanner" x="0" y="48" width="2" height="200" fill="#4CAF50" opacity="0.08" rx="1"/>
+        <!-- Scanner beam -->
+        <rect class="f3-scanner" x="0" y="30" width="3" height="200" fill="url(#f3-scanner-grad)" rx="1.5"/>
+        <line class="f3-scanner-core" x1="0" y1="30" x2="0" y2="230" stroke="#4CAF50" stroke-width="1" opacity="0.4"/>
 
-        <!-- Nodes -->
+        <!-- Nodes on baseline -->
         <g class="f3-node f3-n1" filter="url(#f3-shadow)">
-          <circle cx="70" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
-          <text x="70" y="202" text-anchor="middle" font-size="9" fill="#888">架构笔记</text>
+          <circle cx="70" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="70" y="162" text-anchor="middle" font-size="9" fill="#888">架构笔记</text>
         </g>
         <g class="f3-node f3-n2" filter="url(#f3-shadow)">
-          <circle cx="180" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
-          <text x="180" y="202" text-anchor="middle" font-size="9" fill="#888">商业模式</text>
+          <circle cx="180" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="180" y="162" text-anchor="middle" font-size="9" fill="#888">商业模式</text>
         </g>
-
-        <g class="f3-node f3-drift1" filter="url(#f3-shadow)">
-          <circle cx="290" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
-          <text x="290" y="202" text-anchor="middle" font-size="9" fill="#888">历史脉络</text>
-          <circle class="f3-alert" cx="290" cy="170" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
-        </g>
-
         <g class="f3-node f3-n4" filter="url(#f3-shadow)">
-          <circle cx="400" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
-          <text x="400" y="202" text-anchor="middle" font-size="9" fill="#888">设计原则</text>
+          <circle cx="420" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+          <text x="420" y="162" text-anchor="middle" font-size="9" fill="#888">设计原则</text>
         </g>
 
+        <!-- Drift node 1: starts ABOVE baseline, scanner snaps it down -->
+        <g class="f3-node f3-drift1" filter="url(#f3-shadow)">
+          <g class="f3-drift-marker">
+            <circle cx="260" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+            <!-- Alert ring -->
+            <circle class="f3-alert" cx="260" cy="130" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+            <!-- Repair arrow points down to baseline -->
+            <path class="f3-repair" d="M 260,105 L 260,118" fill="none" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+            <polygon class="f3-repair" points="257,116 260,122 263,116" fill="#4CAF50" opacity="0"/>
+          </g>
+          <text x="260" y="162" text-anchor="middle" font-size="9" fill="#888">历史脉络</text>
+        </g>
+
+        <!-- Drift node 2: starts BELOW baseline, scanner snaps it up -->
         <g class="f3-node f3-drift2" filter="url(#f3-shadow)">
-          <circle cx="450" cy="170" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
-          <text x="450" y="202" text-anchor="middle" font-size="9" fill="#888">知识索引</text>
-          <circle class="f3-alert" cx="450" cy="170" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+          <g class="f3-drift-marker">
+            <circle cx="360" cy="130" r="13" fill="white" stroke="#4CAF50" stroke-width="1.8"/>
+            <!-- Alert ring -->
+            <circle class="f3-alert" cx="360" cy="130" r="20" fill="none" stroke="#EF5350" stroke-width="2" opacity="0"/>
+            <!-- Repair arrow points up to baseline -->
+            <path class="f3-repair" d="M 360,155 L 360,142" fill="none" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+            <polygon class="f3-repair" points="357,144 360,138 363,144" fill="#4CAF50" opacity="0"/>
+          </g>
+          <text x="360" y="162" text-anchor="middle" font-size="9" fill="#888">知识索引</text>
         </g>
 
-        <text x="450" y="278" text-anchor="end" font-size="10" fill="#bbb">LLM Wiki 结构标准</text>
+        <!-- Status indicator -->
+        <g class="f3-status">
+          <circle cx="240" cy="220" r="4" fill="#4CAF50" opacity="0.8"/>
+          <circle cx="240" cy="220" r="4" fill="none" stroke="#4CAF50" stroke-width="1" opacity="0.3">
+            <animate attributeName="r" values="4;8" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.4;0" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <text x="252" y="224" font-size="9" fill="#999">持续扫描中</text>
+        </g>
+
+        <text x="465" y="238" text-anchor="end" font-size="9" fill="#bbb">LLM Wiki 结构标准</text>
       </svg>
     </SVGVisual>
   </div>
@@ -82,25 +114,81 @@ import SVGVisual from '../components/SVGVisual.astro';
   .feature__list { margin: var(--space-md) 0; padding-left: var(--space-lg); font-size: 15px; color: var(--color-text-secondary); line-height: 1.8; }
   .feature__list li::marker { color: var(--color-accent); }
 
-  .f3-scanner { transform-box: fill-box; transform-origin: left center; }
-  .svg-visual.visible .f3-scanner { animation: f3-sweep 3.5s ease-in-out infinite; animation-delay: 1s; }
-  @keyframes f3-sweep { 0% { transform: translateX(0); } 100% { transform: translateX(480px); } }
+  :root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  /* Common cycle: everything loops on 3s with the same delay so it never desyncs */
+  :root { --f3-cycle: 3s; --f3-loop-delay: 1.1s; }
+
+  .f3-scanner, .f3-scanner-core { transform-box: fill-box; transform-origin: left center; }
+  .svg-visual.visible .f3-scanner { animation: f3-sweep var(--f3-cycle) linear infinite; animation-delay: var(--f3-loop-delay); }
+  .svg-visual.visible .f3-scanner-core { animation: f3-sweep var(--f3-cycle) linear infinite; animation-delay: var(--f3-loop-delay); }
+  @keyframes f3-sweep { 0% { transform: translateX(0); } 100% { transform: translateX(450px); } }
 
   .f3-node { opacity: 0; transform-box: fill-box; transform-origin: center center; }
-  .svg-visual.visible .f3-n1 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.15s; }
-  .svg-visual.visible .f3-n2 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.35s; }
+  .svg-visual.visible .f3-n1 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.1s; }
+  .svg-visual.visible .f3-n2 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.25s; }
+  .svg-visual.visible .f3-drift1 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.4s; }
   .svg-visual.visible .f3-n4 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.55s; }
+  .svg-visual.visible .f3-drift2 { animation: f3-pop 0.45s var(--spring) forwards; animation-delay: 0.7s; }
   @keyframes f3-pop { 0% { opacity: 0; transform: translateY(-12px); } 100% { opacity: 1; transform: translateY(0); } }
 
-  .svg-visual.visible .f3-drift1 { animation: f3-drift-up 6s ease-in-out infinite, f3-pop 0.45s var(--spring) forwards; animation-delay: 1.5s, 0.75s; }
-  @keyframes f3-drift-up { 0%, 12% { transform: translateY(0); } 22%, 52% { transform: translateY(-34px); } 62%, 100% { transform: translateY(0); } }
+  .f3-drift-marker { transform-box: fill-box; transform-origin: center center; }
 
-  .svg-visual.visible .f3-drift2 { animation: f3-drift-down 6s ease-in-out infinite, f3-pop 0.45s var(--spring) forwards; animation-delay: 4s, 0.95s; }
-  @keyframes f3-drift-down { 0%, 40% { transform: translateY(0); } 50%, 72% { transform: translateY(34px); } 82%, 100% { transform: translateY(0); } }
+  /* Drift nodes start deviated by default */
+  .f3-drift1 .f3-drift-marker { transform: translateY(-34px); }
+  .f3-drift2 .f3-drift-marker { transform: translateY(34px); }
 
-  .svg-visual.visible .f3-drift1 .f3-alert { animation: f3-pulse 2s ease-in-out infinite; animation-delay: 2.2s; }
-  .svg-visual.visible .f3-drift2 .f3-alert { animation: f3-pulse 2s ease-in-out infinite; animation-delay: 4.7s; }
-  @keyframes f3-pulse { 0%, 35% { opacity: 0; r: 20; } 45%, 65% { opacity: 1; r: 25; } 75%, 100% { opacity: 0; r: 20; } }
+  /* Scanner reaches x=260 at ~1.73s = 57.8% of 3s */
+  .svg-visual.visible .f3-drift1 .f3-drift-marker {
+    animation: f3-drift1-cycle var(--f3-cycle) ease-in-out infinite;
+    animation-delay: var(--f3-loop-delay);
+  }
+  @keyframes f3-drift1-cycle {
+    0%, 52%   { transform: translateY(-34px); }      /* deviated above baseline */
+    57%, 68%  { transform: translateY(0); }           /* scanner pulls it down */
+    73%, 90%  { transform: translateY(0); }           /* stays aligned */
+    95%, 100% { transform: translateY(-34px); }       /* drifts again */
+  }
+
+  /* Scanner reaches x=360 at ~2.40s = 80.0% of 3s */
+  .svg-visual.visible .f3-drift2 .f3-drift-marker {
+    animation: f3-drift2-cycle var(--f3-cycle) ease-in-out infinite;
+    animation-delay: var(--f3-loop-delay);
+  }
+  @keyframes f3-drift2-cycle {
+    0%, 74%   { transform: translateY(34px); }       /* deviated below baseline */
+    79%, 88%  { transform: translateY(0); }           /* scanner pulls it up */
+    93%, 100% { transform: translateY(0); }           /* stays aligned */
+  }
+
+  /* Alert ring: only while deviated */
+  .svg-visual.visible .f3-drift1 .f3-alert { animation: f3-alert-1 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+  .svg-visual.visible .f3-drift2 .f3-alert { animation: f3-alert-2 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+  @keyframes f3-alert-1 {
+    0%, 4%   { opacity: 0; }
+    8%, 50%  { opacity: 0.85; }
+    54%, 92% { opacity: 0; }
+    96%, 100% { opacity: 0.85; }
+  }
+  @keyframes f3-alert-2 {
+    0%, 4%   { opacity: 0; }
+    8%, 72%  { opacity: 0.85; }
+    76%, 100% { opacity: 0; }
+  }
+
+  /* Repair arrow: flashes during snap-back */
+  .svg-visual.visible .f3-drift1 .f3-repair { animation: f3-repair-1 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+  .svg-visual.visible .f3-drift2 .f3-repair { animation: f3-repair-2 var(--f3-cycle) ease-in-out infinite; animation-delay: var(--f3-loop-delay); }
+  @keyframes f3-repair-1 {
+    0%, 54%  { opacity: 0; }
+    57%, 68% { opacity: 0.8; }
+    71%, 100% { opacity: 0; }
+  }
+  @keyframes f3-repair-2 {
+    0%, 76%  { opacity: 0; }
+    79%, 88% { opacity: 0.8; }
+    91%, 100% { opacity: 0; }
+  }
 
   @media (max-width: 900px) { .grid-2 :global(.svg-visual) { order: -1; } }
 </style>
