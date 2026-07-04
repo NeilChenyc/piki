@@ -176,29 +176,8 @@ final class RuntimeSettingsViewModel {
         vaultInitMessage = nil
         defer { isInitializingVault = false }
 
-        let fm = FileManager.default
-        let dirs = [
-            "raw/inbox",
-            "raw/sources",
-            "raw/assets",
-            "wiki/sources",
-            "wiki/concepts",
-            "wiki/entities",
-            "wiki/domains",
-            "wiki/synthesis",
-            "system",
-        ]
-
         do {
-            for dir in dirs {
-                let dirURL = url.appending(path: dir, directoryHint: .isDirectory)
-                try fm.createDirectory(at: dirURL, withIntermediateDirectories: true)
-            }
-
-            try writeTemplateIfMissing(at: url.appending(path: "AGENTS.md"), content: Self.defaultAgentsTemplate, fileManager: fm)
-            try writeTemplateIfMissing(at: url.appending(path: "purpose.md"), content: Self.defaultPurposeTemplate, fileManager: fm)
-            try writeTemplateIfMissing(at: url.appending(path: "wiki/index.md"), content: Self.defaultIndexTemplate, fileManager: fm)
-
+            try Self.ensureVaultExists(at: url)
             vaultInitMessage = "仓库初始化成功。"
         } catch {
             vaultInitMessage = "初始化失败：\(error.localizedDescription)"
@@ -229,7 +208,30 @@ final class RuntimeSettingsViewModel {
         }
     }
 
-    private func writeTemplateIfMissing(at url: URL, content: String, fileManager: FileManager) throws {
+    static func ensureVaultExists(at url: URL, fileManager: FileManager = .default) throws {
+        let dirs = [
+            "raw/inbox",
+            "raw/sources",
+            "raw/assets",
+            "wiki/sources",
+            "wiki/concepts",
+            "wiki/entities",
+            "wiki/domains",
+            "wiki/synthesis",
+            "system",
+        ]
+
+        for dir in dirs {
+            let dirURL = url.appending(path: dir, directoryHint: .isDirectory)
+            try fileManager.createDirectory(at: dirURL, withIntermediateDirectories: true)
+        }
+
+        try writeTemplateIfMissing(at: url.appending(path: "AGENTS.md"), content: defaultAgentsTemplate, fileManager: fileManager)
+        try writeTemplateIfMissing(at: url.appending(path: "purpose.md"), content: defaultPurposeTemplate, fileManager: fileManager)
+        try writeTemplateIfMissing(at: url.appending(path: "wiki/index.md"), content: defaultIndexTemplate, fileManager: fileManager)
+    }
+
+    private static func writeTemplateIfMissing(at url: URL, content: String, fileManager: FileManager) throws {
         guard !fileManager.fileExists(atPath: url.path(percentEncoded: false)) else { return }
         try content.write(to: url, atomically: true, encoding: .utf8)
     }

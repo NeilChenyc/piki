@@ -84,7 +84,7 @@ def write_metadata(arch: str) -> None:
     metadata.write_text(
         (
             "{"
-            f"\"python\":\"PikiRuntime/Python\","
+            f"\"python\":\"PikiRuntime/Python/bin/python3\","
             f"\"site_packages\":\"PikiRuntime/site-packages\","
             f"\"arch\":\"{arch}\""
             "}"

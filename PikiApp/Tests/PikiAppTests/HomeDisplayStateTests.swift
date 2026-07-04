@@ -100,6 +100,31 @@ struct HomeDisplayStateTests {
 
         #expect(!state.shouldAnimateStatusText)
     }
+
+    @Test
+    func unconfiguredRuntimeShowsOnboardingHintInsteadOfError() {
+        let appState = AppState(runtimeService: HomeDisplayRuntimeService())
+        appState.applyServiceHealth(
+            ServiceHealth(
+                ok: true,
+                runnerAvailable: true,
+                runnerDetail: "ready",
+                provider: "claude",
+                anthropicAPIKeyConfigured: false,
+                anthropicBaseURL: nil,
+                agentModel: nil,
+                agentRuntimeEnabled: true,
+                agentRuntimeConfigured: false,
+                claudeConfigDir: nil
+            )
+        )
+        appState.vaultPath = URL(fileURLWithPath: "/tmp/vault", isDirectory: true)
+
+        let state = HomeViewDisplayState(appState: appState, viewModel: HomeViewModel())
+
+        #expect(state.emptyStateHint == "本地 Runtime 已就绪，请前往设置填写模型、Base URL 和 API Key。")
+        #expect(state.inputHint == "本地 Runtime 已就绪，请前往设置填写模型、Base URL 和 API Key。")
+    }
 }
 
 private enum HomeDisplayStateTestError: Error {

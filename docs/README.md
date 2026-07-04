@@ -24,3 +24,4 @@
 
 - `development/开发过程总览.md`
 - `development/issues/长文-ingest-问题与解法.md`
+- `development/developer-local-distribution.md`

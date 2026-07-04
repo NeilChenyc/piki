@@ -129,6 +129,7 @@ final class LocalServiceManager {
     private func launchAgentService() -> Bool {
         let projectRoot = locateProjectRoot()
         let pikiHome = pikiHome()
+        Self.prepareManagedRuntimeEnvironment(at: pikiHome)
         let bundleRuntime = Self.runtimeBundleConfiguration(resourcesURL: Bundle.main.resourceURL)
         guard let pythonURL = locatePython(
             resourcesURL: Bundle.main.resourceURL,
@@ -148,22 +149,20 @@ final class LocalServiceManager {
             "--port", "8782",
             "--log-level", "warning"
         ]
-        if let projectRoot {
+        if pythonURL == bundleRuntime?.pythonURL {
+            proc.currentDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
+        } else if let projectRoot {
             proc.currentDirectoryURL = projectRoot
+        } else {
+            proc.currentDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
         }
 
-        var env = ProcessInfo.processInfo.environment
-        env["PIKI_APP_MANAGED_SERVICE"] = "1"
-        if pythonURL == bundleRuntime?.pythonURL {
-            env["PIKI_APP_RUNTIME_SOURCE"] = "bundle"
-            if let pythonPath = Self.mergedPythonPath(
-                existingPythonPath: env["PYTHONPATH"],
-                sitePackagesURL: bundleRuntime?.sitePackagesURL
-            ) {
-                env["PYTHONPATH"] = pythonPath
-            }
-        }
-        proc.environment = env
+        proc.environment = Self.managedServiceEnvironment(
+            baseEnvironment: ProcessInfo.processInfo.environment,
+            pikiHome: pikiHome,
+            pythonURL: pythonURL,
+            bundleRuntime: bundleRuntime
+        )
 
         let logURL = pikiLogDirectory().appendingPathComponent("agent-service.log")
         if let logHandle = try? FileHandle(forWritingTo: logURL) {
@@ -198,7 +197,7 @@ final class LocalServiceManager {
             launchedProcess = false
             return
         }
-        process.terminate()
+        Self.terminateProcess(process)
         self.process = nil
         launchedProcess = false
     }
@@ -320,6 +319,31 @@ final class LocalServiceManager {
         return uniqueEntries.joined(separator: ":")
     }
 
+    static func managedServiceEnvironment(
+        baseEnvironment: [String: String],
+        pikiHome: URL,
+        pythonURL: URL,
+        bundleRuntime: RuntimeBundleConfiguration?
+    ) -> [String: String] {
+        var environment = baseEnvironment
+        environment["PIKI_APP_MANAGED_SERVICE"] = "1"
+        environment["PIKI_ENABLE_AGENT_RUNTIME"] = "1"
+        environment["CLAUDE_CONFIG_DIR"] = pikiHome.appendingPathComponent("claude-runtime", isDirectory: true).path
+        environment["PIKI_TASK_STAGING_ROOT"] = pikiHome.appendingPathComponent("task-staging", isDirectory: true).path
+
+        if pythonURL == bundleRuntime?.pythonURL {
+            environment["PIKI_APP_RUNTIME_SOURCE"] = "bundle"
+            if let pythonPath = Self.mergedPythonPath(
+                existingPythonPath: environment["PYTHONPATH"],
+                sitePackagesURL: bundleRuntime?.sitePackagesURL
+            ) {
+                environment["PYTHONPATH"] = pythonPath
+            }
+        }
+
+        return environment
+    }
+
     static func listeningProcessIdentifiers(onPort port: Int) -> [Int32] {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
@@ -366,12 +390,25 @@ final class LocalServiceManager {
         kill(pid, SIGTERM)
     }
 
-    private func locateProjectRoot() -> URL? {
-        let knownPath = URL(fileURLWithPath: "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki")
-        if FileManager.default.fileExists(atPath: knownPath.appendingPathComponent("pyproject.toml").path) {
-            return knownPath
+    static func terminateProcess(_ process: Process, gracePeriod: TimeInterval = 2.0) {
+        guard process.isRunning else {
+            return
         }
-        return nil
+
+        process.terminate()
+        let deadline = Date().addingTimeInterval(gracePeriod)
+        while process.isRunning, Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+
+        if process.isRunning {
+            kill(process.processIdentifier, SIGKILL)
+            process.waitUntilExit()
+        }
+    }
+
+    private func locateProjectRoot() -> URL? {
+        Self.developmentProjectRoot()
     }
 
     private func pikiHome() -> URL {
@@ -382,5 +419,77 @@ final class LocalServiceManager {
         let dir = pikiHome()
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
+    }
+
+    static func developmentProjectRoot(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        currentDirectoryURL: URL? = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true),
+        fileManager: FileManager = .default,
+        sourceFileURL: URL = URL(fileURLWithPath: #filePath)
+    ) -> URL? {
+        if let envPath = environment["PIKI_REPO_ROOT"], envPath.isEmpty == false {
+            let candidate = URL(fileURLWithPath: envPath, isDirectory: true)
+            if containsPyproject(at: candidate, fileManager: fileManager) {
+                return candidate
+            }
+        }
+
+        let sourceStart = sourceFileURL.hasDirectoryPath ? sourceFileURL : sourceFileURL.deletingLastPathComponent()
+        if let root = repositoryRoot(containing: "pyproject.toml", startingAt: sourceStart, fileManager: fileManager) {
+            return root
+        }
+
+        if let currentDirectoryURL,
+           let root = repositoryRoot(containing: "pyproject.toml", startingAt: currentDirectoryURL, fileManager: fileManager) {
+            return root
+        }
+
+        return nil
+    }
+
+    static func prepareManagedRuntimeEnvironment(
+        at pikiHome: URL,
+        fileManager: FileManager = .default
+    ) {
+        let directories = [
+            pikiHome,
+            pikiHome.appendingPathComponent("claude-runtime", isDirectory: true),
+            pikiHome.appendingPathComponent("task-staging", isDirectory: true),
+        ]
+
+        for directory in directories {
+            try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+    }
+
+    private static func repositoryRoot(
+        containing markerFile: String,
+        startingAt startURL: URL,
+        fileManager: FileManager
+    ) -> URL? {
+        var candidate = startURL.standardizedFileURL
+        if candidate.hasDirectoryPath == false {
+            candidate = candidate.deletingLastPathComponent()
+        }
+
+        while true {
+            if containsPyproject(at: candidate, fileManager: fileManager, markerFile: markerFile) {
+                return candidate
+            }
+
+            let parent = candidate.deletingLastPathComponent()
+            if parent == candidate {
+                return nil
+            }
+            candidate = parent
+        }
+    }
+
+    private static func containsPyproject(
+        at directory: URL,
+        fileManager: FileManager,
+        markerFile: String = "pyproject.toml"
+    ) -> Bool {
+        fileManager.fileExists(atPath: directory.appendingPathComponent(markerFile).path)
     }
 }

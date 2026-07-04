@@ -46,10 +46,12 @@ python -m uvicorn agent_service.app:app --host 127.0.0.1 --port 8782 --reload
 curl http://127.0.0.1:8782/health
 ```
 
-## 打包分发
+## 开发者分发
 
-DMG 打包时，将 Python runtime + 依赖 + agent_service 打入 .app bundle：
-- 使用 PyInstaller 打成独立可执行文件，或
-- 嵌入精简 Python.framework + venv
+当前默认分发方式是面向开发者的 GitHub Release ZIP：
 
-`LocalServiceManager` 会根据运行环境自动选择 Bundle 内或系统 Python。
+- 维护者运行 `./scripts/build_macos_dev_release.sh`
+- 产出 `Piki.app.zip` 与 `SHA256SUMS`
+- 开发者运行 `./scripts/install_piki_dev_release.sh --version <tag>` 安装
+
+`.app` bundle 内会包含 Python runtime、依赖与 `agent_service`。`LocalServiceManager` 会优先选择 Bundle 内 Python，并在首次启动时准备 `~/.piki` 目录。

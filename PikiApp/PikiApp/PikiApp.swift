@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     var serviceManager: LocalServiceManager?
 
@@ -10,9 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        Task { @MainActor in
-            serviceManager?.stop()
-        }
+        serviceManager?.stop()
     }
 }
 
@@ -40,6 +39,7 @@ struct PikiApp: App {
                 .task {
                     guard !didStartService else { return }
                     didStartService = true
+                    appState.prepareDefaultVaultIfNeeded()
                     let manager = LocalServiceManager(appState: appState)
                     appState.serviceManager = manager
                     appDelegate.serviceManager = manager

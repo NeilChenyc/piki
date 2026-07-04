@@ -36,10 +36,54 @@ struct VaultInitializationTests {
         #expect(try String(contentsOf: purposeURL, encoding: .utf8) == "custom purpose")
     }
 
+    @Test
+    func appStateBootstrapCreatesDefaultVaultAtEnvironmentOverride() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appending(path: "piki-default-vault-\(UUID().uuidString)", directoryHint: .isDirectory)
+        setenv("PIKI_DEFAULT_VAULT_PATH", root.path(percentEncoded: false), 1)
+        defer { unsetenv("PIKI_DEFAULT_VAULT_PATH") }
+
+        let appState = AppState(runtimeService: VaultBootstrapRuntimeService())
+
+        #expect(appState.vaultPath == root)
+        #expect(FileManager.default.fileExists(atPath: root.path(percentEncoded: false)) == false)
+
+        appState.prepareDefaultVaultIfNeeded()
+
+        #expect(FileManager.default.fileExists(atPath: root.appending(path: "raw/inbox").path(percentEncoded: false)))
+        #expect(FileManager.default.fileExists(atPath: root.appending(path: "wiki/index.md").path(percentEncoded: false)))
+        #expect(FileManager.default.fileExists(atPath: root.appending(path: "purpose.md").path(percentEncoded: false)))
+    }
+
     private func temporaryVaultURL() throws -> URL {
         let root = FileManager.default.temporaryDirectory
             .appending(path: "piki-vault-init-\(UUID().uuidString)", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         return root
     }
+}
+
+private enum VaultBootstrapError: Error {
+    case unimplemented
+}
+
+@MainActor
+private final class VaultBootstrapRuntimeService: RuntimeServiceProtocol {
+    func health() async throws -> ServiceHealth { throw VaultBootstrapError.unimplemented }
+    func getRuntimeConfig() async throws -> RuntimeConfigDTO { throw VaultBootstrapError.unimplemented }
+    func updateRuntimeConfig(_ request: RuntimeConfigUpdateRequest) async throws -> RuntimeConfigDTO { throw VaultBootstrapError.unimplemented }
+    func smokeTestRuntime() async throws -> RuntimeSmokeTestResponse { throw VaultBootstrapError.unimplemented }
+    func createTask(_ request: TaskCreateRequest) async throws -> TaskCreateResponse { throw VaultBootstrapError.unimplemented }
+    func taskEvents(taskId: String) -> AsyncThrowingStream<TaskEvent, Error> { AsyncThrowingStream { $0.finish() } }
+    func getTask(taskId: String) async throws -> TaskRecordDTO { throw VaultBootstrapError.unimplemented }
+    func submitTaskInput(taskId: String, message: String) async throws -> TaskRecordDTO { throw VaultBootstrapError.unimplemented }
+    func cancelTask(taskId: String) async throws -> TaskRecordDTO { throw VaultBootstrapError.unimplemented }
+    func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse { throw VaultBootstrapError.unimplemented }
+    func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] { [] }
+    func rollback(entryId: String) async throws {}
+    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] { [] }
+    func enqueueIngest(vaultPath: String, paths: [String]) async throws {}
+    func processIngestQueue(vaultPath: String?) async throws {}
+    func runLint(vaultPath: String) async throws -> LintResultDTO { throw VaultBootstrapError.unimplemented }
+    func fixLint(vaultPath: String, issueIds: [String]?) async throws {}
 }

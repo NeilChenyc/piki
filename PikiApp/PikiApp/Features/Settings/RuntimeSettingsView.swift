@@ -53,7 +53,7 @@ struct RuntimeSettingsView: View {
                 Circle()
                     .fill(statusColor)
                     .frame(width: 8, height: 8)
-                Text("当前接入大模型 API")
+                Text("本地 Runtime 与模型配置")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
@@ -61,9 +61,18 @@ struct RuntimeSettingsView: View {
             }
 
             VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 12) {
+                    metricItem(label: "应用", value: "已启动")
+                    metricItem(label: "本地 Runtime", value: localRuntimeStatus)
+                    metricItem(label: "模型配置", value: modelConfigurationStatus)
+                }
                 metricItem(label: "Model", value: viewModel.currentModel.isEmpty ? "--" : viewModel.currentModel)
                 metricItem(label: "Base URL", value: viewModel.currentBaseURL.isEmpty ? "default" : viewModel.currentBaseURL)
                 metricItem(label: "状态", value: appState.runtimeModeTitle)
+            }
+
+            if shouldShowOnboardingHint {
+                bannerView(.info("本地 Runtime 已就绪。下一步：填写模型、Base URL 和 API Key，然后运行 Smoke Test。"))
             }
 
             if case .none = viewModel.bannerState {} else {
@@ -198,7 +207,26 @@ struct RuntimeSettingsView: View {
                 Text("Smoke Test").font(.system(size: 12))
             }
         }
-        .disabled(viewModel.isRunningSmokeTest || viewModel.isApplyingPreset)
+        .disabled(viewModel.isRunningSmokeTest || viewModel.isApplyingPreset || !appState.isConnected)
+    }
+
+    private var localRuntimeStatus: String {
+        switch appState.connectionStatus {
+        case .connected:
+            "已就绪"
+        case .starting:
+            "启动中"
+        case .disconnected, .error:
+            "未就绪"
+        }
+    }
+
+    private var modelConfigurationStatus: String {
+        viewModel.apiKeyConfigured ? "已完成" : "待填写"
+    }
+
+    private var shouldShowOnboardingHint: Bool {
+        appState.isConnected && !viewModel.apiKeyConfigured
     }
 
     private func metricItem(label: String, value: String) -> some View {

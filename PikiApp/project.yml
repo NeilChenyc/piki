@@ -17,6 +17,20 @@ packages:
   swift-markdown:
     path: LocalPackages/swift-markdown
 
+schemes:
+  PikiApp:
+    build:
+      targets:
+        PikiApp: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+
 targets:
   PikiApp:
     type: application
@@ -25,8 +39,6 @@ targets:
       - path: PikiApp
         excludes:
           - "Preview Content"
-          - "Core/Network"
-          - "Core/Runtime/HTTPRuntimeService.swift"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.piki.app
@@ -42,10 +54,13 @@ targets:
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"
         INFOPLIST_KEY_CFBundleDisplayName: Piki
         INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking: true
+      configs:
+        Release:
+          ARCHS: arm64
+          ONLY_ACTIVE_ARCH: YES
     dependencies:
       - package: swift-markdown
         product: Markdown
-      - target: PikiRuntimeHost
     postBuildScripts:
       - name: Build Runtime Bundle
         basedOnDependencyAnalysis: false
@@ -61,26 +76,3 @@ targets:
           rm -rf "$APP_RESOURCES/PikiRuntime"
           cp -R "${RUNTIME_BUILD_ROOT}/Contents/Resources/PikiRuntime" "$APP_RESOURCES/"
           cp -f "${RUNTIME_BUILD_ROOT}/Contents/Resources/runtime-paths.json" "$APP_RESOURCES/"
-      - name: Copy Runtime Host
-        basedOnDependencyAnalysis: false
-        outputFiles:
-          - "$(TARGET_BUILD_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/PikiRuntimeHost"
-        script: |
-          set -euo pipefail
-          HOST_PRODUCT_PATH="${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/PikiRuntimeHost"
-          cp -f "${BUILT_PRODUCTS_DIR}/PikiRuntimeHost" "$HOST_PRODUCT_PATH"
-          chmod +x "$HOST_PRODUCT_PATH"
-  PikiRuntimeHost:
-    type: tool
-    platform: macOS
-    sources:
-      - path: PikiRuntimeHost
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.piki.runtime-host
-        PRODUCT_NAME: PikiRuntimeHost
-        GENERATE_INFOPLIST_FILE: YES
-        CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: 0.1.0
-        CODE_SIGN_IDENTITY: "-"
-        CODE_SIGN_STYLE: Automatic

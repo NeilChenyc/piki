@@ -3,6 +3,8 @@ import SwiftUI
 @Observable
 @MainActor
 final class AppState {
+    static let defaultVaultDirectoryName = "Piki Vault"
+
     struct CachedLintResult {
         let result: LintResultDTO
         let receivedAt: Date
@@ -25,15 +27,19 @@ final class AppState {
         let config = AppConfigStorage.load()
         self.appConfig = config
         self.runtimeService = runtimeService ?? RuntimeServiceFactory.makeDefault()
-        if let path = config.vaultPath, !path.isEmpty {
+        let defaultVaultURL = AppState.preferredDefaultVaultURL()
+        let environmentOverridesVault = ProcessInfo.processInfo.environment["PIKI_DEFAULT_VAULT_PATH"]?.isEmpty == false
+        if environmentOverridesVault {
+            self.vaultPath = defaultVaultURL
+        } else if let path = config.vaultPath, !path.isEmpty {
             let url = URL(fileURLWithPath: path, isDirectory: true)
             if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
                 self.vaultPath = url
             } else {
-                self.vaultPath = AppState.defaultVaultPath()
+                self.vaultPath = defaultVaultURL
             }
         } else {
-            self.vaultPath = AppState.defaultVaultPath()
+            self.vaultPath = defaultVaultURL
         }
     }
 
@@ -46,31 +52,31 @@ final class AppState {
     }
 
     var runtimeModeTitle: String {
-        guard isConnected else { return "Offline" }
-        guard let serviceHealth else { return "Checking runtime" }
+        guard isConnected else { return "等待 Runtime" }
+        guard let serviceHealth else { return "检查 Runtime 中" }
         if serviceHealth.agentRuntimeConfigured == true {
-            return "Claude Agent"
+            return "模型已就绪"
         }
         if serviceHealth.runnerAvailable == true {
-            return "Runtime not configured"
+            return "待配置模型"
         }
-        return "Runtime installed"
+        return "Runtime 可用"
     }
 
     var runtimeModeDetail: String {
         guard isConnected else {
-            return serviceErrorMessage ?? "Runtime host is disconnected."
+            return serviceErrorMessage ?? "本地 Runtime 尚未连接。"
         }
         guard let serviceHealth else {
-            return "Checking runtime host..."
+            return "正在检查本地 Runtime..."
         }
         if serviceHealth.agentRuntimeConfigured == true {
-            return "Claude Agent runtime is active."
+            return "本地 Runtime 已就绪，模型配置已完成。"
         }
         if serviceHealth.runnerAvailable == true {
-            return "Claude runtime is installed but not configured."
+            return "本地 Runtime 已就绪，请前往设置填写模型、Base URL 和 API Key。"
         }
-        return serviceHealth.runnerDetail ?? "Claude runtime is installed, but the agent SDK is unavailable."
+        return serviceHealth.runnerDetail ?? "本地 Runtime 可用，但 Agent SDK 尚未准备好。"
     }
 
     func refreshServiceHealth() async {
@@ -112,27 +118,32 @@ final class AppState {
         }
     }
 
+    func prepareDefaultVaultIfNeeded() {
+        let targetURL = vaultPath ?? Self.preferredDefaultVaultURL()
+        vaultPath = targetURL
+        do {
+            try RuntimeSettingsViewModel.ensureVaultExists(at: targetURL)
+        } catch {
+            serviceErrorMessage = "默认知识库初始化失败：\(error.localizedDescription)"
+        }
+    }
+
     private func persistConfig() {
         appConfig.vaultPath = vaultPath?.path(percentEncoded: false)
         AppConfigStorage.save(appConfig)
     }
 
-    private static func defaultVaultPath() -> URL? {
-        let fileManager = FileManager.default
-        if let envPath = ProcessInfo.processInfo.environment["PIKI_DEFAULT_VAULT_PATH"], !envPath.isEmpty {
-            let url = URL(fileURLWithPath: envPath, isDirectory: true)
-            if fileManager.fileExists(atPath: url.path(percentEncoded: false)) {
-                return url
-            }
+    static func preferredDefaultVaultURL(
+        fileManager: FileManager = .default,
+        processInfo: ProcessInfo = .processInfo
+    ) -> URL {
+        if let envPath = processInfo.environment["PIKI_DEFAULT_VAULT_PATH"], !envPath.isEmpty {
+            return URL(fileURLWithPath: envPath, isDirectory: true)
         }
-
-        let developmentVaultPath = "/Users/a99/localDocuments/codeBase/ideaWorkplace/piki/piki-vault"
-        let developmentVaultURL = URL(fileURLWithPath: developmentVaultPath, isDirectory: true)
-        if fileManager.fileExists(atPath: developmentVaultURL.path(percentEncoded: false)) {
-            return developmentVaultURL
+        if let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            return documentsURL.appending(path: defaultVaultDirectoryName, directoryHint: .isDirectory)
         }
-
-        return nil
+        return fileManager.homeDirectoryForCurrentUser.appending(path: defaultVaultDirectoryName, directoryHint: .isDirectory)
     }
 }
 
