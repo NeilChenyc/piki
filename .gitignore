@@ -24,3 +24,8 @@ PikiApp/.swiftpm/xcode/xcuserdata/
 
 # Generated reports and local research outputs
 outputs/
+
+# Private product/docs/work-in-progress content
+docs/
+openspec/changes/
+piki-vault/
