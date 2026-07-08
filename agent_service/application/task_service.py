@@ -164,6 +164,9 @@ _INGEST_KEYWORDS = (
     "处理这个文件",
 )
 
+_PODCAST_URL_PATTERN = re.compile(r"https://www\.xiaoyuzhoufm\.com/episode/[A-Za-z0-9]+")
+_PODCAST_KEYWORDS = ("播客转录",)
+
 _HEALTH_PATTERNS = (
     re.compile(r"^\s*lint\s*$", re.IGNORECASE),
     re.compile(r"^\s*run\s+lint\s*$", re.IGNORECASE),
@@ -188,6 +191,12 @@ def _normalize_task_request(request: TaskCreateRequest) -> TaskCreateRequest:
     if action:
         return request
 
+    if _looks_like_podcast_request(request.user_input):
+        action_context = {**request.action_context, "action": "podcast_transcribe"}
+        if podcast_url := _detect_podcast_episode_url(request.user_input):
+            action_context["podcast_url"] = podcast_url
+        return request.model_copy(update={"action_context": action_context})
+
     if _looks_like_ingest_request(request.user_input):
         return request
 
@@ -200,6 +209,15 @@ def _normalize_task_request(request: TaskCreateRequest) -> TaskCreateRequest:
 def _looks_like_ingest_request(user_input: str) -> bool:
     normalized = user_input.casefold()
     return any(keyword in normalized for keyword in _INGEST_KEYWORDS)
+
+
+def _looks_like_podcast_request(user_input: str) -> bool:
+    return any(keyword in user_input for keyword in _PODCAST_KEYWORDS) or _detect_podcast_episode_url(user_input) is not None
+
+
+def _detect_podcast_episode_url(user_input: str) -> str | None:
+    match = _PODCAST_URL_PATTERN.search(user_input)
+    return match.group(0) if match else None
 
 
 def _looks_like_health_check_request(user_input: str) -> bool:

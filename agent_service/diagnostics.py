@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+UTC = timezone.utc
 
 
 def runtime_log(component: str, message: str, *, extra: dict[str, Any] | None = None) -> None:

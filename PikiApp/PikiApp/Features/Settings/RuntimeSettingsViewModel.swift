@@ -36,6 +36,20 @@ final class RuntimeSettingsViewModel {
     // MARK: - Smoke test
     var isRunningSmokeTest = false
 
+    // MARK: - Podcast transcription
+    var tingwuConfigured = false
+    var tingwuRegionId = "cn-beijing"
+    var aliyunAccessKeyIdPreview = ""
+    var aliyunAccessKeySecretConfigured = false
+    var tingwuAppKeyPreview = ""
+    var draftAliyunAccessKeyId = ""
+    var draftAliyunAccessKeySecret = ""
+    var draftTingwuAppKey = ""
+    var draftTingwuRegionId = "cn-beijing"
+    var isSavingTingwuConfig = false
+    var isClearingTingwuConfig = false
+    var showTingwuHelpSheet = false
+
     // MARK: - Vault
     var isInitializingVault = false
     var vaultInitMessage: String?
@@ -45,6 +59,17 @@ final class RuntimeSettingsViewModel {
     var canSavePreset: Bool {
         !draftName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && !draftModel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var canSaveTingwuConfig: Bool {
+        guard !draftTingwuRegionId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return false
+        }
+        guard !isSavingTingwuConfig && !isClearingTingwuConfig else { return false }
+        if tingwuConfigured { return true }
+        return !draftAliyunAccessKeyId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !draftAliyunAccessKeySecret.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !draftTingwuAppKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     // MARK: - Load
@@ -169,6 +194,53 @@ final class RuntimeSettingsViewModel {
         }
     }
 
+    // MARK: - Podcast Transcription
+
+    func saveTingwuConfig(appState: AppState) async {
+        guard canSaveTingwuConfig else { return }
+        isSavingTingwuConfig = true
+        bannerState = .info("正在保存播客转录配置...")
+        defer { isSavingTingwuConfig = false }
+
+        let accessKeyId = trimmedOrNil(draftAliyunAccessKeyId)
+        let accessKeySecret = trimmedOrNil(draftAliyunAccessKeySecret)
+        let appKey = trimmedOrNil(draftTingwuAppKey)
+        let regionId = draftTingwuRegionId.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let request = RuntimeConfigUpdateRequest(
+            aliyunAccessKeyId: accessKeyId,
+            aliyunAccessKeySecret: accessKeySecret,
+            tingwuAppKey: appKey,
+            tingwuRegionId: regionId,
+            clearTingwuConfig: nil
+        )
+
+        do {
+            let config = try await appState.runtimeService.updateRuntimeConfig(request)
+            applyConfig(config)
+            bannerState = .success("播客转录配置已保存。")
+        } catch {
+            bannerState = .error("保存播客转录配置失败：\(error.localizedDescription)")
+        }
+    }
+
+    func clearTingwuConfig(appState: AppState) async {
+        guard !isSavingTingwuConfig && !isClearingTingwuConfig else { return }
+        isClearingTingwuConfig = true
+        bannerState = .info("正在清空播客转录配置...")
+        defer { isClearingTingwuConfig = false }
+
+        let request = RuntimeConfigUpdateRequest(clearTingwuConfig: true)
+
+        do {
+            let config = try await appState.runtimeService.updateRuntimeConfig(request)
+            applyConfig(config)
+            bannerState = .success("已清空保存在 Piki 的播客转录配置。")
+        } catch {
+            bannerState = .error("清空播客转录配置失败：\(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Vault Initialization
 
     func initializeVault(at url: URL) async {
@@ -192,6 +264,31 @@ final class RuntimeSettingsViewModel {
         currentBaseURL = config.anthropicBaseURL ?? ""
         apiKeyConfigured = config.apiKeyConfigured ?? false
         runtimeEnabled = config.agentRuntimeEnabled ?? false
+        tingwuConfigured = config.tingwuConfigured ?? false
+        tingwuRegionId = nonEmpty(config.tingwuRegionId) ?? "cn-beijing"
+        aliyunAccessKeyIdPreview = config.aliyunAccessKeyIdPreview ?? ""
+        aliyunAccessKeySecretConfigured = config.aliyunAccessKeySecretConfigured ?? false
+        tingwuAppKeyPreview = config.tingwuAppKeyPreview ?? ""
+        resetTingwuDrafts()
+    }
+
+    private func resetTingwuDrafts() {
+        draftAliyunAccessKeyId = ""
+        draftAliyunAccessKeySecret = ""
+        draftTingwuAppKey = ""
+        draftTingwuRegionId = tingwuRegionId
+    }
+
+    private func trimmedOrNil(_ value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func nonEmpty(_ value: String?) -> String? {
+        guard let value, !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return nil
+        }
+        return value
     }
 
     private func detectActivePreset() {

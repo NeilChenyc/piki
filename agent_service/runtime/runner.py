@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import shutil
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
@@ -424,8 +425,10 @@ class PikiWikiAgentRunner:
         extra = [
             "你运行在 Piki 的 Claude Agent runtime 中。",
             "可用工具只有 Claude 内建工具：Read、Write、Edit、Glob、Grep、Bash、AskUserQuestion。",
-            "不要假设有自定义工具。需要 lint 或 source 提取时，请使用 Bash 调用 `python -m agent_service.runtime.cli ...`。",
+            "不要假设有自定义工具。需要 lint 或 source 提取时，请使用 Bash 调用 `$PIKI_RUNTIME_PYTHON -m agent_service.runtime.cli ...`。",
+            "运行 `agent_service.runtime.cli` 时必须使用 `$PIKI_RUNTIME_PYTHON`；不要直接调用系统 `python` 或 `python3`。",
             "Bash 只用于读取、分析、提取和输出 JSON，不要用 Bash 直接写 vault 文件；所有 vault 修改都必须通过 Write 或 Edit。",
+            "ingest 时，`extract-source` 返回的 asset_path 只作为 source 元数据保留；不要用 Bash mkdir/cp 创建 raw/assets 或复制 staged 文件。",
             "如果你需要用户确认或补充，请调用 AskUserQuestion。",
             "调用 Read/Write/Edit/Glob/Grep 时，优先使用相对当前 vault 根目录的路径，例如 `wiki/index.md`；不要使用 `/home/user/vault/...` 这类占位绝对路径。",
             "同一个文件读取成功后，优先复用你已经看到的内容，除非确实需要重新确认；不要因为路径风格不同而重复读取同一份文档。",
@@ -563,6 +566,7 @@ class PikiWikiAgentRunner:
             CLAUDE_CODE_DISABLE_AUTO_MEMORY="1",
             PIKI_AGENT_RUNTIME_PROVIDER=config.runtime_provider,
             PIKI_REPO_ROOT=str(repo_root),
+            PIKI_RUNTIME_PYTHON=sys.executable,
             PYTHONPATH=os.pathsep.join(pythonpath_entries),
         )
         if config.anthropic_base_url:
@@ -684,7 +688,15 @@ def _lint_tool_permission_decision(*, tracker: JournalTracker, tool_name: str, t
 
 def _is_lint_helper_command(command: str) -> bool:
     normalized = " ".join(command.strip().split())
-    return normalized.startswith("python -m agent_service.runtime.cli lint --vault .")
+    return any(
+        normalized.startswith(prefix)
+        for prefix in (
+            "python -m agent_service.runtime.cli lint --vault .",
+            "python3 -m agent_service.runtime.cli lint --vault .",
+            "$PIKI_RUNTIME_PYTHON -m agent_service.runtime.cli lint --vault .",
+            "${PIKI_RUNTIME_PYTHON} -m agent_service.runtime.cli lint --vault .",
+        )
+    )
 
 
 def _extract_lint_payload(*, command: str, tool_output: Any) -> dict[str, Any] | None:

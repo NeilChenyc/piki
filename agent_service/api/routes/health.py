@@ -11,11 +11,26 @@ class RuntimeConfigUpdateRequest(BaseModel):
     anthropic_base_url: str | None = None
     api_key: str | None = None
     clear_api_key: bool = False
+    aliyun_access_key_id: str | None = None
+    aliyun_access_key_secret: str | None = None
+    tingwu_app_key: str | None = None
+    tingwu_region_id: str | None = None
+    clear_tingwu_config: bool = False
 
     @model_validator(mode="after")
     def validate_request(self) -> RuntimeConfigUpdateRequest:
         if self.clear_api_key and self.api_key is not None and self.api_key.strip():
             raise ValueError("`api_key` and `clear_api_key=true` cannot be sent together.")
+        if self.clear_tingwu_config and any(
+            value is not None and value.strip()
+            for value in (
+                self.aliyun_access_key_id,
+                self.aliyun_access_key_secret,
+                self.tingwu_app_key,
+                self.tingwu_region_id,
+            )
+        ):
+            raise ValueError("Tingwu credentials and `clear_tingwu_config=true` cannot be sent together.")
         if self.anthropic_base_url is not None:
             trimmed = self.anthropic_base_url.strip()
             if trimmed and not (trimmed.startswith("http://") or trimmed.startswith("https://")):
@@ -50,6 +65,11 @@ def register_health_routes(app: FastAPI, *, config: ServiceConfig, runner):
             anthropic_base_url=request.anthropic_base_url,
             api_key=request.api_key,
             clear_api_key=request.clear_api_key,
+            aliyun_access_key_id=request.aliyun_access_key_id,
+            aliyun_access_key_secret=request.aliyun_access_key_secret,
+            tingwu_app_key=request.tingwu_app_key,
+            tingwu_region_id=request.tingwu_region_id,
+            clear_tingwu_config=request.clear_tingwu_config,
         )
 
     @app.post("/runtime/smoke-test")

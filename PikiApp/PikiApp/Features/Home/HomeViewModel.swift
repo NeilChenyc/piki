@@ -241,7 +241,7 @@ final class HomeViewModel {
         } catch is CancellationError {
             statusText = nil
         } catch {
-            failMessage(id: assistantMessageId, content: "Task failed: \(error.localizedDescription)")
+            failMessage(id: assistantMessageId, content: "任务执行失败：\(error.localizedDescription)")
             statusText = nil
         }
         if activeTaskId == nil || activeTaskId == pendingInputTaskId {
@@ -403,16 +403,17 @@ final class HomeViewModel {
                 )
             )
             return content
-        case let .failed(message):
+        case let .failed(failure):
             pendingInputTaskId = nil
             pendingInputPrompt = nil
             markRunFinished(id: assistantMessageId, status: "failed")
             failMessage(
                 id: assistantMessageId,
-                content: message ?? "Task failed."
+                content: failure.displayText,
+                errorAction: failure.action
             )
             statusText = nil
-            return message
+            return failure.message
         case let .runCompleted(preview):
             statusText = "正在整理回答"
             upsertTraceEvent(
@@ -581,6 +582,9 @@ final class HomeViewModel {
                 "podcast_url": url,
             ]
         }
+        if trimmed.contains("播客转录") {
+            return ["action": "podcast_transcribe"]
+        }
         return [:]
     }
 
@@ -687,13 +691,14 @@ final class HomeViewModel {
         }
     }
 
-    private func failMessage(id: String, content: String) {
+    private func failMessage(id: String, content: String, errorAction: UserFacingErrorAction? = nil) {
         mutateMessage(id: id) { message in
             message.content = content
             message.liveContent = ""
             message.isRunning = false
             message.isTraceExpanded = false
             message.runStatus = "failed"
+            message.errorAction = errorAction
         }
     }
 
@@ -748,6 +753,13 @@ final class HomeViewModel {
     func toggleTrace(messageId: String) {
         mutateMessage(id: messageId) { message in
             message.isTraceExpanded.toggle()
+        }
+    }
+
+    func handleErrorAction(_ action: UserFacingErrorAction, appState: AppState) {
+        if action.target == "settings.tingwu" {
+            appState.selectedTab = .settings
+            statusText = "请在设置中检查播客转录配置"
         }
     }
 
@@ -826,6 +838,8 @@ final class HomeViewModel {
             switch apiError {
             case .connectionFailed, .invalidResponse, .serverError:
                 return true
+            case .userFacing(let error):
+                return error.code == "task.not_found" || error.retryable
             case .serverMessage(let message):
                 let normalized = message.lowercased()
                 return normalized.contains("not found")
@@ -851,6 +865,7 @@ struct ChatMessage: Identifiable {
     var hasStartedAnswering: Bool = false
     var isAgentRun: Bool = false
     var runStatus: String = ""
+    var errorAction: UserFacingErrorAction?
 
     enum MessageRole {
         case user, assistant, system

@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import re
+import sys
 import time
 from dataclasses import dataclass
 from html import unescape
@@ -26,6 +27,7 @@ JSON_LD_PATTERN = re.compile(
     r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
     re.IGNORECASE | re.DOTALL,
 )
+TOOL_ERROR_PREFIX = "PIKI_TOOL_ERROR:"
 
 
 @dataclass
@@ -195,6 +197,124 @@ def create_tingwu_client(config: TingwuConfig):
         ) from exc
 
     return AcsClient(config.access_key_id, config.access_key_secret, config.region_id)
+
+
+def tool_error_payload(exc: Exception) -> dict[str, Any]:
+    detail = str(exc)
+    sdk_code = _sdk_exception_value(exc, "get_error_code")
+    if sdk_code:
+        detail = f"{sdk_code} {detail}".strip()
+    if sdk_code == "InvalidAccessKeyId.NotFound" or "InvalidAccessKeyId.NotFound" in detail:
+        return _tool_error(
+            code="podcast.tingwu.invalid_access_key",
+            title="阿里云 AccessKey 无效",
+            message="AccessKey ID 不存在或不属于当前阿里云账号。",
+            recovery_suggestion="请在设置页检查 AccessKey ID 是否复制完整、是否属于当前账号，且没有误填为 AppKey。",
+            action_label="打开播客转录设置",
+            action_target="settings.tingwu",
+            technical_detail=_technical_detail(exc),
+        )
+    if any(token in detail for token in ("SignatureDoesNotMatch", "InvalidAccessKeySecret")):
+        return _tool_error(
+            code="podcast.tingwu.invalid_access_key_secret",
+            title="阿里云 AccessKey Secret 无效",
+            message="AccessKey Secret 无法通过阿里云校验。",
+            recovery_suggestion="请在设置页重新粘贴 AccessKey Secret，确认没有多余空格或复制遗漏。",
+            action_label="打开播客转录设置",
+            action_target="settings.tingwu",
+            technical_detail=_technical_detail(exc),
+        )
+    if any(token in detail for token in ("NoPermission", "Forbidden", "Unauthorized", "AccessDenied")):
+        return _tool_error(
+            code="podcast.tingwu.permission_denied",
+            title="阿里云账号缺少听悟权限",
+            message="当前 AccessKey 没有调用通义听悟离线转写的权限。",
+            recovery_suggestion="请确认阿里云账号已开通通义听悟，并给 RAM 用户授予对应访问权限。",
+            action_label="打开播客转录设置",
+            action_target="settings.tingwu",
+            technical_detail=_technical_detail(exc),
+        )
+    if "AppKey" in detail or "appkey" in detail or "app_key" in detail:
+        return _tool_error(
+            code="podcast.tingwu.invalid_app_key",
+            title="通义听悟 AppKey 无效",
+            message="通义听悟项目 AppKey 无法通过校验。",
+            recovery_suggestion="请在阿里云通义听悟项目页复制项目 AppKey，不要填写 AccessKey ID。",
+            action_label="打开播客转录设置",
+            action_target="settings.tingwu",
+            technical_detail=_technical_detail(exc),
+        )
+    if isinstance(exc, requests.RequestException) or any(
+        token in detail.lower()
+        for token in ("timeout", "timed out", "connection", "network", "ssl")
+    ):
+        return _tool_error(
+            code="podcast.network_error",
+            title="播客转录网络连接失败",
+            message="连接小宇宙或阿里云通义听悟时失败。",
+            recovery_suggestion="请检查网络后重试。如果阿里云服务临时不可用，可以稍后再试。",
+            retryable=True,
+            technical_detail=_technical_detail(exc),
+        )
+    return _tool_error(
+        code="podcast.failed",
+        title="播客转录失败",
+        message="播客转录没有完成。",
+        recovery_suggestion="请稍后重试；如果问题持续，请检查播客链接和转录配置。",
+        retryable=True,
+        technical_detail=_technical_detail(exc),
+    )
+
+
+def emit_tool_error(exc: Exception) -> None:
+    payload = tool_error_payload(exc)
+    print(f"{TOOL_ERROR_PREFIX} {json.dumps(payload, ensure_ascii=False)}", file=sys.stderr)
+
+
+def _tool_error(
+    *,
+    code: str,
+    title: str,
+    message: str,
+    recovery_suggestion: str | None = None,
+    retryable: bool = False,
+    action_label: str | None = None,
+    action_target: str | None = None,
+    technical_detail: str | None = None,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "code": code,
+        "title": title,
+        "message": message,
+        "retryable": retryable,
+    }
+    if recovery_suggestion:
+        payload["recovery_suggestion"] = recovery_suggestion
+    if action_label:
+        payload["action_label"] = action_label
+    if action_target:
+        payload["action_target"] = action_target
+    if technical_detail:
+        payload["technical_detail"] = technical_detail
+    return payload
+
+
+def _sdk_exception_value(exc: Exception, accessor: str) -> str:
+    getter = getattr(exc, accessor, None)
+    if not callable(getter):
+        return ""
+    try:
+        return str(getter() or "").strip()
+    except Exception:
+        return ""
+
+
+def _technical_detail(exc: Exception) -> str:
+    detail = str(exc).strip() or exc.__class__.__name__
+    request_id = _sdk_exception_value(exc, "get_request_id")
+    if request_id and "RequestID" not in detail:
+        detail = f"{detail} RequestID: {request_id}"
+    return detail
 
 
 def request_with_sdk(client: Any, method: str, uri_pattern: str, body: dict[str, Any] | None = None):
@@ -602,3 +722,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n[中断] 已取消")
         raise SystemExit(130)
+    except Exception as exc:
+        emit_tool_error(exc)
+        raise SystemExit(1)

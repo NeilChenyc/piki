@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 @MainActor
 struct HomeViewDisplayState {
@@ -60,6 +61,7 @@ struct HomeView: View {
     @Environment(AppState.self) private var appState
     @Environment(HomeViewModel.self) private var viewModel
     @Environment(WikiViewModel.self) private var wikiViewModel
+    @Environment(OnboardingViewModel.self) private var onboardingVM
     @Namespace private var inputTransition
 
     var body: some View {
@@ -92,7 +94,10 @@ struct HomeView: View {
                                 onToggleTrace: {
                                     viewModel.toggleTrace(messageId: message.id)
                                 },
-                                onWikiLinkTap: handleWikiLinkTap(_:)
+                                onWikiLinkTap: handleWikiLinkTap(_:),
+                                onErrorAction: { action in
+                                    viewModel.handleErrorAction(action, appState: appState)
+                                }
                             )
                         }
                     }
@@ -186,6 +191,20 @@ struct HomeView: View {
 
             VStack(spacing: 36) {
                 PikiLogo(style: .hero)
+                    .popoverTip(HomeTip())
+
+                if !onboardingVM.showcaseDismissed {
+                    UseCaseShowcase(
+                        items: UseCaseItem.allCases,
+                        onSelect: { item in
+                            viewModel.inputText = item.starterPrompt
+                        },
+                        onDismiss: {
+                            onboardingVM.dismissShowcase()
+                        }
+                    )
+                    .padding(.horizontal, 40)
+                }
 
                 VStack(alignment: .leading, spacing: 12) {
                     ChatInputView(

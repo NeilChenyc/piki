@@ -101,6 +101,11 @@ class RuntimeWorker:
                 anthropic_base_url=params.get("anthropic_base_url"),
                 api_key=params.get("api_key"),
                 clear_api_key=bool(params.get("clear_api_key", False)),
+                aliyun_access_key_id=params.get("aliyun_access_key_id"),
+                aliyun_access_key_secret=params.get("aliyun_access_key_secret"),
+                tingwu_app_key=params.get("tingwu_app_key"),
+                tingwu_region_id=params.get("tingwu_region_id"),
+                clear_tingwu_config=bool(params.get("clear_tingwu_config", False)),
             )
         if method == "smoke_test_runtime":
             return self._smoke_test_runtime()

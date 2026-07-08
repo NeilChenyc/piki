@@ -3,10 +3,16 @@ import SwiftUI
 
 struct MarkdownSelectableTextView: NSViewRepresentable {
     let attributedText: NSAttributedString
+    let layoutWidth: CGFloat?
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
 
-    init(attributedText: NSAttributedString, onOpenWikiLink: ((WikiLinkTarget) -> Void)? = nil) {
+    init(
+        attributedText: NSAttributedString,
+        layoutWidth: CGFloat? = nil,
+        onOpenWikiLink: ((WikiLinkTarget) -> Void)? = nil
+    ) {
         self.attributedText = attributedText
+        self.layoutWidth = layoutWidth
         self.onOpenWikiLink = onOpenWikiLink
     }
 
@@ -47,6 +53,7 @@ struct MarkdownSelectableTextView: NSViewRepresentable {
     func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSTextView, context: Context) -> CGSize? {
         let width = Self.measurementWidth(
             proposalWidth: proposal.width,
+            layoutWidth: layoutWidth,
             currentWidth: nsView.bounds.width,
             lastKnownWidth: context.coordinator.lastKnownWidth
         )
@@ -86,11 +93,16 @@ struct MarkdownSelectableTextView: NSViewRepresentable {
 
     static func measurementWidth(
         proposalWidth: CGFloat?,
+        layoutWidth: CGFloat? = nil,
         currentWidth: CGFloat,
         lastKnownWidth: CGFloat? = nil
     ) -> CGFloat {
-        if let proposalWidth, proposalWidth > 1 {
-            return proposalWidth
+        let candidates = [proposalWidth, layoutWidth].compactMap { value -> CGFloat? in
+            guard let value, value > 1 else { return nil }
+            return value
+        }
+        if let measuredWidth = candidates.min() {
+            return measuredWidth
         }
         if currentWidth > 1 {
             return currentWidth

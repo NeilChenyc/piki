@@ -63,6 +63,26 @@ struct HomeTemplateActionTests {
     }
 
     @Test
+    func podcastKeywordRoutesToPodcastTranscriptionActionWithoutUrl() async throws {
+        let runtime = HomeTemplateRuntimeService()
+        let appState = AppState(runtimeService: runtime)
+        appState.connectionStatus = .connected
+        appState.vaultPath = makeTemporaryDirectory()
+
+        let viewModel = HomeViewModel()
+        viewModel.sendMessage(
+            "我想上传一集播客并自动转录。请按播客转录流程先完成完整转录，再整理进知识库。",
+            appState: appState
+        )
+
+        await runtime.waitForCreateTask()
+
+        #expect(runtime.createdRequests.count == 1)
+        #expect(runtime.createdRequests[0].actionContext["action"] == "podcast_transcribe")
+        #expect(runtime.createdRequests[0].actionContext["podcast_url"] == nil)
+    }
+
+    @Test
     func templateActionRefusesToStartWhenBusy() {
         let runtime = HomeTemplateRuntimeService()
         let appState = AppState(runtimeService: runtime)

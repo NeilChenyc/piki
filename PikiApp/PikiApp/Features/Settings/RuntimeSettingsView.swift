@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 struct RuntimeSettingsView: View {
     private let topCardMinHeight: CGFloat = 190
@@ -16,6 +17,7 @@ struct RuntimeSettingsView: View {
                     runtimeStatusSection
                     vaultSection
                 }
+                podcastTranscriptionSection
                 presetsSection
             }
             .padding(24)
@@ -30,6 +32,9 @@ struct RuntimeSettingsView: View {
             PresetFormSheet()
                 .environment(viewModel)
         }
+        .sheet(isPresented: $vm.showTingwuHelpSheet) {
+            TingwuHelpSheet()
+        }
     }
 
     // MARK: - Header
@@ -43,6 +48,7 @@ struct RuntimeSettingsView: View {
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.textSecondary)
         }
+        .popoverTip(SettingsTip())
     }
 
     // MARK: - Section 1: Runtime Status
@@ -84,7 +90,95 @@ struct RuntimeSettingsView: View {
         .cardStyle()
     }
 
-    // MARK: - Section 2: Presets
+    // MARK: - Section 2: Podcast Transcription
+
+    private var podcastTranscriptionSection: some View {
+        @Bindable var vm = viewModel
+
+        return VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center, spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text("播客转录")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                        tingwuStatusPill
+                    }
+                    Text("配置你自己的阿里云通义听悟账号，小宇宙播客转录会走你的阿里云账号计费。")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                Button {
+                    viewModel.showTingwuHelpSheet = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                        .font(.system(size: 15, weight: .medium))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Theme.textSecondary)
+                .help("如何配置播客转录功能")
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 12)], alignment: .leading, spacing: 12) {
+                tingwuField("AccessKey ID", help: tingwuAccessKeyHint) {
+                    TextField("LTAI...", text: $vm.draftAliyunAccessKeyId)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                tingwuField("AccessKey Secret", help: viewModel.aliyunAccessKeySecretConfigured ? "留空则保留已有 Secret" : nil) {
+                    SecureField("AccessKey Secret", text: $vm.draftAliyunAccessKeySecret)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                tingwuField("通义听悟 AppKey", help: tingwuAppKeyHint) {
+                    SecureField("项目 AppKey", text: $vm.draftTingwuAppKey)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                tingwuField("Region", help: "默认 cn-beijing") {
+                    TextField("cn-beijing", text: $vm.draftTingwuRegionId)
+                        .textFieldStyle(.roundedBorder)
+                }
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    Task { await viewModel.saveTingwuConfig(appState: appState) }
+                } label: {
+                    if viewModel.isSavingTingwuConfig {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Text("保存播客转录配置")
+                    }
+                }
+                .controlSize(.large)
+                .disabled(!viewModel.canSaveTingwuConfig || !appState.isConnected)
+
+                Button(role: .destructive) {
+                    Task { await viewModel.clearTingwuConfig(appState: appState) }
+                } label: {
+                    if viewModel.isClearingTingwuConfig {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Text("清空配置")
+                    }
+                }
+                .controlSize(.large)
+                .disabled(!viewModel.tingwuConfigured || viewModel.isSavingTingwuConfig || viewModel.isClearingTingwuConfig || !appState.isConnected)
+
+                Spacer()
+
+                Text("保存后，播客任务会先调用通义听悟转录，再交给 Agent 入库。")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+        }
+        .padding(18)
+        .cardStyle()
+    }
+
+    // MARK: - Section 3: Presets
 
     private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -136,7 +230,7 @@ struct RuntimeSettingsView: View {
         }
     }
 
-    // MARK: - Section 3: Vault
+    // MARK: - Section 4: Vault
 
     private var vaultSection: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -187,6 +281,41 @@ struct RuntimeSettingsView: View {
     }
 
     // MARK: - Helpers
+
+    private var tingwuStatusPill: some View {
+        Text(viewModel.tingwuConfigured ? "已配置" : "未配置")
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(viewModel.tingwuConfigured ? Theme.accentDark : Theme.warning)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(viewModel.tingwuConfigured ? Theme.accentLight : Theme.warning.opacity(0.12))
+            .clipShape(.rect(cornerRadius: 5))
+    }
+
+    private var tingwuAccessKeyHint: String? {
+        guard !viewModel.aliyunAccessKeyIdPreview.isEmpty else { return nil }
+        return "当前：\(viewModel.aliyunAccessKeyIdPreview)。留空则保留。"
+    }
+
+    private var tingwuAppKeyHint: String? {
+        guard !viewModel.tingwuAppKeyPreview.isEmpty else { return nil }
+        return "当前：\(viewModel.tingwuAppKeyPreview)。留空则保留。"
+    }
+
+    private func tingwuField(_ label: String, help: String? = nil, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Theme.textSecondary)
+            content()
+            if let help {
+                Text(help)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(2)
+            }
+        }
+    }
 
     private var statusColor: Color {
         switch appState.connectionStatus {
@@ -269,6 +398,58 @@ struct RuntimeSettingsView: View {
         if panel.runModal() == .OK, let url = panel.url {
             appState.vaultPath = url
             viewModel.vaultInitMessage = nil
+        }
+    }
+}
+
+struct TingwuHelpSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack {
+                Text("如何配置播客转录功能")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                Spacer()
+                Button("关闭") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+            }
+
+            Text("Piki 会使用你填写的阿里云通义听悟凭证提交离线转写任务，并主动轮询结果；费用由你的阿里云账号承担。")
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.textSecondary)
+
+            VStack(alignment: .leading, spacing: 10) {
+                helpStep("1", "登录阿里云控制台，开通通义听悟服务。")
+                helpStep("2", "在 RAM / AccessKey 管理中创建 AccessKey ID 和 AccessKey Secret。")
+                helpStep("3", "进入通义听悟控制台，创建或选择一个项目，复制项目 AppKey。")
+                helpStep("4", "在 Piki 设置页填入 AccessKey、AppKey 和 Region；默认 Region 使用 cn-beijing。")
+                helpStep("5", "Piki 使用主动轮询方式，不需要配置回调地址。")
+            }
+
+            HStack(spacing: 12) {
+                Link("通义听悟快速入门", destination: URL(string: "https://help.aliyun.com/zh/tingwu/getting-started-1")!)
+                Link("音视频文件离线转写", destination: URL(string: "https://help.aliyun.com/zh/tingwu/offline-transcribe-of-audio-and-video-files")!)
+            }
+            .font(.system(size: 12, weight: .medium))
+        }
+        .padding(24)
+        .frame(width: 520)
+    }
+
+    private func helpStep(_ number: String, _ text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text(number)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.accentDark)
+                .frame(width: 22, height: 22)
+                .background(Theme.accentLight)
+                .clipShape(Circle())
+            Text(text)
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

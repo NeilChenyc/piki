@@ -608,6 +608,23 @@ def test_runtime_env_allows_cli_module_from_vault_cwd(tmp_path: Path, monkeypatc
     assert "canonical_markdown" in payload
 
 
+def test_runtime_env_exports_current_python_for_agent_cli_helpers(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
+    runner = PikiWikiAgentRunner()
+    config = ServiceConfig(
+        db_path=tmp_path / "agent.sqlite3",
+        enable_agent_runtime=True,
+        agent_model="claude-test",
+        staging_root=tmp_path / ".piki/task-staging",
+        claude_config_dir=tmp_path / ".piki/claude-runtime",
+    )
+
+    env = runner._runtime_env(config)
+
+    assert env["PIKI_RUNTIME_PYTHON"] == sys.executable
+
+
 def test_runtime_env_exports_anthropic_auth_token_alias(tmp_path: Path, monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "packy-token")

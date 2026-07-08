@@ -69,8 +69,21 @@ struct ChatBubbleView: View {
     let message: ChatMessage
     let onToggleTrace: () -> Void
     let onWikiLinkTap: (WikiLinkTarget) -> Void
+    let onErrorAction: (UserFacingErrorAction) -> Void
 
     @State private var isHoveringTrace = false
+
+    init(
+        message: ChatMessage,
+        onToggleTrace: @escaping () -> Void,
+        onWikiLinkTap: @escaping (WikiLinkTarget) -> Void,
+        onErrorAction: @escaping (UserFacingErrorAction) -> Void = { _ in }
+    ) {
+        self.message = message
+        self.onToggleTrace = onToggleTrace
+        self.onWikiLinkTap = onWikiLinkTap
+        self.onErrorAction = onErrorAction
+    }
 
     private var displayState: ChatBubbleDisplayState {
         ChatBubbleDisplayState(message: message)
@@ -138,6 +151,21 @@ struct ChatBubbleView: View {
                 Text(fallbackText)
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.textTertiary)
+            }
+
+            if let errorAction = message.errorAction {
+                Button {
+                    onErrorAction(errorAction)
+                } label: {
+                    Label(errorAction.label, systemImage: "slider.horizontal.3")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.error)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Theme.error.opacity(0.10))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
             }
 
             if !message.citations.isEmpty {

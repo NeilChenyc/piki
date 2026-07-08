@@ -224,8 +224,13 @@ final class APIClient {
             throw APIError.invalidResponse
         }
         guard (200..<300).contains(http.statusCode) else {
-            let detail = try? JSONDecoder().decode(APIErrorResponse.self, from: data).detail
-            throw APIError.serverMessage(detail ?? "Server error: \(http.statusCode)")
+            if let response = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
+                if let userFacingError = response.error {
+                    throw APIError.userFacing(userFacingError)
+                }
+                throw APIError.serverMessage(response.detail ?? "Server error: \(http.statusCode)")
+            }
+            throw APIError.serverMessage("Server error: \(http.statusCode)")
         }
     }
 

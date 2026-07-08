@@ -15,7 +15,7 @@ struct PikiLogo: View {
         var height: CGFloat {
             switch self {
             case .navigation: 78.4
-            case .hero: 120
+            case .hero: 156
             }
         }
     }

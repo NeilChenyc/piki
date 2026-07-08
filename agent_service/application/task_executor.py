@@ -31,7 +31,7 @@ class TaskExecutor:
         self.store = store
         self.events = events
         self.runner = runner
-        self.system_actions = DeterministicActionExecutor(store=store, events=events)
+        self.system_actions = DeterministicActionExecutor(store=store, events=events, config=config)
 
     def execute(self, *, task_id: str, request: TaskCreateRequest, plan: TaskPlan, run_control: TaskRunControl | None = None):
         runtime_log("task_executor", "execute_start", extra={"task_id": task_id, "mode": request.mode, "async_mode": request.async_mode})

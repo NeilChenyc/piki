@@ -80,6 +80,7 @@ enum APIError: Error, LocalizedError {
     case invalidResponse
     case serverError(Int)
     case serverMessage(String)
+    case userFacing(TaskFailurePresentation)
 
     var errorDescription: String? {
         switch self {
@@ -87,6 +88,7 @@ enum APIError: Error, LocalizedError {
         case .invalidResponse: "Invalid response from server"
         case .serverError(let code): "Server error: \(code)"
         case .serverMessage(let message): message
+        case .userFacing(let error): error.displayText
         }
     }
 }

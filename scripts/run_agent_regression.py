@@ -13,7 +13,7 @@ import urllib.parse
 import urllib.request
 import uuid
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CASES_PATH = ROOT / "docs/development/agent_regression_cases.json"
 DEFAULT_VAULT_PATH = ROOT / "piki-vault"
 DEFAULT_OUTPUT_DIR = ROOT / "outputs/agent-regression"
+UTC = timezone.utc
 
 
 @dataclass

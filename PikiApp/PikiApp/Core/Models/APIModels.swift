@@ -149,6 +149,13 @@ struct TaskEventPayload: Codable {
     let sessionId: String?
     let pendingInput: PendingInputDTO?
     let options: [String]?
+    let errorCode: String?
+    let errorTitle: String?
+    let errorMessage: String?
+    let recoverySuggestion: String?
+    let retryable: Bool?
+    let actionLabel: String?
+    let actionTarget: String?
 
     init(
         summary: String? = nil,
@@ -173,7 +180,14 @@ struct TaskEventPayload: Codable {
         provider: String? = nil,
         sessionId: String? = nil,
         pendingInput: PendingInputDTO? = nil,
-        options: [String]? = nil
+        options: [String]? = nil,
+        errorCode: String? = nil,
+        errorTitle: String? = nil,
+        errorMessage: String? = nil,
+        recoverySuggestion: String? = nil,
+        retryable: Bool? = nil,
+        actionLabel: String? = nil,
+        actionTarget: String? = nil
     ) {
         self.summary = summary
         self.answer = answer
@@ -198,6 +212,13 @@ struct TaskEventPayload: Codable {
         self.sessionId = sessionId
         self.pendingInput = pendingInput
         self.options = options
+        self.errorCode = errorCode
+        self.errorTitle = errorTitle
+        self.errorMessage = errorMessage
+        self.recoverySuggestion = recoverySuggestion
+        self.retryable = retryable
+        self.actionLabel = actionLabel
+        self.actionTarget = actionTarget
     }
 
     enum CodingKeys: String, CodingKey {
@@ -224,6 +245,25 @@ struct TaskEventPayload: Codable {
         case sessionId = "session_id"
         case pendingInput = "pending_input"
         case options
+        case errorCode = "error_code"
+        case errorTitle = "error_title"
+        case errorMessage = "error_message"
+        case recoverySuggestion = "recovery_suggestion"
+        case retryable
+        case actionLabel = "action_label"
+        case actionTarget = "action_target"
+    }
+
+    var failurePresentation: TaskFailurePresentation {
+        TaskFailurePresentation(
+            code: errorCode,
+            title: errorTitle ?? "任务执行失败",
+            message: errorMessage ?? error ?? summary ?? "任务执行失败。",
+            recoverySuggestion: recoverySuggestion,
+            retryable: retryable ?? false,
+            actionLabel: actionLabel,
+            actionTarget: actionTarget
+        )
     }
 }
 
@@ -238,6 +278,85 @@ struct PendingInputDTO: Codable {
         case prompt
         case options
         case toolUseId = "tool_use_id"
+    }
+}
+
+struct UserFacingErrorAction: Equatable {
+    let label: String
+    let target: String
+}
+
+struct TaskFailurePresentation: Decodable, Equatable {
+    let code: String?
+    let title: String
+    let message: String
+    let recoverySuggestion: String?
+    let retryable: Bool
+    let actionLabel: String?
+    let actionTarget: String?
+
+    init(
+        code: String? = nil,
+        title: String,
+        message: String,
+        recoverySuggestion: String? = nil,
+        retryable: Bool = false,
+        actionLabel: String? = nil,
+        actionTarget: String? = nil
+    ) {
+        self.code = code
+        self.title = title
+        self.message = message
+        self.recoverySuggestion = recoverySuggestion
+        self.retryable = retryable
+        self.actionLabel = actionLabel
+        self.actionTarget = actionTarget
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case code
+        case errorCode = "error_code"
+        case title
+        case errorTitle = "error_title"
+        case message
+        case errorMessage = "error_message"
+        case error
+        case recoverySuggestion = "recovery_suggestion"
+        case retryable
+        case actionLabel = "action_label"
+        case actionTarget = "action_target"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        code = try container.decodeIfPresent(String.self, forKey: .errorCode)
+            ?? container.decodeIfPresent(String.self, forKey: .code)
+        title = try container.decodeIfPresent(String.self, forKey: .errorTitle)
+            ?? container.decodeIfPresent(String.self, forKey: .title)
+            ?? "任务执行失败"
+        message = try container.decodeIfPresent(String.self, forKey: .errorMessage)
+            ?? container.decodeIfPresent(String.self, forKey: .message)
+            ?? container.decodeIfPresent(String.self, forKey: .error)
+            ?? "任务执行失败。"
+        recoverySuggestion = try container.decodeIfPresent(String.self, forKey: .recoverySuggestion)
+        retryable = try container.decodeIfPresent(Bool.self, forKey: .retryable) ?? false
+        actionLabel = try container.decodeIfPresent(String.self, forKey: .actionLabel)
+        actionTarget = try container.decodeIfPresent(String.self, forKey: .actionTarget)
+    }
+
+    var displayText: String {
+        var parts = [title, message]
+        if let recoverySuggestion, !recoverySuggestion.isEmpty {
+            parts.append(recoverySuggestion)
+        }
+        return parts.joined(separator: "\n\n")
+    }
+
+    var action: UserFacingErrorAction? {
+        guard let actionLabel, let actionTarget, !actionLabel.isEmpty, !actionTarget.isEmpty else {
+            return nil
+        }
+        return UserFacingErrorAction(label: actionLabel, target: actionTarget)
     }
 }
 
@@ -277,6 +396,11 @@ struct RuntimeConfigDTO: Codable {
     let apiKeyPreview: String?
     let apiKeySource: String?
     let agentRuntimeEnabled: Bool?
+    let tingwuConfigured: Bool?
+    let tingwuRegionId: String?
+    let aliyunAccessKeyIdPreview: String?
+    let aliyunAccessKeySecretConfigured: Bool?
+    let tingwuAppKeyPreview: String?
 
     enum CodingKeys: String, CodingKey {
         case provider
@@ -286,6 +410,11 @@ struct RuntimeConfigDTO: Codable {
         case apiKeyPreview = "api_key_preview"
         case apiKeySource = "api_key_source"
         case agentRuntimeEnabled = "agent_runtime_enabled"
+        case tingwuConfigured = "tingwu_configured"
+        case tingwuRegionId = "tingwu_region_id"
+        case aliyunAccessKeyIdPreview = "aliyun_access_key_id_preview"
+        case aliyunAccessKeySecretConfigured = "aliyun_access_key_secret_configured"
+        case tingwuAppKeyPreview = "tingwu_app_key_preview"
     }
 }
 
@@ -294,12 +423,44 @@ struct RuntimeConfigUpdateRequest: Codable, Sendable {
     let anthropicBaseURL: String?
     let apiKey: String?
     let clearAPIKey: Bool?
+    let aliyunAccessKeyId: String?
+    let aliyunAccessKeySecret: String?
+    let tingwuAppKey: String?
+    let tingwuRegionId: String?
+    let clearTingwuConfig: Bool?
+
+    init(
+        agentModel: String? = nil,
+        anthropicBaseURL: String? = nil,
+        apiKey: String? = nil,
+        clearAPIKey: Bool? = nil,
+        aliyunAccessKeyId: String? = nil,
+        aliyunAccessKeySecret: String? = nil,
+        tingwuAppKey: String? = nil,
+        tingwuRegionId: String? = nil,
+        clearTingwuConfig: Bool? = nil
+    ) {
+        self.agentModel = agentModel
+        self.anthropicBaseURL = anthropicBaseURL
+        self.apiKey = apiKey
+        self.clearAPIKey = clearAPIKey
+        self.aliyunAccessKeyId = aliyunAccessKeyId
+        self.aliyunAccessKeySecret = aliyunAccessKeySecret
+        self.tingwuAppKey = tingwuAppKey
+        self.tingwuRegionId = tingwuRegionId
+        self.clearTingwuConfig = clearTingwuConfig
+    }
 
     enum CodingKeys: String, CodingKey {
         case agentModel = "agent_model"
         case anthropicBaseURL = "anthropic_base_url"
         case apiKey = "api_key"
         case clearAPIKey = "clear_api_key"
+        case aliyunAccessKeyId = "aliyun_access_key_id"
+        case aliyunAccessKeySecret = "aliyun_access_key_secret"
+        case tingwuAppKey = "tingwu_app_key"
+        case tingwuRegionId = "tingwu_region_id"
+        case clearTingwuConfig = "clear_tingwu_config"
     }
 }
 
@@ -325,8 +486,25 @@ struct RuntimeSmokeTestResponse: Codable {
     }
 }
 
-struct APIErrorResponse: Codable {
+struct APIErrorResponse: Decodable {
     let detail: String?
+    let error: TaskFailurePresentation?
+
+    enum CodingKeys: String, CodingKey {
+        case detail
+        case error
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let detailError = try? container.decode(TaskFailurePresentation.self, forKey: .detail)
+        if let detailString = try? container.decode(String.self, forKey: .detail) {
+            detail = detailString
+        } else {
+            detail = detailError?.message
+        }
+        error = (try? container.decode(TaskFailurePresentation.self, forKey: .error)) ?? detailError
+    }
 }
 
 // MARK: - Journal

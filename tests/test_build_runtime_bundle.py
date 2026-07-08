@@ -1,4 +1,5 @@
 from pathlib import Path
+import tomllib
 
 import scripts.build_runtime_bundle as runtime_bundle
 
@@ -35,3 +36,38 @@ def test_prepare_clean_source_tree_excludes_build_artifacts(tmp_path, monkeypatc
     assert not (staged_root / "build").exists()
     assert not (staged_root / "dist").exists()
     assert not (staged_root / "piki.egg-info").exists()
+
+
+def test_python_distribution_includes_podcast_tool_and_tingwu_sdk_dependency():
+    pyproject = tomllib.loads((runtime_bundle.ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    assert "xiaoyuzhou_tingwu_tool" in pyproject["tool"]["setuptools"]["py-modules"]
+    assert "aliyun-python-sdk-core>=2.16.0" in pyproject["project"]["dependencies"]
+    assert "requests>=2.32.0" in pyproject["project"]["dependencies"]
+
+
+def test_main_preserves_existing_runtime_bundle_when_download_fails(tmp_path, monkeypatch):
+    bundle_root = tmp_path / "runtime-bundle"
+    cache_root = tmp_path / "runtime-cache"
+    sentinel = bundle_root / "Contents" / "Resources" / "PikiRuntime" / "sentinel.txt"
+    sentinel.parent.mkdir(parents=True)
+    sentinel.write_text("previous bundle", encoding="utf-8")
+
+    monkeypatch.setattr(runtime_bundle, "BUNDLE_ROOT", bundle_root)
+    monkeypatch.setattr(runtime_bundle, "CACHE_ROOT", cache_root)
+    monkeypatch.setattr(runtime_bundle, "detect_arch", lambda: "aarch64")
+    monkeypatch.setattr(runtime_bundle, "release_url", lambda arch: "https://example.invalid/python.tar.gz")
+
+    def fail_download(url, target):
+        raise RuntimeError("download failed")
+
+    monkeypatch.setattr(runtime_bundle, "download_and_extract_python", fail_download)
+
+    try:
+        runtime_bundle.main()
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("main should fail when python download fails")
+
+    assert sentinel.read_text(encoding="utf-8") == "previous bundle"

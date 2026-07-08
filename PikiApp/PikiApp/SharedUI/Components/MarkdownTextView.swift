@@ -8,6 +8,7 @@ struct DocumentMarkdownView: View {
     let baseURL: URL?
     let textScale: CGFloat
     let onOpenWikiLink: ((WikiLinkTarget) -> Void)?
+    @State private var availableWidth: CGFloat? = nil
 
     private var preparedDocument: MarkdownDocumentPresentation.PreparedDocument {
         MarkdownDocumentPresentation.prepare(source: content, mode: presentationMode)
@@ -37,9 +38,15 @@ struct DocumentMarkdownView: View {
 
         MarkdownSelectableTextView(
             attributedText: renderedDocument.attributedText,
+            layoutWidth: availableWidth,
             onOpenWikiLink: onOpenWikiLink
         )
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(MarkdownLayoutWidthReader())
+        .onPreferenceChange(MarkdownLayoutWidthPreferenceKey.self) { width in
+            guard width > 1, availableWidth != width else { return }
+            availableWidth = width
+        }
     }
 }
 
@@ -77,6 +84,27 @@ struct MessageMarkdownView: View {
             onOpenWikiLink(target)
             return .handled
         })
+    }
+}
+
+private struct MarkdownLayoutWidthPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        let next = nextValue()
+        guard next > 1 else { return }
+        value = value > 1 ? min(value, next) : next
+    }
+}
+
+private struct MarkdownLayoutWidthReader: View {
+    var body: some View {
+        GeometryReader { proxy in
+            Color.clear.preference(
+                key: MarkdownLayoutWidthPreferenceKey.self,
+                value: proxy.size.width
+            )
+        }
     }
 }
 
@@ -178,34 +206,49 @@ struct MarkdownRenderedDocument: Equatable {
 private enum UnifiedMarkdownDocumentBuilder {
     struct Configuration {
         let foregroundColor: Color
+        let h1FontSize: CGFloat
+        let h2FontSize: CGFloat
+        let h3FontSize: CGFloat
         let bodyFontSize: CGFloat
         let codeFontSize: CGFloat
         let metadataFontSize: CGFloat?
         let displayTitle: String?
         let shouldRenderTitleInsideDocument: Bool
-        let isMessage: Bool
+
+        func headingFontSize(for level: Int) -> CGFloat {
+            switch level {
+            case 1: h1FontSize
+            case 2: h2FontSize
+            case 3: h3FontSize
+            default: bodyFontSize
+            }
+        }
 
         static func document(style: DocumentMarkdownStyle) -> Configuration {
             Configuration(
                 foregroundColor: Theme.textPrimary,
+                h1FontSize: style.h1FontSize,
+                h2FontSize: style.h2FontSize,
+                h3FontSize: style.h3FontSize,
                 bodyFontSize: style.bodyFontSize,
                 codeFontSize: style.codeFontSize,
                 metadataFontSize: style.metadataFontSize,
                 displayTitle: nil,
-                shouldRenderTitleInsideDocument: false,
-                isMessage: false
+                shouldRenderTitleInsideDocument: false
             )
         }
 
         static func message(foregroundColor: Color) -> Configuration {
             Configuration(
                 foregroundColor: foregroundColor,
+                h1FontSize: 22,
+                h2FontSize: 18,
+                h3FontSize: 15,
                 bodyFontSize: 13,
                 codeFontSize: 12,
                 metadataFontSize: nil,
                 displayTitle: nil,
-                shouldRenderTitleInsideDocument: false,
-                isMessage: true
+                shouldRenderTitleInsideDocument: false
             )
         }
     }
@@ -224,12 +267,14 @@ private enum UnifiedMarkdownDocumentBuilder {
     ) -> MarkdownRenderedDocument {
         let effectiveConfiguration = Configuration(
             foregroundColor: configuration.foregroundColor,
+            h1FontSize: configuration.h1FontSize,
+            h2FontSize: configuration.h2FontSize,
+            h3FontSize: configuration.h3FontSize,
             bodyFontSize: configuration.bodyFontSize,
             codeFontSize: configuration.codeFontSize,
             metadataFontSize: configuration.metadataFontSize,
             displayTitle: preparedDocument.resolvedDisplayTitle,
-            shouldRenderTitleInsideDocument: preparedDocument.shouldRenderTitleInsideDocument,
-            isMessage: configuration.isMessage
+            shouldRenderTitleInsideDocument: preparedDocument.shouldRenderTitleInsideDocument
         )
 
         let blocks = MarkdownDocumentRenderer.parse(preparedDocument.bodyMarkdown, baseURL: baseURL)
@@ -247,8 +292,8 @@ private enum UnifiedMarkdownDocumentBuilder {
                 MarkdownAttributedTextFactory.heading(
                     title,
                     level: 1,
-                    color: NSColor.labelColor,
-                    isMessage: effectiveConfiguration.isMessage
+                    fontSize: effectiveConfiguration.headingFontSize(for: 1),
+                    color: NSColor.labelColor
                 ),
                 to: &state.attributedText
             )
@@ -281,8 +326,8 @@ private enum UnifiedMarkdownDocumentBuilder {
             content = MarkdownAttributedTextFactory.heading(
                 text,
                 level: level,
-                color: NSColor.labelColor,
-                isMessage: configuration.isMessage
+                fontSize: configuration.headingFontSize(for: level),
+                color: NSColor.labelColor
             )
         case .paragraph(let text):
             content = MarkdownAttributedTextFactory.body(
@@ -386,21 +431,16 @@ private enum MarkdownAttributedTextFactory {
         return text
     }
 
-    static func heading(_ text: String, level: Int, color: NSColor, isMessage: Bool) -> NSAttributedString {
-        let size: CGFloat
+    static func heading(_ text: String, level: Int, fontSize: CGFloat, color: NSColor) -> NSAttributedString {
         let weight: NSFont.Weight
         switch level {
         case 1:
-            size = isMessage ? 22 : 24
             weight = .bold
         case 2:
-            size = isMessage ? 18 : 20
             weight = .semibold
         case 3:
-            size = isMessage ? 15 : 16
             weight = .semibold
         default:
-            size = 13
             weight = .semibold
         }
 
@@ -410,7 +450,7 @@ private enum MarkdownAttributedTextFactory {
         return NSAttributedString(
             string: text,
             attributes: [
-                .font: NSFont.systemFont(ofSize: size, weight: weight),
+                .font: NSFont.systemFont(ofSize: fontSize, weight: weight),
                 .foregroundColor: color,
                 .paragraphStyle: paragraphStyle,
             ]
@@ -420,7 +460,7 @@ private enum MarkdownAttributedTextFactory {
     static func body(_ source: String, fontSize: CGFloat, foregroundColor: Color) -> NSAttributedString {
         return inlineMarkdownText(
             source,
-            font: .system(size: fontSize),
+            font: .systemFont(ofSize: fontSize),
             foregroundColor: foregroundColor
         )
         .withParagraphStyle(makeBodyParagraphStyle())
@@ -458,7 +498,7 @@ private enum MarkdownAttributedTextFactory {
             )
             let content = inlineMarkdownText(
                 item.text,
-                font: .system(size: fontSize),
+                font: .systemFont(ofSize: fontSize),
                 foregroundColor: foregroundColor
             )
             let mutableContent = NSMutableAttributedString(attributedString: content)
@@ -584,7 +624,7 @@ private enum MarkdownAttributedTextFactory {
 
                 let content = NSMutableAttributedString(attributedString: inlineMarkdownText(
                     text,
-                    font: .system(size: fontSize, weight: rowIndex == 0 ? .semibold : .regular),
+                    font: .systemFont(ofSize: fontSize, weight: rowIndex == 0 ? .semibold : .regular),
                     foregroundColor: foregroundColor
                 ))
                 content.addAttributes(
@@ -648,7 +688,7 @@ private enum MarkdownAttributedTextFactory {
         return attachmentString
     }
 
-    static func inlineMarkdownText(_ source: String, font: Font, foregroundColor: Color) -> NSAttributedString {
+    static func inlineMarkdownText(_ source: String, font: NSFont, foregroundColor: Color) -> NSAttributedString {
         (try? MarkdownInlineTextStyler.makeNSAttributedString(
             from: source,
             font: font,
@@ -656,7 +696,7 @@ private enum MarkdownAttributedTextFactory {
         )) ?? NSAttributedString(
             string: source,
             attributes: [
-                .font: NSFont.systemFont(ofSize: 13),
+                .font: font,
                 .foregroundColor: NSColor.labelColor,
             ]
         )
@@ -995,12 +1035,13 @@ enum DocumentMarkdownDebug {
     static func renderedDocument(
         for content: String,
         mode: MarkdownDocumentPresentation.Mode,
-        baseURL: URL? = nil
+        baseURL: URL? = nil,
+        textScale: CGFloat = 1.0
     ) -> MarkdownRenderedDocument {
         UnifiedMarkdownDocumentBuilder.makeDocument(
             preparedDocument: MarkdownDocumentPresentation.prepare(source: content, mode: mode),
             baseURL: baseURL,
-            configuration: .document(style: DocumentMarkdownStyle(scale: 1.0))
+            configuration: .document(style: DocumentMarkdownStyle(scale: textScale))
         )
     }
 }

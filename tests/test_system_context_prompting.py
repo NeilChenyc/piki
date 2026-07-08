@@ -100,6 +100,34 @@ def test_runtime_contract_forbids_manual_ingest_fallback_when_extract_source_fai
     assert "不能跳过 raw/sources" in runtime_contract
 
 
+def test_runtime_contract_requires_runtime_python_for_cli_helpers():
+    context_contents = {
+        "AGENTS.md": "",
+        "purpose.md": "",
+        "wiki/index.md": "",
+    }
+
+    messages = build_piki_system_context(context_contents=context_contents)
+    runtime_contract = messages[0].content
+
+    assert "$PIKI_RUNTIME_PYTHON -m agent_service.runtime.cli extract-source" in runtime_contract
+    assert "不要直接使用系统 `python` 或 `python3`" in runtime_contract
+
+
+def test_runtime_contract_treats_asset_path_as_metadata_only():
+    context_contents = {
+        "AGENTS.md": "",
+        "purpose.md": "",
+        "wiki/index.md": "",
+    }
+
+    messages = build_piki_system_context(context_contents=context_contents)
+    runtime_contract = messages[0].content
+
+    assert "asset_path 只作为 canonical source 元数据保留" in runtime_contract
+    assert "不要用 Bash 创建 raw/assets" in runtime_contract
+
+
 def test_system_context_serialization_preserves_order_and_content():
     messages = [
         SystemContextMessage(role="system", content="<runtime_contract>alpha</runtime_contract>", name="runtime_contract"),

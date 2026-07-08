@@ -148,6 +148,68 @@ def test_runtime_config_clear_reveals_environment_fallback_source(tmp_path: Path
     assert cleared.json()["api_key_preview"] == "env-...oken"
 
 
+def test_runtime_config_round_trip_tingwu_config_masks_secrets(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("ALIBABA_CLOUD_ACCESS_KEY_ID", raising=False)
+    monkeypatch.delenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET", raising=False)
+    monkeypatch.delenv("ALIYUN_ACCESS_KEY_ID", raising=False)
+    monkeypatch.delenv("ALIYUN_ACCESS_KEY_SECRET", raising=False)
+    monkeypatch.delenv("TINGWU_APP_KEY", raising=False)
+    monkeypatch.delenv("TINGWU_REGION_ID", raising=False)
+    monkeypatch.delenv("appkey", raising=False)
+    monkeypatch.delenv("app_key", raising=False)
+    monkeypatch.delenv("region_id", raising=False)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            runtime_config_path=tmp_path / "runtime-config.json",
+            enable_agent_runtime=False,
+        ),
+        store=store,
+    )
+    client = TestClient(app)
+
+    initial = client.get("/runtime/config")
+    assert initial.status_code == 200
+    assert initial.json()["tingwu_configured"] is False
+    assert initial.json()["tingwu_region_id"] == "cn-beijing"
+
+    update = client.put(
+        "/runtime/config",
+        json={
+            "aliyun_access_key_id": "LTAI-test-access-key",
+            "aliyun_access_key_secret": "aliyun-secret-value",
+            "tingwu_app_key": "tingwu-app-key-value",
+            "tingwu_region_id": "cn-shanghai",
+        },
+    )
+
+    assert update.status_code == 200
+    payload = update.json()
+    assert payload["tingwu_configured"] is True
+    assert payload["tingwu_region_id"] == "cn-shanghai"
+    assert payload["aliyun_access_key_id_preview"] == "LTAI...-key"
+    assert payload["aliyun_access_key_secret_configured"] is True
+    assert payload["tingwu_app_key_preview"] == "ting...alue"
+    assert "aliyun-secret-value" not in update.text
+    assert "tingwu-app-key-value" not in update.text
+
+    fetched = client.get("/runtime/config")
+    assert fetched.status_code == 200
+    assert fetched.json()["tingwu_configured"] is True
+    assert "aliyun-secret-value" not in fetched.text
+    assert "tingwu-app-key-value" not in fetched.text
+
+    cleared = client.put("/runtime/config", json={"clear_tingwu_config": True})
+    assert cleared.status_code == 200
+    assert cleared.json()["tingwu_configured"] is False
+    assert cleared.json()["aliyun_access_key_id_preview"] is None
+    assert cleared.json()["aliyun_access_key_secret_configured"] is False
+    assert cleared.json()["tingwu_app_key_preview"] is None
+    assert cleared.json()["tingwu_region_id"] == "cn-beijing"
+
+
 def test_runtime_config_rejects_conflicting_api_key_and_clear_request(tmp_path: Path):
     client = make_client(tmp_path)
 

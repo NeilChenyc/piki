@@ -52,8 +52,24 @@ def _env_anthropic_auth_token() -> str:
     )
 
 
+def _env_any(*names: str, default: str = "") -> str:
+    for name in names:
+        value = os.environ.get(name)
+        if value is not None and value.strip():
+            return value.strip()
+    return default.strip()
+
+
 def _normalize_optional_text(value: str | None) -> str:
     return (value or "").strip()
+
+
+def _secret_value(value: SecretStr | str | None) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, SecretStr):
+        return value.get_secret_value().strip()
+    return _normalize_optional_text(value)
 
 
 def _mask_api_key(value: str | None) -> str | None:
@@ -72,6 +88,10 @@ class ServiceConfig(BaseModel):
     anthropic_base_url: str = ""
     runtime_api_key: SecretStr | None = Field(default=None, exclude=True, repr=False)
     runtime_api_key_source: str = Field(default="none", exclude=True, repr=False)
+    aliyun_access_key_id: str = ""
+    aliyun_access_key_secret: SecretStr | None = Field(default=None, exclude=True, repr=False)
+    tingwu_app_key: SecretStr | None = Field(default=None, exclude=True, repr=False)
+    tingwu_region_id: str = "cn-beijing"
     enable_agent_runtime: bool = Field(
         default_factory=lambda: env_flag("PIKI_ENABLE_AGENT_RUNTIME", env_flag("PIKI_ENABLE_SDK_RUNTIME"))
     )
@@ -122,6 +142,36 @@ class ServiceConfig(BaseModel):
             self.runtime_api_key = SecretStr(api_key) if api_key else None
             self.runtime_api_key_source = "persisted" if persisted_api_key else ("environment" if env_api_key else "none")
 
+        if "aliyun_access_key_id" not in self.model_fields_set:
+            self.aliyun_access_key_id = _normalize_optional_text(
+                runtime_config.get("aliyun_access_key_id")
+                or _env_any("ALIBABA_CLOUD_ACCESS_KEY_ID", "ALIYUN_ACCESS_KEY_ID")
+            )
+        else:
+            self.aliyun_access_key_id = _normalize_optional_text(self.aliyun_access_key_id)
+
+        if "aliyun_access_key_secret" not in self.model_fields_set:
+            access_key_secret = _normalize_optional_text(
+                runtime_config.get("aliyun_access_key_secret")
+                or _env_any("ALIBABA_CLOUD_ACCESS_KEY_SECRET", "ALIYUN_ACCESS_KEY_SECRET")
+            )
+            self.aliyun_access_key_secret = SecretStr(access_key_secret) if access_key_secret else None
+
+        if "tingwu_app_key" not in self.model_fields_set:
+            app_key = _normalize_optional_text(
+                runtime_config.get("tingwu_app_key")
+                or _env_any("TINGWU_APP_KEY", "appkey", "app_key")
+            )
+            self.tingwu_app_key = SecretStr(app_key) if app_key else None
+
+        if "tingwu_region_id" not in self.model_fields_set:
+            self.tingwu_region_id = _normalize_optional_text(
+                runtime_config.get("tingwu_region_id")
+                or _env_any("TINGWU_REGION_ID", "region_id", default="cn-beijing")
+            ) or "cn-beijing"
+        else:
+            self.tingwu_region_id = _normalize_optional_text(self.tingwu_region_id) or "cn-beijing"
+
     @property
     def api_key(self) -> str:
         if self.runtime_api_key is None:
@@ -139,6 +189,32 @@ class ServiceConfig(BaseModel):
     @property
     def api_key_source(self) -> str:
         return self.runtime_api_key_source
+
+    @property
+    def aliyun_access_key_secret_value(self) -> str:
+        return _secret_value(self.aliyun_access_key_secret)
+
+    @property
+    def tingwu_app_key_value(self) -> str:
+        return _secret_value(self.tingwu_app_key)
+
+    @property
+    def tingwu_configured(self) -> bool:
+        return bool(
+            self.aliyun_access_key_id.strip()
+            and self.aliyun_access_key_secret_value
+            and self.tingwu_app_key_value
+        )
+
+    def tingwu_environment(self) -> dict[str, str]:
+        if not self.tingwu_configured:
+            return {}
+        return {
+            "ALIBABA_CLOUD_ACCESS_KEY_ID": self.aliyun_access_key_id.strip(),
+            "ALIBABA_CLOUD_ACCESS_KEY_SECRET": self.aliyun_access_key_secret_value,
+            "TINGWU_APP_KEY": self.tingwu_app_key_value,
+            "TINGWU_REGION_ID": self.tingwu_region_id or "cn-beijing",
+        }
 
     @property
     def agent_runtime_configured(self) -> bool:
@@ -161,6 +237,11 @@ class ServiceConfig(BaseModel):
             "api_key_preview": self.api_key_preview,
             "api_key_source": self.api_key_source,
             "agent_runtime_enabled": self.enable_agent_runtime,
+            "tingwu_configured": self.tingwu_configured,
+            "tingwu_region_id": self.tingwu_region_id or "cn-beijing",
+            "aliyun_access_key_id_preview": _mask_api_key(self.aliyun_access_key_id),
+            "aliyun_access_key_secret_configured": bool(self.aliyun_access_key_secret_value),
+            "tingwu_app_key_preview": _mask_api_key(self.tingwu_app_key_value),
         }
 
     def update_runtime_config(
@@ -170,6 +251,11 @@ class ServiceConfig(BaseModel):
         anthropic_base_url: str | None = None,
         api_key: str | None = None,
         clear_api_key: bool = False,
+        aliyun_access_key_id: str | None = None,
+        aliyun_access_key_secret: str | None = None,
+        tingwu_app_key: str | None = None,
+        tingwu_region_id: str | None = None,
+        clear_tingwu_config: bool = False,
     ) -> dict[str, Any]:
         runtime_config = self._read_runtime_config_file()
 
@@ -194,6 +280,35 @@ class ServiceConfig(BaseModel):
             if normalized_api_key:
                 runtime_config["api_key"] = normalized_api_key
 
+        if clear_tingwu_config:
+            for key in ("aliyun_access_key_id", "aliyun_access_key_secret", "tingwu_app_key", "tingwu_region_id"):
+                runtime_config.pop(key, None)
+        else:
+            if aliyun_access_key_id is not None:
+                normalized_access_key_id = _normalize_optional_text(aliyun_access_key_id)
+                if normalized_access_key_id:
+                    runtime_config["aliyun_access_key_id"] = normalized_access_key_id
+                else:
+                    runtime_config.pop("aliyun_access_key_id", None)
+
+            if aliyun_access_key_secret is not None:
+                normalized_access_key_secret = _normalize_optional_text(aliyun_access_key_secret)
+                if normalized_access_key_secret:
+                    runtime_config["aliyun_access_key_secret"] = normalized_access_key_secret
+                else:
+                    runtime_config.pop("aliyun_access_key_secret", None)
+
+            if tingwu_app_key is not None:
+                normalized_app_key = _normalize_optional_text(tingwu_app_key)
+                if normalized_app_key:
+                    runtime_config["tingwu_app_key"] = normalized_app_key
+                else:
+                    runtime_config.pop("tingwu_app_key", None)
+
+            if tingwu_region_id is not None:
+                normalized_region_id = _normalize_optional_text(tingwu_region_id) or "cn-beijing"
+                runtime_config["tingwu_region_id"] = normalized_region_id
+
         self._write_runtime_config_file(runtime_config)
         self.reload_runtime_config()
         return self.runtime_config_response()
@@ -209,6 +324,24 @@ class ServiceConfig(BaseModel):
         api_key = persisted_api_key or env_api_key
         self.runtime_api_key = SecretStr(api_key) if api_key else None
         self.runtime_api_key_source = "persisted" if persisted_api_key else ("environment" if env_api_key else "none")
+        self.aliyun_access_key_id = _normalize_optional_text(
+            runtime_config.get("aliyun_access_key_id")
+            or _env_any("ALIBABA_CLOUD_ACCESS_KEY_ID", "ALIYUN_ACCESS_KEY_ID")
+        )
+        access_key_secret = _normalize_optional_text(
+            runtime_config.get("aliyun_access_key_secret")
+            or _env_any("ALIBABA_CLOUD_ACCESS_KEY_SECRET", "ALIYUN_ACCESS_KEY_SECRET")
+        )
+        self.aliyun_access_key_secret = SecretStr(access_key_secret) if access_key_secret else None
+        app_key = _normalize_optional_text(
+            runtime_config.get("tingwu_app_key")
+            or _env_any("TINGWU_APP_KEY", "appkey", "app_key")
+        )
+        self.tingwu_app_key = SecretStr(app_key) if app_key else None
+        self.tingwu_region_id = _normalize_optional_text(
+            runtime_config.get("tingwu_region_id")
+            or _env_any("TINGWU_REGION_ID", "region_id", default="cn-beijing")
+        ) or "cn-beijing"
 
     def _read_runtime_config_file(self) -> dict[str, str]:
         path = self.runtime_config_path.expanduser()
@@ -223,7 +356,15 @@ class ServiceConfig(BaseModel):
         return {
             key: _normalize_optional_text(value)
             for key, value in payload.items()
-            if key in {"agent_model", "anthropic_base_url", "api_key"} and isinstance(value, str)
+            if key in {
+                "agent_model",
+                "anthropic_base_url",
+                "api_key",
+                "aliyun_access_key_id",
+                "aliyun_access_key_secret",
+                "tingwu_app_key",
+                "tingwu_region_id",
+            } and isinstance(value, str)
         }
 
     def _write_runtime_config_file(self, payload: dict[str, str]) -> None:
@@ -232,7 +373,15 @@ class ServiceConfig(BaseModel):
         serialized = {
             key: value
             for key, value in payload.items()
-            if key in {"agent_model", "anthropic_base_url", "api_key"} and _normalize_optional_text(value)
+            if key in {
+                "agent_model",
+                "anthropic_base_url",
+                "api_key",
+                "aliyun_access_key_id",
+                "aliyun_access_key_secret",
+                "tingwu_app_key",
+                "tingwu_region_id",
+            } and _normalize_optional_text(value)
         }
         serialized_text = json.dumps(serialized, indent=2, sort_keys=True)
         temp_path: Path | None = None

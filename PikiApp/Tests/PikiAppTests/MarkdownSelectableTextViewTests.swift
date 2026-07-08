@@ -66,6 +66,32 @@ struct MarkdownSelectableTextViewTests {
 
     @MainActor
     @Test
+    func prefersMeasuredLayoutWidthWhenCurrentWidthIsStaleAfterPaneShrinks() {
+        let width = MarkdownSelectableTextView.measurementWidth(
+            proposalWidth: nil,
+            layoutWidth: 420,
+            currentWidth: 760,
+            lastKnownWidth: 760
+        )
+
+        #expect(width == 420)
+    }
+
+    @MainActor
+    @Test
+    func usesNarrowerMeasuredWidthWhenProposalAndLayoutWidthDisagree() {
+        let width = MarkdownSelectableTextView.measurementWidth(
+            proposalWidth: 760,
+            layoutWidth: 420,
+            currentWidth: 760,
+            lastKnownWidth: 760
+        )
+
+        #expect(width == 420)
+    }
+
+    @MainActor
+    @Test
     func onlyUpdatesNativeTextWhenAttributedContentChanges() {
         let existing = NSAttributedString(string: "same")
         let incoming = NSAttributedString(string: "same")
@@ -73,6 +99,21 @@ struct MarkdownSelectableTextViewTests {
 
         #expect(MarkdownSelectableTextView.shouldUpdateText(existing: existing, incoming: incoming) == false)
         #expect(MarkdownSelectableTextView.shouldUpdateText(existing: existing, incoming: changed))
+    }
+
+    @MainActor
+    @Test
+    func updatesNativeTextWhenOnlyFontChanges() {
+        let small = NSAttributedString(
+            string: "same",
+            attributes: [.font: NSFont.systemFont(ofSize: 13)]
+        )
+        let large = NSAttributedString(
+            string: "same",
+            attributes: [.font: NSFont.systemFont(ofSize: 18)]
+        )
+
+        #expect(MarkdownSelectableTextView.shouldUpdateText(existing: small, incoming: large))
     }
 
     @MainActor

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from agent_service.application.events import EventPublisher
+from agent_service.config import ServiceConfig
 from agent_service.models import EventType, TaskCreateRequest, TaskStatus
 from agent_service.store import SQLiteStore
 from agent_service.system.source_scan import scan_sources_for_updates
@@ -10,9 +11,10 @@ from agent_service.workflows.podcast import PodcastWorkflowError, run_podcast_tr
 
 
 class DeterministicActionExecutor:
-    def __init__(self, *, store: SQLiteStore, events: EventPublisher):
+    def __init__(self, *, store: SQLiteStore, events: EventPublisher, config: ServiceConfig | None = None):
         self.store = store
         self.events = events
+        self.config = config
 
     def can_handle(self, request: TaskCreateRequest) -> bool:
         action = str(request.action_context.get("action") or "").strip()
@@ -53,20 +55,23 @@ class DeterministicActionExecutor:
                     episode_url=podcast_url,
                     events=self.events,
                     task_id=task_id,
+                    config=self.config,
                 )
             except PodcastWorkflowError as exc:
+                user_error = exc.user_error
                 self.store.update_task(
                     task_id,
                     status=TaskStatus.FAILED,
-                    summary=str(exc),
+                    summary=user_error.message,
                     output={
-                        "summary": str(exc),
+                        "summary": user_error.message,
+                        "error": user_error.to_event_payload(),
                         "action_context": dict(request.action_context or {}),
                         "selected_paths": list(request.selected_paths),
                         "conversation_id": request.conversation_id or task_id,
                     },
                 )
-                self.events.task_failed(task_id, str(exc))
+                self.events.task_failed(task_id, user_error)
                 return (True, None) if return_payload else True
 
             rescan = scan_sources_for_updates(vault=vault, store=self.store)

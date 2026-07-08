@@ -30,6 +30,20 @@ schemes:
       config: Release
     analyze:
       config: Debug
+  PikiApp Onboarding:
+    build:
+      targets:
+        PikiApp: all
+    run:
+      config: Debug
+      environmentVariables:
+        PIKI_FORCE_ONBOARDING: "1"
+    archive:
+      config: Release
+    profile:
+      config: Release
+    analyze:
+      config: Debug
 
 targets:
   PikiApp:

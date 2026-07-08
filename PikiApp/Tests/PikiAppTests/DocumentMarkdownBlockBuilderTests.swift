@@ -117,6 +117,37 @@ struct DocumentMarkdownBlockBuilderTests {
 
     @MainActor
     @Test
+    func documentPreviewScaleChangesTitleAndBodyFonts() throws {
+        let source = """
+        ---
+        title: 页面标题
+        kind: memo
+        ---
+
+        第一段正文
+        """
+        let normal = DocumentMarkdownDebug.renderedDocument(
+            for: source,
+            mode: .documentPage(displayTitle: "页面标题"),
+            textScale: 1.0
+        )
+        let enlarged = DocumentMarkdownDebug.renderedDocument(
+            for: source,
+            mode: .documentPage(displayTitle: "页面标题"),
+            textScale: 1.3
+        )
+
+        let normalTitleFont = try #require(normal.attributedText.font(containing: "页面标题"))
+        let enlargedTitleFont = try #require(enlarged.attributedText.font(containing: "页面标题"))
+        let normalBodyFont = try #require(normal.attributedText.font(containing: "第一段正文"))
+        let enlargedBodyFont = try #require(enlarged.attributedText.font(containing: "第一段正文"))
+
+        #expect(enlargedTitleFont.pointSize > normalTitleFont.pointSize)
+        #expect(enlargedBodyFont.pointSize > normalBodyFont.pointSize)
+    }
+
+    @MainActor
+    @Test
     func preservesListItemParagraphSpacingWithinSingleListItem() {
         let items = MessageMarkdownDebug.listItemTexts(
             for: """
@@ -216,5 +247,13 @@ struct DocumentMarkdownBlockBuilderTests {
         }
 
         #expect(foundTableParagraph)
+    }
+}
+
+private extension NSAttributedString {
+    func font(containing substring: String) -> NSFont? {
+        let range = (string as NSString).range(of: substring)
+        guard range.location != NSNotFound else { return nil }
+        return attribute(.font, at: range.location, effectiveRange: nil) as? NSFont
     }
 }

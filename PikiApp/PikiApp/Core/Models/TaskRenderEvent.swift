@@ -11,7 +11,7 @@ enum TaskRenderEvent {
     case inputResolved
     case completed(content: String?)
     case cancelled(content: String?)
-    case failed(message: String?)
+    case failed(TaskFailurePresentation)
     case runStarted
     case runCompleted(preview: String?)
     case ignored(statusText: String?)
@@ -67,7 +67,7 @@ extension TaskEvent {
         case "task.cancelled":
             return .cancelled(content: payload.summary ?? payload.content)
         case "task.failed":
-            return .failed(message: payload.error ?? payload.summary)
+            return .failed(payload.failurePresentation)
         case "agent.run.started":
             return .runStarted
         case "agent.run.completed":

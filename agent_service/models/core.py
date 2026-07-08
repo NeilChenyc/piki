@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
+
+UTC = timezone.utc
 
 
 def utc_now_iso() -> str:

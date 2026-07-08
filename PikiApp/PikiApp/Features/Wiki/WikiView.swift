@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 struct WikiView: View {
     @Environment(AppState.self) private var appState
@@ -19,6 +20,7 @@ struct WikiView: View {
                             .textFieldStyle(.plain)
                             .font(.system(size: 12))
                     }
+                    .popoverTip(WikiTip())
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(Theme.elevatedCardBackground)

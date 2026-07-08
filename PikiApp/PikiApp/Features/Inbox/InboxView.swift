@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 struct InboxView: View {
     @Environment(AppState.self) private var appState
@@ -15,13 +16,20 @@ struct InboxView: View {
                 searchQuery: $viewModel.searchQuery
             )
                 .background(Theme.primaryPanelBackground)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .frame(idealWidth: DetailLayoutGuide.inboxPrimaryIdealWidth)
+                .frame(
+                    minWidth: DetailLayoutGuide.inboxPrimaryMinWidthResolved,
+                    idealWidth: DetailLayoutGuide.inboxPrimaryIdealWidth,
+                    maxHeight: .infinity
+                )
 
             inboxDetailPane
                 .background(Theme.secondaryPanelBackground)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .frame(idealWidth: DetailLayoutGuide.inboxSecondaryIdealWidth)
+                .frame(
+                    minWidth: DetailLayoutGuide.inboxSecondaryMinWidthResolved,
+                    idealWidth: DetailLayoutGuide.inboxSecondaryIdealWidth,
+                    maxWidth: .infinity,
+                    maxHeight: .infinity
+                )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.primaryPanelBackground)
@@ -38,6 +46,7 @@ struct InboxView: View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("资料箱")
+                    .popoverTip(InboxTip())
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
                 Text("拖入文件以添加到知识库")

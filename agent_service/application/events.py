@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+from agent_service.diagnostics import runtime_log
+from agent_service.errors import UserFacingError
 from agent_service.models import EventType, TaskEvent
 from agent_service.store import SQLiteStore
 
@@ -94,8 +96,23 @@ class EventPublisher:
             payload["journal_entry_id"] = journal_entry_id
         return self.emit(task_id, EventType.TASK_COMPLETED, payload)
 
-    def task_failed(self, task_id: str, error: str, **extra: Any) -> TaskEvent:
-        return self.emit(task_id, EventType.TASK_FAILED, {"error": error, **extra})
+    def task_failed(self, task_id: str, error: str | UserFacingError, **extra: Any) -> TaskEvent:
+        if isinstance(error, UserFacingError):
+            if error.technical_detail:
+                runtime_log(
+                    "task_error",
+                    "user_facing_error",
+                    extra={
+                        "task_id": task_id,
+                        "code": error.code,
+                        "technical_detail": error.technical_detail.replace("\n", " | "),
+                    },
+                )
+            payload = error.to_event_payload()
+        else:
+            payload = {"error": error}
+        payload.update(extra)
+        return self.emit(task_id, EventType.TASK_FAILED, payload)
 
     def task_cancelled(self, task_id: str, reason: str, **extra: Any) -> TaskEvent:
         return self.emit(task_id, EventType.TASK_CANCELLED, {"reason": reason, "summary": reason, **extra})

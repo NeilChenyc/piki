@@ -59,4 +59,38 @@ struct MarkdownInlineTextStyler {
 
         return mutable
     }
+
+    static func makeNSAttributedString(
+        from source: String,
+        font: NSFont,
+        foregroundColor: Color,
+        linkColor: NSColor = .linkColor
+    ) throws -> NSAttributedString {
+        let attributed = try makeAttributedString(
+            from: source,
+            font: .system(size: font.pointSize),
+            foregroundColor: foregroundColor,
+            linkColor: Color(nsColor: linkColor)
+        )
+        let mutable = NSMutableAttributedString(attributedString: NSAttributedString(attributed))
+        let fullRange = NSRange(location: 0, length: mutable.length)
+
+        if fullRange.length > 0 {
+            mutable.addAttributes([
+                .font: font,
+                .foregroundColor: NSColor(foregroundColor),
+            ], range: fullRange)
+        }
+
+        mutable.enumerateAttribute(.link, in: fullRange) { value, range, _ in
+            guard value != nil else { return }
+            mutable.addAttributes([
+                .foregroundColor: linkColor,
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .cursor: NSCursor.pointingHand,
+            ], range: range)
+        }
+
+        return mutable
+    }
 }

@@ -21,6 +21,6 @@ struct PikiLogoStyleTests {
     func heroLogoIsDoubledFromPreviousCompactSize() {
         let style = PikiLogo.Style.hero
 
-        #expect(style.height >= 120)
+        #expect(style.height == 156)
     }
 }

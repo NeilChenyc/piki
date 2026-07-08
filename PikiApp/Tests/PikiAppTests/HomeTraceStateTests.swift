@@ -83,6 +83,50 @@ struct HomeTraceStateTests {
         #expect(reasoning.category == "model")
         #expect(reasoning.status == "running")
     }
+
+    @Test
+    func structuredTaskFailureUsesFriendlyMessageAndAction() async throws {
+        let runtime = HomeTraceRuntimeService()
+        let appState = configuredAppState(runtime: runtime)
+        let viewModel = HomeViewModel()
+
+        viewModel.sendMessage("请播客转录", appState: appState)
+        await Task.yield()
+
+        let assistant = try #require(viewModel.messages.last)
+        let event = try JSONDecoder().decode(
+            TaskEvent.self,
+            from: Data(
+                """
+                {
+                  "id": "evt-structured-error",
+                  "task_id": "task-1",
+                  "type": "task.failed",
+                  "payload": {
+                    "error": "AccessKey ID 不存在或不属于当前阿里云账号。",
+                    "error_code": "podcast.tingwu.invalid_access_key",
+                    "error_title": "阿里云 AccessKey 无效",
+                    "error_message": "AccessKey ID 不存在或不属于当前阿里云账号。",
+                    "recovery_suggestion": "请在设置页检查 AccessKey ID 是否复制完整，且没有误填为 AppKey。",
+                    "retryable": false,
+                    "action_label": "打开播客转录设置",
+                    "action_target": "settings.tingwu"
+                  }
+                }
+                """.utf8
+            )
+        )
+
+        _ = viewModel.handleForTesting(event, assistantMessageId: assistant.id)
+
+        let updatedAssistant = try #require(viewModel.messages.last)
+        #expect(updatedAssistant.runStatus == "failed")
+        #expect(updatedAssistant.content.contains("阿里云 AccessKey 无效"))
+        #expect(updatedAssistant.content.contains("AccessKey ID 不存在或不属于当前阿里云账号。"))
+        #expect(updatedAssistant.content.contains("Traceback") == false)
+        #expect(updatedAssistant.errorAction?.label == "打开播客转录设置")
+        #expect(updatedAssistant.errorAction?.target == "settings.tingwu")
+    }
 }
 
 @MainActor

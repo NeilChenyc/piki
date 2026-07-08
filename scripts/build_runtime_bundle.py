@@ -12,23 +12,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP_DIR = ROOT / "PikiApp"
 BUNDLE_ROOT = APP_DIR / ".build" / "runtime-bundle"
-RESOURCES_ROOT = BUNDLE_ROOT / "Contents" / "Resources" / "PikiRuntime"
+CACHE_ROOT = APP_DIR / ".build" / "runtime-cache"
 PYTHON_VERSION = "3.12.13"
 RELEASE_TAG = "20260610"
 
 
 def main() -> int:
     arch = detect_arch()
-    python_root = RESOURCES_ROOT / "Python"
-    site_packages = RESOURCES_ROOT / "site-packages"
     python_url = release_url(arch)
+    staging_root = BUNDLE_ROOT.with_name(f"{BUNDLE_ROOT.name}.staging")
 
-    shutil.rmtree(BUNDLE_ROOT, ignore_errors=True)
-    site_packages.mkdir(parents=True, exist_ok=True)
-
-    download_and_extract_python(python_url, python_root)
-    install_packages(python_root, site_packages)
-    write_metadata(arch)
+    shutil.rmtree(staging_root, ignore_errors=True)
+    try:
+        build_bundle(staging_root, arch=arch, python_url=python_url)
+        replace_bundle(staging_root, BUNDLE_ROOT)
+    except Exception:
+        shutil.rmtree(staging_root, ignore_errors=True)
+        raise
     print(BUNDLE_ROOT)
     return 0
 
@@ -47,10 +47,35 @@ def release_url(arch: str) -> str:
     return f"https://github.com/astral-sh/python-build-standalone/releases/download/{RELEASE_TAG}/{filename}"
 
 
+def build_bundle(bundle_root: Path, *, arch: str, python_url: str) -> None:
+    resources_root = bundle_root / "Contents" / "Resources" / "PikiRuntime"
+    python_root = resources_root / "Python"
+    site_packages = resources_root / "site-packages"
+
+    site_packages.mkdir(parents=True, exist_ok=True)
+    download_and_extract_python(python_url, python_root)
+    install_packages(python_root, site_packages)
+    write_metadata(arch, bundle_root=bundle_root)
+
+
+def replace_bundle(staging_root: Path, target_root: Path) -> None:
+    target_root.parent.mkdir(parents=True, exist_ok=True)
+    backup_root = target_root.with_name(f"{target_root.name}.previous")
+    shutil.rmtree(backup_root, ignore_errors=True)
+    if target_root.exists():
+        shutil.move(str(target_root), str(backup_root))
+    try:
+        shutil.move(str(staging_root), str(target_root))
+    except Exception:
+        if backup_root.exists() and not target_root.exists():
+            shutil.move(str(backup_root), str(target_root))
+        raise
+    shutil.rmtree(backup_root, ignore_errors=True)
+
+
 def download_and_extract_python(url: str, target: Path) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
-        archive = Path(tmpdir) / "python.tar.gz"
-        subprocess.run(["/usr/bin/curl", "-L", "--fail", "-o", str(archive), url], check=True)
+        archive = cached_python_archive(url)
         extract_root = Path(tmpdir) / "extract"
         extract_root.mkdir(parents=True, exist_ok=True)
         with tarfile.open(archive, mode="r:gz") as tar:
@@ -59,6 +84,22 @@ def download_and_extract_python(url: str, target: Path) -> None:
         if source_root is None:
             raise SystemExit("Python archive did not contain an expected root directory.")
         shutil.move(str(source_root), str(target))
+
+
+def cached_python_archive(url: str) -> Path:
+    CACHE_ROOT.mkdir(parents=True, exist_ok=True)
+    archive = CACHE_ROOT / Path(url).name
+    if archive.exists() and archive.stat().st_size > 0:
+        return archive
+
+    temp_archive = archive.with_name(f"{archive.name}.tmp")
+    temp_archive.unlink(missing_ok=True)
+    try:
+        subprocess.run(["/usr/bin/curl", "-L", "--fail", "-o", str(temp_archive), url], check=True)
+        temp_archive.replace(archive)
+    finally:
+        temp_archive.unlink(missing_ok=True)
+    return archive
 
 
 def install_packages(python_root: Path, site_packages: Path) -> None:
@@ -116,8 +157,9 @@ def _ignore_workspace_artifacts(current_dir: str, names: list[str]) -> set[str]:
     return ignored
 
 
-def write_metadata(arch: str) -> None:
-    metadata = BUNDLE_ROOT / "Contents" / "Resources" / "runtime-paths.json"
+def write_metadata(arch: str, *, bundle_root: Path | None = None) -> None:
+    root = bundle_root or BUNDLE_ROOT
+    metadata = root / "Contents" / "Resources" / "runtime-paths.json"
     metadata.parent.mkdir(parents=True, exist_ok=True)
     metadata.write_text(
         (

@@ -28,13 +28,13 @@ struct WikiPageContentView: View {
                 Spacer()
 
                 if wikiViewModel.isEditingSelectedPage && wikiViewModel.selectedPage?.id == page.id {
-                    Button("Cancel", role: .cancel) {
+                    Button("取消", role: .cancel) {
                         wikiViewModel.cancelEditingSelectedPage()
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
 
-                    Button("Save", systemImage: "checkmark") {
+                    Button("保存", systemImage: "checkmark") {
                         do {
                             try wikiViewModel.saveEditingSelectedPage()
                         } catch {
@@ -59,7 +59,7 @@ struct WikiPageContentView: View {
                     .controlSize(.small)
                     .disabled(!wikiViewModel.canIncreasePreviewTextScale)
 
-                    Button("Edit", systemImage: "pencil") {
+                    Button("编辑", systemImage: "pencil") {
                         wikiViewModel.startEditingSelectedPage()
                     }
                     .buttonStyle(.bordered)
@@ -71,23 +71,22 @@ struct WikiPageContentView: View {
 
             Divider()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    if wikiViewModel.isEditingSelectedPage && wikiViewModel.selectedPage?.id == page.id {
-                        if let editingText = wikiViewModel.editingText {
-                            WikiMarkdownEditorView(
-                                text: Binding(
-                                    get: { wikiViewModel.editingText ?? editingText },
-                                    set: { wikiViewModel.updateDraftForSelectedPage($0) }
-                                )
-                            )
-                            .padding(.horizontal, 24)
-                            .padding(.top, 24)
-                            .padding(.bottom, 24)
-                        }
-                    } else {
+            if wikiViewModel.isEditingSelectedPage && wikiViewModel.selectedPage?.id == page.id {
+                WikiMarkdownEditorView(
+                    text: Binding(
+                        get: { wikiViewModel.editingText ?? page.content },
+                        set: { wikiViewModel.updateDraftForSelectedPage($0) }
+                    )
+                )
+                .padding(.horizontal, 24)
+                .padding(.top, 24)
+                .padding(.bottom, 24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
                         if page.content.isEmpty {
-                            Text("No content yet")
+                            Text("暂无内容")
                                 .font(.system(size: 13))
                                 .foregroundStyle(Theme.textTertiary)
                                 .padding(24)
@@ -105,7 +104,7 @@ struct WikiPageContentView: View {
 
                         if !page.relatedConcepts.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Related Concepts")
+                                Text("相关概念")
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundStyle(Theme.textSecondary)
                                 FlowLayout(spacing: 6) {
@@ -124,10 +123,10 @@ struct WikiPageContentView: View {
                             .padding(.bottom, 24)
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
-                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Theme.primaryPanelBackground)

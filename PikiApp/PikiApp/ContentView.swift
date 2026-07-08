@@ -2,9 +2,12 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState
+    @Environment(OnboardingViewModel.self) private var onboardingVM
+    @Environment(RuntimeSettingsViewModel.self) private var runtimeSettingsVM
 
     var body: some View {
         @Bindable var appState = appState
+        @Bindable var onboardingVM = onboardingVM
 
         NavigationSplitView(columnVisibility: $appState.sidebarVisibility) {
             SidebarView()
@@ -35,6 +38,10 @@ struct ContentView: View {
             .background(Theme.primaryPanelBackground)
         }
         .background(Theme.appBackground)
+        .sheet(isPresented: $onboardingVM.showWizard) {
+            SetupWizardSheet(viewModel: onboardingVM)
+                .interactiveDismissDisabled()
+        }
     }
 }
 
@@ -46,4 +53,5 @@ struct ContentView: View {
         .environment(InboxViewModel())
         .environment(HealthViewModel())
         .environment(RuntimeSettingsViewModel())
+        .environment(OnboardingViewModel())
 }
