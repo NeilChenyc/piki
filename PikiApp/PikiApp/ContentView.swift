@@ -52,6 +52,7 @@ struct ContentView: View {
         .environment(WikiViewModel())
         .environment(InboxViewModel())
         .environment(HealthViewModel())
+        .environment(InspirationViewModel())
         .environment(RuntimeSettingsViewModel())
         .environment(OnboardingViewModel())
 }

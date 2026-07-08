@@ -45,6 +45,22 @@ final class HTTPRuntimeService: RuntimeServiceProtocol {
         try await client.processIngestQueue(vaultPath: vaultPath)
     }
 
+    func listInspirations(vaultPath: String, query: String?) async throws -> [InspirationDTO] {
+        try await client.listInspirations(vaultPath: vaultPath, query: query)
+    }
+    func createInspiration(_ request: InspirationCreateRequest) async throws -> InspirationDTO {
+        try await client.createInspiration(request)
+    }
+    func updateInspiration(id: String, request: InspirationUpdateRequest) async throws -> InspirationDTO {
+        try await client.updateInspiration(id: id, request: request)
+    }
+    func deleteInspiration(id: String, vaultPath: String) async throws {
+        try await client.deleteInspiration(id: id, vaultPath: vaultPath)
+    }
+    func compileInspirations(vaultPath: String) async throws -> InspirationCompileResponse {
+        try await client.compileInspirations(vaultPath: vaultPath)
+    }
+
     func runLint(vaultPath: String) async throws -> LintResultDTO { try await client.runLint(vaultPath: vaultPath) }
     func fixLint(vaultPath: String, issueIds: [String]?) async throws {
         try await client.fixLint(vaultPath: vaultPath, issueIds: issueIds)

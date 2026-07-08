@@ -6,6 +6,7 @@ from agent_service.api.routes import (
     register_approval_routes,
     register_health_routes,
     register_ingest_queue_routes,
+    register_inspiration_routes,
     register_journal_routes,
     register_lint_routes,
     register_source_routes,
@@ -20,6 +21,7 @@ from agent_service.application.maintenance import (
     LintService,
     SourceService,
 )
+from agent_service.application.inspirations import InspirationService
 from agent_service.application.task_executor import TaskExecutor
 from agent_service.application.task_router import TaskRouter
 from agent_service.application.task_service import TaskService
@@ -54,6 +56,11 @@ def create_app(config: ServiceConfig | None = None, store: SQLiteStore | None = 
     ingest_queue_service = IngestQueueService(sqlite_store, events)
     lint_service = LintService(sqlite_store, events)
     approval_service = ApprovalService(sqlite_store, events)
+    inspiration_service = InspirationService(
+        config=service_config,
+        task_service=task_service,
+        runner=runner,
+    )
 
     app = FastAPI(title="Piki Local Agent Service")
     app.state.config = service_config
@@ -67,6 +74,7 @@ def create_app(config: ServiceConfig | None = None, store: SQLiteStore | None = 
     register_journal_routes(app, journal_service=journal_service)
     register_source_routes(app, source_service=source_service)
     register_ingest_queue_routes(app, ingest_queue_service=ingest_queue_service)
+    register_inspiration_routes(app, inspiration_service=inspiration_service)
     register_lint_routes(app, lint_service=lint_service)
     register_approval_routes(app, approval_service=approval_service)
     return app

@@ -36,6 +36,7 @@
 		6AF4D9A1F1C3BBA10BC206B8 /* HealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2039447DE882C09CB87FE2A6 /* HealthView.swift */; };
 		6E28497689FB6695EC1FD09A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7249FFE507E86DAE979CD97C /* HomeView.swift */; };
 		71D3880185003E3C1DFBAA97 /* HealthScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB2F2D1BA49A3FF13C4F3AA /* HealthScoreCard.swift */; };
+		7472F6980F7E4101BA70B441 /* InspirationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D07B7675CC84F948499CE50 /* InspirationPanel.swift */; };
 		785B2C38CA4974302553A167 /* MarkdownSelectableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157B15D8E2B21CDB076AE300 /* MarkdownSelectableTextView.swift */; };
 		7AA20E82C5A7D0271053F14B /* PikiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C8C20519720DEC42158EF5 /* PikiApp.swift */; };
 		86F87B0F69A31122F444BBCD /* DetailLayoutGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63F663B3B3C8152D0FD73DF /* DetailLayoutGuide.swift */; };
@@ -71,6 +72,7 @@
 		4EF9E565EFBF4D1BACE822DB /* UseCaseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54D37580EEDD40DBB643BB0A /* UseCaseCard.swift */; };
 		2D6117315FBE4CD7B6AACBF4 /* UseCaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4890EAA1B3EA4F8C940A3030 /* UseCaseItem.swift */; };
 		C9DA99A5ECFC4098B7971877 /* UseCaseShowcase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFCEF38E1B343598FC3D6AC /* UseCaseShowcase.swift */; };
+		D7D9E38E084D479EA9176884 /* InspirationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D50AE641EC34948A3FF29AF /* InspirationViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,6 +85,7 @@
 		158490133DDBD171883C03FA /* LintComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LintComponents.swift; sourceTree = "<group>"; };
 		1996F0136E908523C15056A5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1ADC2BA18F8E68F018CF68C6 /* SidebarNavRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarNavRow.swift; sourceTree = "<group>"; };
+		1D07B7675CC84F948499CE50 /* InspirationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspirationPanel.swift; sourceTree = "<group>"; };
 		2039447DE882C09CB87FE2A6 /* HealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthView.swift; sourceTree = "<group>"; };
 		29A756DA17731FCFE154EADB /* ChatBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubbleView.swift; sourceTree = "<group>"; };
 		2D7E221313C9D9DE368238DC /* PikiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PikiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,6 +100,7 @@
 		5CD4C667EA0FE13258E24CE9 /* MarkdownDocumentPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownDocumentPresentation.swift; sourceTree = "<group>"; };
 		5F037D17D8F871F0FACF1600 /* RuntimeServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeServiceProtocol.swift; sourceTree = "<group>"; };
 		66CD7E7A8F080D54BFD585E8 /* PikiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikiLogo.swift; sourceTree = "<group>"; };
+		6D50AE641EC34948A3FF29AF /* InspirationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspirationViewModel.swift; sourceTree = "<group>"; };
 		6FF7EEE571B61A88771D7640 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7249FFE507E86DAE979CD97C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7CB66741B165A1E69A2BD665 /* HTTPRuntimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRuntimeService.swift; sourceTree = "<group>"; };
@@ -181,6 +185,7 @@
 			children = (
 				95F463AF43465D6C7318E53A /* Health */,
 				54E19A06F67A8E8CA246AC12 /* Home */,
+				16E13BD0ABFA4C7B80495D8A /* Inspiration */,
 				5AED57BC8281E4C954E19EAF /* Inbox */,
 				EF21444027C2B972158E94CF /* Settings */,
 				FD809E385332C6BAAD234B8E /* Sidebar */,
@@ -203,6 +208,15 @@
 				36815EBD6E13953F8700D0AE /* VaultStatusCard.swift */,
 			);
 			path = Home;
+			sourceTree = "<group>";
+		};
+		16E13BD0ABFA4C7B80495D8A /* Inspiration */ = {
+			isa = PBXGroup;
+			children = (
+				1D07B7675CC84F948499CE50 /* InspirationPanel.swift */,
+				6D50AE641EC34948A3FF29AF /* InspirationViewModel.swift */,
+			);
+			path = Inspiration;
 			sourceTree = "<group>";
 		};
 		5AED57BC8281E4C954E19EAF /* Inbox */ = {
@@ -488,6 +502,8 @@
 				934DDD35050AA64D863CD91E /* HealthViewModel.swift in Sources */,
 				6E28497689FB6695EC1FD09A /* HomeView.swift in Sources */,
 				2397CE855FBD90E003163703 /* HomeViewModel.swift in Sources */,
+				7472F6980F7E4101BA70B441 /* InspirationPanel.swift in Sources */,
+				D7D9E38E084D479EA9176884 /* InspirationViewModel.swift in Sources */,
 				667A500AE8D9048DFE319D00 /* InboxFileRow.swift in Sources */,
 				315953CB83AD0A6E40A02938 /* InboxFilterBar.swift in Sources */,
 				5FBF9300D3179D2B94309FF4 /* InboxView.swift in Sources */,

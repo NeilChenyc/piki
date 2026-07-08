@@ -57,6 +57,17 @@ struct HomeViewDisplayState {
     }
 }
 
+struct HomeEmptyStateLayoutMetrics {
+    static let maxContentWidth: CGFloat = 680
+    static let horizontalPadding: CGFloat = 24
+    static let verticalPadding: CGFloat = 32
+    static let sectionSpacing: CGFloat = 22
+
+    static func contentWidth(for availableWidth: CGFloat) -> CGFloat {
+        max(0, min(maxContentWidth, availableWidth - horizontalPadding * 2))
+    }
+}
+
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @Environment(HomeViewModel.self) private var viewModel
@@ -65,119 +76,114 @@ struct HomeView: View {
     @Namespace private var inputTransition
 
     var body: some View {
-        Group {
-            if isEmptyState {
-                emptyStateView
-                    .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.98))))
-            } else {
-                chatStateView
-                    .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .bottom)), removal: .opacity))
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .animation(.spring(response: 0.42, dampingFraction: 0.9), value: isEmptyState)
-        .task(id: appState.vaultPath) {
-            await viewModel.loadRecentJournal(appState: appState)
-        }
-    }
+        GeometryReader { proxy in
+            let dividerWidth: CGFloat = 1
+            let availableWidth = max(proxy.size.width - dividerWidth, 0)
+            let chatWidth = availableWidth * CGFloat(HomeSplitMetrics.chatFraction)
+            let inspirationWidth = availableWidth * CGFloat(HomeSplitMetrics.inspirationFraction)
 
-    private var chatStateView: some View {
-        @Bindable var viewModel = viewModel
-
-        return HStack(spacing: 0) {
-            VStack(spacing: 0) {
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(viewModel.messages) { message in
-                            ChatBubbleView(
-                                message: message,
-                                onToggleTrace: {
-                                    viewModel.toggleTrace(messageId: message.id)
-                                },
-                                onWikiLinkTap: handleWikiLinkTap(_:),
-                                onErrorAction: { action in
-                                    viewModel.handleErrorAction(action, appState: appState)
-                                }
-                            )
-                        }
-                    }
-                    .padding(24)
-                }
-                .background(Theme.primaryPanelBackground)
+            HStack(spacing: 0) {
+                conversationPane
+                    .frame(width: chatWidth, height: proxy.size.height)
 
                 Divider()
 
-                QuickActionsView(onAction: viewModel.handleQuickAction)
+                InspirationPanel()
+                    .frame(width: inspirationWidth, height: proxy.size.height)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Theme.primaryPanelBackground)
+        .animation(.spring(response: 0.42, dampingFraction: 0.9), value: isEmptyState)
+    }
+
+    @ViewBuilder
+    private var conversationPane: some View {
+        if isEmptyState {
+            emptyStateView
+                .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.98))))
+        } else {
+            chatConversationView
+                .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .bottom)), removal: .opacity))
+        }
+    }
+
+    private var chatConversationView: some View {
+        @Bindable var viewModel = viewModel
+
+        return VStack(spacing: 0) {
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(viewModel.messages) { message in
+                        ChatBubbleView(
+                            message: message,
+                            onToggleTrace: {
+                                viewModel.toggleTrace(messageId: message.id)
+                            },
+                            onWikiLinkTap: handleWikiLinkTap(_:),
+                            onErrorAction: { action in
+                                viewModel.handleErrorAction(action, appState: appState)
+                            }
+                        )
+                    }
+                }
+                .padding(24)
+            }
+            .background(Theme.primaryPanelBackground)
+
+            Divider()
+
+            QuickActionsView(onAction: viewModel.handleQuickAction)
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
+
+            if let inputHint {
+                Text(inputHint)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 24)
-                    .padding(.top, 12)
-
-                if let inputHint {
-                    Text(inputHint)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.textSecondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 8)
-                }
-
-                if let statusText = viewModel.statusText {
-                    RunningStatusText(
-                        text: statusText,
-                        isActive: displayState.shouldAnimateStatusText,
-                        font: .system(size: 12),
-                        color: Theme.textTertiary
-                    )
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 6)
-                }
-
-                ChatInputView(
-                    text: $viewModel.inputText,
-                    placeholder: inputPlaceholder,
-                    isDisabled: isInputDisabled,
-                    showsStopButton: viewModel.isSending,
-                    isStopping: viewModel.isStopping,
-                    style: .docked,
-                    helperText: nil,
-                    autofocus: true,
-                    externalRequest: viewModel.chatInputExternalRequest,
-                    onExternalRequestHandled: {
-                        viewModel.consumeChatInputExternalRequest()
-                    },
-                    onRequestFileUpload: nil,
-                    onRequestPodcastPrompt: {
-                        viewModel.preparePodcastPrompt()
-                    },
-                    onSend: { text, files in
-                        viewModel.sendMessage(text, appState: appState, selectedFiles: files)
-                    },
-                    onStop: {
-                        viewModel.stopCurrentTask(appState: appState)
-                    }
-                )
-                .matchedGeometryEffect(id: "home-input-shell", in: inputTransition)
-                .padding(16)
+                    .padding(.top, 8)
             }
-            .background(Theme.primaryPanelBackground)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            VStack(alignment: .leading, spacing: 16) {
-                VaultStatusCard(status: appState.connectionStatus, vaultURL: appState.vaultPath)
-                RecentActivityList(
-                    entries: viewModel.recentActivity,
-                    onRollback: { entry in
-                        viewModel.rollback(entry, appState: appState)
-                    }
+            if let statusText = viewModel.statusText {
+                RunningStatusText(
+                    text: statusText,
+                    isActive: displayState.shouldAnimateStatusText,
+                    font: .system(size: 12),
+                    color: Theme.textTertiary
                 )
-                Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 6)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 16)
-            .frame(width: DetailLayoutGuide.homeAuxiliaryWidth)
-            .frame(maxHeight: .infinity, alignment: .topLeading)
-            .background(Theme.primaryPanelBackground)
+
+            ChatInputView(
+                text: $viewModel.inputText,
+                placeholder: inputPlaceholder,
+                isDisabled: isInputDisabled,
+                showsStopButton: viewModel.isSending,
+                isStopping: viewModel.isStopping,
+                style: .docked,
+                helperText: nil,
+                autofocus: true,
+                externalRequest: viewModel.chatInputExternalRequest,
+                onExternalRequestHandled: {
+                    viewModel.consumeChatInputExternalRequest()
+                },
+                onRequestFileUpload: nil,
+                onRequestPodcastPrompt: {
+                    viewModel.preparePodcastPrompt()
+                },
+                onSend: { text, files in
+                    viewModel.sendMessage(text, appState: appState, selectedFiles: files)
+                },
+                onStop: {
+                    viewModel.stopCurrentTask(appState: appState)
+                }
+            )
+            .matchedGeometryEffect(id: "home-input-shell", in: inputTransition)
+            .padding(16)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.primaryPanelBackground)
@@ -186,58 +192,60 @@ struct HomeView: View {
     private var emptyStateView: some View {
         @Bindable var viewModel = viewModel
 
-        return VStack {
-            Spacer(minLength: 48)
+        return GeometryReader { proxy in
+            let contentWidth = HomeEmptyStateLayoutMetrics.contentWidth(for: proxy.size.width)
 
-            VStack(spacing: 36) {
-                PikiLogo(style: .hero)
-                    .popoverTip(HomeTip())
+            ScrollView(.vertical) {
+                VStack(spacing: HomeEmptyStateLayoutMetrics.sectionSpacing) {
+                    PikiLogo(style: .hero)
+                        .popoverTip(HomeTip())
 
-                if !onboardingVM.showcaseDismissed {
-                    UseCaseShowcase(
-                        items: UseCaseItem.allCases,
-                        onSelect: { item in
-                            viewModel.inputText = item.starterPrompt
-                        },
-                        onDismiss: {
-                            onboardingVM.dismissShowcase()
-                        }
-                    )
-                    .padding(.horizontal, 40)
+                    if !onboardingVM.showcaseDismissed {
+                        UseCaseShowcase(
+                            items: UseCaseItem.allCases,
+                            onSelect: { item in
+                                viewModel.inputText = item.starterPrompt
+                            },
+                            onDismiss: {
+                                onboardingVM.dismissShowcase()
+                            }
+                        )
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        ChatInputView(
+                            text: $viewModel.inputText,
+                            placeholder: inputPlaceholder,
+                            isDisabled: isInputDisabled,
+                            showsStopButton: viewModel.isSending,
+                            isStopping: viewModel.isStopping,
+                            style: .hero,
+                            helperText: emptyStateHint,
+                            autofocus: true,
+                            externalRequest: viewModel.chatInputExternalRequest,
+                            onExternalRequestHandled: {
+                                viewModel.consumeChatInputExternalRequest()
+                            },
+                            onRequestFileUpload: nil,
+                            onRequestPodcastPrompt: {
+                                viewModel.preparePodcastPrompt()
+                            },
+                            onSend: { text, files in
+                                viewModel.sendMessage(text, appState: appState, selectedFiles: files)
+                            },
+                            onStop: {
+                                viewModel.stopCurrentTask(appState: appState)
+                            }
+                        )
+                        .matchedGeometryEffect(id: "home-input-shell", in: inputTransition)
+                    }
                 }
-
-                VStack(alignment: .leading, spacing: 12) {
-                    ChatInputView(
-                        text: $viewModel.inputText,
-                        placeholder: inputPlaceholder,
-                        isDisabled: isInputDisabled,
-                        showsStopButton: viewModel.isSending,
-                        isStopping: viewModel.isStopping,
-                        style: .hero,
-                        helperText: emptyStateHint,
-                        autofocus: true,
-                        externalRequest: viewModel.chatInputExternalRequest,
-                        onExternalRequestHandled: {
-                            viewModel.consumeChatInputExternalRequest()
-                        },
-                        onRequestFileUpload: nil,
-                        onRequestPodcastPrompt: {
-                            viewModel.preparePodcastPrompt()
-                        },
-                        onSend: { text, files in
-                            viewModel.sendMessage(text, appState: appState, selectedFiles: files)
-                        },
-                        onStop: {
-                            viewModel.stopCurrentTask(appState: appState)
-                        }
-                    )
-                    .matchedGeometryEffect(id: "home-input-shell", in: inputTransition)
-                }
-                .frame(maxWidth: 1160)
-                .padding(.horizontal, 40)
+                .frame(width: contentWidth)
+                .padding(.vertical, HomeEmptyStateLayoutMetrics.verticalPadding)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: proxy.size.height, alignment: .center)
             }
-
-            Spacer(minLength: 96)
+            .scrollIndicators(.hidden)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.primaryPanelBackground)

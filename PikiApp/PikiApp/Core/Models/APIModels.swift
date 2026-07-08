@@ -559,6 +559,116 @@ struct IngestQueueItemDTO: Codable, Identifiable {
     }
 }
 
+// MARK: - Inspirations
+
+struct InspirationAttachmentDTO: Codable, Equatable {
+    let filename: String
+    let path: String?
+    let bufferedPath: String?
+    let mimeType: String?
+    let sizeBytes: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case filename
+        case path
+        case bufferedPath = "buffered_path"
+        case mimeType = "mime_type"
+        case sizeBytes = "size_bytes"
+    }
+
+    init(
+        filename: String,
+        path: String? = nil,
+        bufferedPath: String? = nil,
+        mimeType: String? = nil,
+        sizeBytes: Int? = nil
+    ) {
+        self.filename = filename
+        self.path = path
+        self.bufferedPath = bufferedPath
+        self.mimeType = mimeType
+        self.sizeBytes = sizeBytes
+    }
+}
+
+struct InspirationDTO: Codable, Identifiable, Equatable {
+    let id: String
+    let path: String
+    let content: String
+    let attachments: [InspirationAttachmentDTO]
+    let createdAt: String
+    let updatedAt: String
+    let contentHash: String
+    let compileStatus: String
+    let compileTaskId: String?
+    let compiledHash: String?
+    let sourcePath: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case path
+        case content
+        case attachments
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case contentHash = "content_hash"
+        case compileStatus = "compile_status"
+        case compileTaskId = "compile_task_id"
+        case compiledHash = "compiled_hash"
+        case sourcePath = "source_path"
+    }
+}
+
+struct InspirationListResponse: Codable {
+    let items: [InspirationDTO]
+}
+
+struct InspirationCreateRequest: Codable {
+    let vaultPath: String
+    let content: String
+    let attachments: [InspirationAttachmentDTO]
+
+    enum CodingKeys: String, CodingKey {
+        case vaultPath = "vault_path"
+        case content
+        case attachments
+    }
+}
+
+struct InspirationUpdateRequest: Codable {
+    let vaultPath: String
+    let content: String
+    let attachments: [InspirationAttachmentDTO]
+
+    enum CodingKeys: String, CodingKey {
+        case vaultPath = "vault_path"
+        case content
+        case attachments
+    }
+}
+
+struct InspirationCompileRequest: Codable {
+    let vaultPath: String
+
+    enum CodingKeys: String, CodingKey {
+        case vaultPath = "vault_path"
+    }
+}
+
+struct InspirationCompileResponse: Codable {
+    let compiledCount: Int
+    let taskId: String?
+    let sourcePath: String?
+    let error: String?
+
+    enum CodingKeys: String, CodingKey {
+        case compiledCount = "compiled_count"
+        case taskId = "task_id"
+        case sourcePath = "source_path"
+        case error
+    }
+}
+
 // MARK: - Lint
 
 struct LintResultDTO: Codable {

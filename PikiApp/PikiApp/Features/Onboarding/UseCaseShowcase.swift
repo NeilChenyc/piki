@@ -5,8 +5,20 @@ struct UseCaseShowcase: View {
     let onSelect: (UseCaseItem) -> Void
     let onDismiss: () -> Void
 
+    private var columns: [GridItem] {
+        [
+            GridItem(
+                .adaptive(
+                    minimum: UseCaseCardMetrics.minWidth,
+                    maximum: UseCaseCardMetrics.maxWidth
+                ),
+                spacing: UseCaseCardMetrics.interCardSpacing
+            )
+        ]
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("试试看")
                     .font(.system(size: 13, weight: .medium))
@@ -22,7 +34,7 @@ struct UseCaseShowcase: View {
                 .buttonStyle(.plain)
             }
 
-            HStack(spacing: 12) {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: UseCaseCardMetrics.interCardSpacing) {
                 ForEach(items) { item in
                     UseCaseCard(item: item) {
                         onSelect(item)

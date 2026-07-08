@@ -25,4 +25,20 @@ struct LayoutStabilityTests {
         #expect(DetailLayoutGuide.inboxUsesPersistentDetailPane)
         #expect(DetailLayoutGuide.inboxListUsesBoundedScrollViewport)
     }
+
+    @Test
+    func homeEmptyStateContentUsesACompactBoundedWorkArea() {
+        #expect(HomeEmptyStateLayoutMetrics.maxContentWidth <= 720)
+        #expect(HomeEmptyStateLayoutMetrics.horizontalPadding <= 32)
+        #expect(HomeEmptyStateLayoutMetrics.contentWidth(for: 620) == 572)
+        #expect(HomeEmptyStateLayoutMetrics.contentWidth(for: 960) == HomeEmptyStateLayoutMetrics.maxContentWidth)
+    }
+
+    @Test
+    func homeStarterUseCaseCardsStayCompactEnoughForTheChatPane() {
+        #expect(UseCaseCardMetrics.minWidth <= 148)
+        #expect(UseCaseCardMetrics.maxWidth <= 168)
+        #expect(UseCaseCardMetrics.minHeight <= 96)
+        #expect(UseCaseCardMetrics.iconSize <= 20)
+    }
 }

@@ -41,23 +41,23 @@ struct ChatInputMetrics {
     }
 
     var minHeight: CGFloat {
-        style == .hero ? 82 : 0
+        style == .hero ? 70 : 0
     }
 
     var horizontalPadding: CGFloat {
-        style == .hero ? 20 : 16
-    }
-
-    var verticalPadding: CGFloat {
         style == .hero ? 16 : 16
     }
 
+    var verticalPadding: CGFloat {
+        style == .hero ? 12 : 16
+    }
+
     var cornerRadius: CGFloat {
-        style == .hero ? 24 : 18
+        style == .hero ? 18 : 18
     }
 
     var textSize: CGFloat {
-        style == .hero ? 17 : 13
+        style == .hero ? 15 : 13
     }
 
     var helperTextSize: CGFloat {
@@ -81,15 +81,15 @@ struct ChatInputMetrics {
     }
 
     var actionButtonSize: CGFloat {
-        style == .hero ? 34 : 28
+        style == .hero ? 30 : 28
     }
 
     var attachmentIconSize: CGFloat {
-        style == .hero ? 18 : 20
+        style == .hero ? 16 : 20
     }
 
     var sendIconSize: CGFloat {
-        style == .hero ? 20 : 24
+        style == .hero ? 18 : 24
     }
 
     var attachmentSymbolName: String {
@@ -166,7 +166,7 @@ struct ChatInputView: View {
                     }
             }
 
-            VStack(alignment: .leading, spacing: style == .hero ? 14 : 8) {
+            VStack(alignment: .leading, spacing: style == .hero ? 10 : 8) {
                 if !selectedFiles.isEmpty {
                     HStack(spacing: 8) {
                         ForEach(selectedFiles, id: \.path) { file in
@@ -214,7 +214,7 @@ struct ChatInputView: View {
                         .padding(.top, style == .hero ? 2 : 0)
                 }
 
-                HStack(spacing: style == .hero ? 14 : 12) {
+                HStack(spacing: 12) {
                     Button(action: chooseFile) {
                         Image(systemName: metrics.attachmentSymbolName)
                             .font(.system(size: metrics.attachmentIconSize, weight: .regular))
@@ -364,7 +364,7 @@ struct ChatInputView: View {
     }
 
     private var attachmentMenuVerticalOffset: CGFloat {
-        style == .hero ? 110 : 102
+        style == .hero ? 96 : 102
     }
 
     private var attachmentTint: Color {

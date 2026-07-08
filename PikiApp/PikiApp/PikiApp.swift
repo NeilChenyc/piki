@@ -38,6 +38,7 @@ struct PikiApp: App {
     @State private var wikiViewModel = WikiViewModel()
     @State private var inboxViewModel = InboxViewModel()
     @State private var healthViewModel = HealthViewModel()
+    @State private var inspirationViewModel = InspirationViewModel()
     @State private var runtimeSettingsViewModel = RuntimeSettingsViewModel()
     @State private var onboardingViewModel = OnboardingViewModel()
     @State private var didStartService = false
@@ -50,6 +51,7 @@ struct PikiApp: App {
                 .environment(wikiViewModel)
                 .environment(inboxViewModel)
                 .environment(healthViewModel)
+                .environment(inspirationViewModel)
                 .environment(runtimeSettingsViewModel)
                 .environment(onboardingViewModel)
                 .preferredColorScheme(.light)
@@ -62,6 +64,7 @@ struct PikiApp: App {
                     appDelegate.serviceManager = manager
                     await manager.start()
                     await appState.prewarmHealthLintIfNeeded()
+                    await inspirationViewModel.compilePendingOnLaunchIfNeeded(appState: appState)
                     try? Tips.configure([
                         .displayFrequency(.daily),
                         .datastoreLocation(.applicationDefault)

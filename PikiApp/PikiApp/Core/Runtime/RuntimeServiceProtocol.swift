@@ -21,6 +21,34 @@ protocol RuntimeServiceProtocol: AnyObject {
     func enqueueIngest(vaultPath: String, paths: [String]) async throws
     func processIngestQueue(vaultPath: String?) async throws
 
+    func listInspirations(vaultPath: String, query: String?) async throws -> [InspirationDTO]
+    func createInspiration(_ request: InspirationCreateRequest) async throws -> InspirationDTO
+    func updateInspiration(id: String, request: InspirationUpdateRequest) async throws -> InspirationDTO
+    func deleteInspiration(id: String, vaultPath: String) async throws
+    func compileInspirations(vaultPath: String) async throws -> InspirationCompileResponse
+
     func runLint(vaultPath: String) async throws -> LintResultDTO
     func fixLint(vaultPath: String, issueIds: [String]?) async throws
+}
+
+extension RuntimeServiceProtocol {
+    func listInspirations(vaultPath: String, query: String?) async throws -> [InspirationDTO] {
+        throw RuntimeError.runtimeHostUnavailable
+    }
+
+    func createInspiration(_ request: InspirationCreateRequest) async throws -> InspirationDTO {
+        throw RuntimeError.runtimeHostUnavailable
+    }
+
+    func updateInspiration(id: String, request: InspirationUpdateRequest) async throws -> InspirationDTO {
+        throw RuntimeError.runtimeHostUnavailable
+    }
+
+    func deleteInspiration(id: String, vaultPath: String) async throws {
+        throw RuntimeError.runtimeHostUnavailable
+    }
+
+    func compileInspirations(vaultPath: String) async throws -> InspirationCompileResponse {
+        throw RuntimeError.runtimeHostUnavailable
+    }
 }

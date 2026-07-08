@@ -16,8 +16,10 @@ struct ChatInputLayoutTests {
     func heroLayoutIsMoreCompactThanPreviousOversizedVersion() {
         let hero = ChatInputMetrics(style: .hero)
 
-        #expect(hero.minHeight <= 82)
-        #expect(hero.textSize < 21)
+        #expect(hero.minHeight <= 72)
+        #expect(hero.textSize <= 15)
+        #expect(hero.cornerRadius <= 18)
+        #expect(hero.actionButtonSize <= 30)
     }
 
     @Test

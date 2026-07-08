@@ -187,6 +187,62 @@ final class APIClient {
         try validate(response: response, data: data)
     }
 
+    // MARK: - Inspirations
+
+    func listInspirations(vaultPath: String, query: String? = nil) async throws -> [InspirationDTO] {
+        var url = baseURL.appending(path: "inspirations")
+        var queryItems = [URLQueryItem(name: "vault_path", value: vaultPath)]
+        if let query, !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            queryItems.append(URLQueryItem(name: "query", value: query))
+        }
+        url.append(queryItems: queryItems)
+        let (data, response) = try await URLSession.shared.data(from: url)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(InspirationListResponse.self, from: data).items
+    }
+
+    func createInspiration(_ request: InspirationCreateRequest) async throws -> InspirationDTO {
+        let url = baseURL.appending(path: "inspirations")
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(request)
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(InspirationDTO.self, from: data)
+    }
+
+    func updateInspiration(id: String, request: InspirationUpdateRequest) async throws -> InspirationDTO {
+        let url = baseURL.appending(path: "inspirations/\(id)")
+        var req = URLRequest(url: url)
+        req.httpMethod = "PATCH"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(request)
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(InspirationDTO.self, from: data)
+    }
+
+    func compileInspirations(vaultPath: String) async throws -> InspirationCompileResponse {
+        let url = baseURL.appending(path: "inspirations/compile")
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(InspirationCompileRequest(vaultPath: vaultPath))
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(InspirationCompileResponse.self, from: data)
+    }
+
+    func deleteInspiration(id: String, vaultPath: String) async throws {
+        var url = baseURL.appending(path: "inspirations/\(id)")
+        url.append(queryItems: [URLQueryItem(name: "vault_path", value: vaultPath)])
+        var req = URLRequest(url: url)
+        req.httpMethod = "DELETE"
+        let (data, response) = try await URLSession.shared.data(for: req)
+        try validate(response: response, data: data)
+    }
+
     // MARK: - Lint
 
     func runLint(vaultPath: String) async throws -> LintResultDTO {
@@ -250,6 +306,10 @@ final class APIClient {
         case "md", "markdown": return "text/markdown"
         case "txt": return "text/plain"
         case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        case "png": return "image/png"
+        case "jpg", "jpeg": return "image/jpeg"
+        case "gif": return "image/gif"
+        case "webp": return "image/webp"
         default: return "application/octet-stream"
         }
     }

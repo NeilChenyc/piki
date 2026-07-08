@@ -332,6 +332,56 @@ class IngestQueueProcessResult(BaseModel):
     task_id: str | None = None
 
 
+class InspirationAttachment(BaseModel):
+    filename: str
+    path: str | None = None
+    buffered_path: str | None = None
+    mime_type: str | None = None
+    size_bytes: int | None = None
+
+
+class InspirationCreateRequest(BaseModel):
+    vault_path: Path
+    content: str = Field(min_length=1)
+    attachments: list[InspirationAttachment] = Field(default_factory=list)
+
+
+class InspirationUpdateRequest(BaseModel):
+    vault_path: Path
+    content: str = Field(min_length=1)
+    attachments: list[InspirationAttachment] = Field(default_factory=list)
+
+
+class InspirationCompileRequest(BaseModel):
+    vault_path: Path
+    max_items: int = Field(default=50, ge=1, le=200)
+
+
+class InspirationDTO(BaseModel):
+    id: str
+    path: str
+    content: str
+    attachments: list[InspirationAttachment] = Field(default_factory=list)
+    created_at: str
+    updated_at: str
+    content_hash: str
+    compile_status: str = "pending"
+    compile_task_id: str | None = None
+    compiled_hash: str | None = None
+    source_path: str | None = None
+
+
+class InspirationListResponse(BaseModel):
+    items: list[InspirationDTO] = Field(default_factory=list)
+
+
+class InspirationCompileResponse(BaseModel):
+    compiled_count: int = 0
+    task_id: str | None = None
+    source_path: str | None = None
+    error: str | None = None
+
+
 class LintSeverity(StrEnum):
     INFO = "info"
     WARNING = "warning"

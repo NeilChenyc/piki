@@ -51,6 +51,7 @@ struct VaultInitializationTests {
         appState.prepareDefaultVaultIfNeeded()
 
         #expect(FileManager.default.fileExists(atPath: root.appending(path: "raw/inbox").path(percentEncoded: false)))
+        #expect(FileManager.default.fileExists(atPath: root.appending(path: "raw/inspirations").path(percentEncoded: false)))
         #expect(FileManager.default.fileExists(atPath: root.appending(path: "wiki/index.md").path(percentEncoded: false)))
         #expect(FileManager.default.fileExists(atPath: root.appending(path: "purpose.md").path(percentEncoded: false)))
     }

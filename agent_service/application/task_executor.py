@@ -437,7 +437,11 @@ def _build_podcast_ingest_prompt(*, source_path: str, source_title: str) -> str:
 
 
 def _decorate_agent_input_for_ingest_if_needed(*, task_input: AgentTaskInput, vault: Vault) -> AgentTaskInput:
-    source_path = str(task_input.action_context.get("podcast_source_path") or "").strip()
+    source_path = str(
+        task_input.action_context.get("podcast_source_path")
+        or task_input.action_context.get("inspiration_source_path")
+        or ""
+    ).strip()
     if not source_path:
         return task_input
     source_meta = read_source_meta(vault, source_path)

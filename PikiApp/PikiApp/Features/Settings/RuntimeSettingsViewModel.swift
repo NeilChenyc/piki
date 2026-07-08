@@ -308,6 +308,7 @@ final class RuntimeSettingsViewModel {
     static func ensureVaultExists(at url: URL, fileManager: FileManager = .default) throws {
         let dirs = [
             "raw/inbox",
+            "raw/inspirations",
             "raw/sources",
             "raw/assets",
             "wiki/sources",
@@ -372,12 +373,14 @@ final class RuntimeSettingsViewModel {
     `raw/` 是来源归档层，不是主要回答层。
 
     - `raw/inbox/`：待处理来源入口。
+    - `raw/inspirations/`：随手记和灵感的原始归档入口，保存尚未整理成 Wiki 页的小观点、片段和观察。
     - `raw/assets/`：原始附件、归档文件。
     - `raw/sources/`：canonical 来源页。
 
     规则：
 
     - `raw/` 以归档为主。
+    - `raw/inspirations/` 中的内容是 quick capture 原料；不要把它当成最终知识层。
     - 不要把 `raw/` 当成长期写作工作区。
     - 不要为了“修正文案”而重写历史来源；优先新增归档、补充说明或在 `wiki/` 中修正理解。
 
@@ -445,6 +448,7 @@ final class RuntimeSettingsViewModel {
     - 明确要求“记录这个文档”
     - 明确要求“整理并保存”
     - 明确要求“生成来源页 / 实体页 / 概念页 / 综合页”
+    - 系统触发的 `ingest_inspirations`，表示把 `raw/inspirations/` 中的随手记批量整理进 Wiki
 
     ingest 的目标是把来源编译进 wiki，而不是仅把文件放进仓库。
 
@@ -461,6 +465,7 @@ final class RuntimeSettingsViewModel {
 
     - 新来源不应只改来源页就结束。
     - 要把知识整合进现有页面结构。
+    - 对随手记批量 ingest，应提炼稳定实体、概念、主题和可复用判断；零散表达可以保留在来源页，不要机械逐条扩写。
     - 如果重要概念或实体频繁出现但还没有页面，应考虑补页。
     - 如果新来源推翻旧判断，应更新相关页面并显式标记变化。
 
