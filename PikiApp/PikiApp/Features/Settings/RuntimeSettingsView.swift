@@ -17,8 +17,8 @@ struct RuntimeSettingsView: View {
                     runtimeStatusSection
                     vaultSection
                 }
-                podcastTranscriptionSection
                 presetsSection
+                podcastTranscriptionSection
             }
             .padding(24)
             .padding(.top, 16)

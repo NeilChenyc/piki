@@ -159,10 +159,6 @@ private final class InboxStubRuntimeService: RuntimeServiceProtocol {
     func cancelTask(taskId: String) async throws -> TaskRecordDTO { throw InboxTestError.unimplemented }
     func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse { throw InboxTestError.unimplemented }
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] { throw InboxTestError.unimplemented }
-    func rollback(entryId: String) async throws { throw InboxTestError.unimplemented }
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] { throw InboxTestError.unimplemented }
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws { throw InboxTestError.unimplemented }
-    func processIngestQueue(vaultPath: String?) async throws { throw InboxTestError.unimplemented }
     func runLint(vaultPath: String) async throws -> LintResultDTO { throw InboxTestError.unimplemented }
     func fixLint(vaultPath: String, issueIds: [String]?) async throws { throw InboxTestError.unimplemented }
 }

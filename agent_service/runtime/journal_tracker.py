@@ -82,7 +82,6 @@ class JournalTracker:
         snapshot = FileSnapshot(
             path=relative,
             before_hash=_content_hash(before_content) if before_content is not None else None,
-            before_content=before_content,
         )
         self._snapshots[relative] = snapshot
         return relative, snapshot
@@ -93,7 +92,6 @@ class JournalTracker:
         if snapshot is None:
             _, snapshot = self.before_write(path)
         after_content = file_path.read_text(encoding="utf-8", errors="replace") if file_path.exists() else None
-        snapshot.after_content = after_content
         snapshot.after_hash = _content_hash(after_content) if after_content is not None else None
         if snapshot.before_hash != snapshot.after_hash and relative not in self._changed_files:
             self._changed_files.append(relative)

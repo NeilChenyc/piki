@@ -64,7 +64,6 @@ struct PikiApp: App {
                     appDelegate.serviceManager = manager
                     await manager.start()
                     await appState.prewarmHealthLintIfNeeded()
-                    await inspirationViewModel.compilePendingOnLaunchIfNeeded(appState: appState)
                     try? Tips.configure([
                         .displayFrequency(.daily),
                         .datastoreLocation(.applicationDefault)

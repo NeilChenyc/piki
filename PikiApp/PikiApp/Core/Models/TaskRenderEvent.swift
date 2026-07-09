@@ -97,9 +97,8 @@ extension TaskEvent {
     var renderFriendlyStatus: String {
         switch type {
         case "source_intake.started": return "正在整理资料"
-        case "ingest.started", "ingest_queue.process_started": return "正在整理资料"
+        case "ingest.started": return "正在整理资料"
         case "agent.run.started": return "正在思考和生成"
-        case "rollback.completed", "rollback.failed": return "正在回退变更"
         default: return "正在处理"
         }
     }

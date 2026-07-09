@@ -10,20 +10,15 @@ from agent_service.models import (
     ApprovalStatus,
     EventType,
     FileSnapshot,
-    IngestQueueItem,
-    IngestQueueStatus,
     JournalEntry,
     RiskLevel,
-    SourceChangeType,
     TaskKind,
     TaskEvent,
     TaskRecord,
     TaskStatus,
-    UpdateQueueItem,
-    UpdateQueueStatus,
     utc_now_iso,
 )
-from agent_service.store.repositories import EventRepository, JournalRepository, QueueRepository, TaskRepository
+from agent_service.store.repositories import EventRepository, JournalRepository, TaskRepository
 from agent_service.store.schema import SCHEMA, apply_compat_migrations
 
 
@@ -36,7 +31,6 @@ class SQLiteStore:
         self.tasks = TaskRepository(self)
         self.events = EventRepository(self)
         self.journal = JournalRepository(self)
-        self.queues = QueueRepository(self)
 
     def connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -343,9 +337,9 @@ class SQLiteStore:
                     task_id,
                     reason,
                     "active",
-                    diff,
+                    "",
                     json.dumps(affected_files, ensure_ascii=False),
-                    json.dumps([snapshot.model_dump(mode="json") for snapshot in snapshots], ensure_ascii=False),
+                    "[]",
                     now,
                 ),
             )
@@ -412,233 +406,6 @@ class SQLiteStore:
     def get_task_for_journal_entry(self, journal_id: str) -> TaskRecord:
         journal = self.get_journal_entry(journal_id)
         return self.get_task(journal.task_id)
-
-    def create_update_queue_item(
-        self,
-        *,
-        source_path: str,
-        change_type: SourceChangeType,
-        previous_hash: str | None,
-        current_hash: str | None,
-        reason: str,
-    ) -> UpdateQueueItem:
-        existing = self.find_pending_update_queue_item(
-            source_path=source_path,
-            change_type=change_type,
-            current_hash=current_hash,
-        )
-        if existing:
-            return existing
-        item_id = f"queue_{uuid4().hex}"
-        now = utc_now_iso()
-        with self.connect() as conn:
-            conn.execute(
-                """
-                INSERT INTO update_queue
-                  (id, source_path, change_type, status, previous_hash, current_hash, reason, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    item_id,
-                    source_path,
-                    change_type.value,
-                    UpdateQueueStatus.PENDING.value,
-                    previous_hash,
-                    current_hash,
-                    reason,
-                    now,
-                    now,
-                ),
-            )
-        return self.get_update_queue_item(item_id)
-
-    def find_pending_update_queue_item(
-        self,
-        *,
-        source_path: str,
-        change_type: SourceChangeType,
-        current_hash: str | None,
-    ) -> UpdateQueueItem | None:
-        with self.connect() as conn:
-            row = conn.execute(
-                """
-                SELECT id FROM update_queue
-                WHERE source_path = ?
-                  AND change_type = ?
-                  AND status = ?
-                  AND COALESCE(current_hash, '') = COALESCE(?, '')
-                ORDER BY created_at DESC, id DESC
-                LIMIT 1
-                """,
-                (
-                    source_path,
-                    change_type.value,
-                    UpdateQueueStatus.PENDING.value,
-                    current_hash,
-                ),
-            ).fetchone()
-        return self.get_update_queue_item(row["id"]) if row else None
-
-    def get_update_queue_item(self, item_id: str) -> UpdateQueueItem:
-        with self.connect() as conn:
-            row = conn.execute("SELECT * FROM update_queue WHERE id = ?", (item_id,)).fetchone()
-            if row is None:
-                raise KeyError(f"Update queue item not found: {item_id}")
-        return UpdateQueueItem(
-            id=row["id"],
-            source_path=row["source_path"],
-            change_type=SourceChangeType(row["change_type"]),
-            status=UpdateQueueStatus(row["status"]),
-            previous_hash=row["previous_hash"],
-            current_hash=row["current_hash"],
-            reason=row["reason"],
-            created_at=row["created_at"],
-            updated_at=row["updated_at"],
-        )
-
-    def list_update_queue_items(
-        self,
-        *,
-        status: UpdateQueueStatus | None = None,
-        limit: int = 100,
-    ) -> list[UpdateQueueItem]:
-        if status is None:
-            query = "SELECT id FROM update_queue ORDER BY created_at DESC, id DESC LIMIT ?"
-            params = (limit,)
-        else:
-            query = "SELECT id FROM update_queue WHERE status = ? ORDER BY created_at DESC, id DESC LIMIT ?"
-            params = (status.value, limit)
-        with self.connect() as conn:
-            rows = conn.execute(query, params).fetchall()
-        return [self.get_update_queue_item(row["id"]) for row in rows]
-
-    def create_ingest_queue_item(
-        self,
-        *,
-        vault_path: str,
-        original_path: str,
-    ) -> IngestQueueItem:
-        existing = self.find_active_ingest_queue_item(vault_path=vault_path, original_path=original_path)
-        if existing:
-            return existing
-        item_id = f"ingestq_{uuid4().hex}"
-        now = utc_now_iso()
-        with self.connect() as conn:
-            conn.execute(
-                """
-                INSERT INTO ingest_queue
-                  (id, vault_path, original_path, status, attempts, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    item_id,
-                    vault_path,
-                    original_path,
-                    IngestQueueStatus.PENDING.value,
-                    0,
-                    now,
-                    now,
-                ),
-            )
-        return self.get_ingest_queue_item(item_id)
-
-    def find_active_ingest_queue_item(self, *, vault_path: str, original_path: str) -> IngestQueueItem | None:
-        with self.connect() as conn:
-            row = conn.execute(
-                """
-                SELECT id FROM ingest_queue
-                WHERE vault_path = ?
-                  AND original_path = ?
-                  AND status IN ('pending', 'processing', 'retry')
-                ORDER BY created_at DESC, id DESC
-                LIMIT 1
-                """,
-                (vault_path, original_path),
-            ).fetchone()
-        return self.get_ingest_queue_item(row["id"]) if row else None
-
-    def get_ingest_queue_item(self, item_id: str) -> IngestQueueItem:
-        with self.connect() as conn:
-            row = conn.execute("SELECT * FROM ingest_queue WHERE id = ?", (item_id,)).fetchone()
-            if row is None:
-                raise KeyError(f"Ingest queue item not found: {item_id}")
-        return IngestQueueItem(
-            id=row["id"],
-            vault_path=row["vault_path"],
-            original_path=row["original_path"],
-            status=IngestQueueStatus(row["status"]),
-            attempts=row["attempts"],
-            error=row["error"],
-            task_id=row["task_id"],
-            source_path=row["source_path"],
-            created_at=row["created_at"],
-            updated_at=row["updated_at"],
-        )
-
-    def list_ingest_queue_items(
-        self,
-        *,
-        status: IngestQueueStatus | None = None,
-        vault_path: str | None = None,
-        processable: bool = False,
-        limit: int = 100,
-    ) -> list[IngestQueueItem]:
-        clauses = []
-        params: list[str | int] = []
-        if processable:
-            clauses.append("status IN ('pending', 'retry')")
-        elif status is not None:
-            clauses.append("status = ?")
-            params.append(status.value)
-        if vault_path is not None:
-            clauses.append("vault_path = ?")
-            params.append(vault_path)
-        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-        params.append(limit)
-        with self.connect() as conn:
-            rows = conn.execute(
-                f"SELECT id FROM ingest_queue {where} ORDER BY created_at ASC, id ASC LIMIT ?",
-                tuple(params),
-            ).fetchall()
-        return [self.get_ingest_queue_item(row["id"]) for row in rows]
-
-    def update_ingest_queue_item(
-        self,
-        item_id: str,
-        *,
-        status: IngestQueueStatus | None = None,
-        attempts: int | None = None,
-        error: str | None = None,
-        clear_error: bool = False,
-        task_id: str | None = None,
-        source_path: str | None = None,
-        clear_task: bool = False,
-        clear_source: bool = False,
-    ) -> IngestQueueItem:
-        item = self.get_ingest_queue_item(item_id)
-        new_status = status or item.status
-        new_attempts = item.attempts if attempts is None else attempts
-        new_error = None if clear_error else item.error if error is None else error
-        new_task_id = None if clear_task else item.task_id if task_id is None else task_id
-        new_source_path = None if clear_source else item.source_path if source_path is None else source_path
-        with self.connect() as conn:
-            conn.execute(
-                """
-                UPDATE ingest_queue
-                SET status = ?, attempts = ?, error = ?, task_id = ?, source_path = ?, updated_at = ?
-                WHERE id = ?
-                """,
-                (
-                    new_status.value,
-                    new_attempts,
-                    new_error,
-                    new_task_id,
-                    new_source_path,
-                    utc_now_iso(),
-                    item_id,
-                ),
-            )
-        return self.get_ingest_queue_item(item_id)
 
     def upsert_session(self, session_id: str, payload: dict, task_id: str | None = None):
         now = utc_now_iso()

@@ -520,7 +520,6 @@ struct JournalEntry: Codable, Identifiable {
     let affectedFiles: [String]
     let createdAt: String
     let rolledBackAt: String?
-    let eligibleForRollback: Bool
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -529,33 +528,6 @@ struct JournalEntry: Codable, Identifiable {
         case affectedFiles = "affected_files"
         case createdAt = "created_at"
         case rolledBackAt = "rolled_back_at"
-        case eligibleForRollback = "eligible_for_rollback"
-    }
-}
-
-// MARK: - Ingest Queue
-
-struct IngestQueueResponse: Codable {
-    let items: [IngestQueueItemDTO]
-}
-
-struct IngestQueueItemDTO: Codable, Identifiable {
-    let id: String
-    let originalPath: String
-    let sourcePath: String?
-    let status: String
-    let error: String?
-    let createdAt: String?
-    let updatedAt: String?
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case originalPath = "original_path"
-        case sourcePath = "source_path"
-        case status
-        case error
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
     }
 }
 

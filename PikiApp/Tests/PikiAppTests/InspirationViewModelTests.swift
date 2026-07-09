@@ -7,9 +7,14 @@ import Testing
 @Suite("Inspiration panel")
 struct InspirationViewModelTests {
     @Test
-    func homeSplitUsesSixtyFortyRatio() {
-        #expect(HomeSplitMetrics.chatFraction == 0.6)
-        #expect(HomeSplitMetrics.inspirationFraction == 0.4)
+    func homeSplitGivesCollapsedSidebarSpaceToChatPane() {
+        let defaultPaneWidths = HomeSplitMetrics.paneWidths(for: 1_046)
+        let compactPaneWidths = HomeSplitMetrics.paneWidths(for: 700)
+
+        #expect(defaultPaneWidths.chat == 654)
+        #expect(defaultPaneWidths.inspiration == 392)
+        #expect(compactPaneWidths.chat == 420)
+        #expect(compactPaneWidths.inspiration == 280)
     }
 
     @Test
@@ -102,6 +107,23 @@ struct InspirationViewModelTests {
     }
 
     @Test
+    func pasteboardImageReaderLoadsHTMLDataURLImage() throws {
+        let imageData = try makePNGData()
+        let html = """
+        <html><body><img src="data:image/png;base64,\(imageData.base64EncodedString())"></body></html>
+        """
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name("piki-inspiration-html-image-\(UUID().uuidString)"))
+        pasteboard.clearContents()
+        pasteboard.setString(html, forType: .html)
+
+        let images = InspirationPasteboardImageReader.images(from: pasteboard)
+
+        #expect(images.count == 1)
+        #expect(images.first?.size.width == 4)
+        #expect(images.first?.size.height == 4)
+    }
+
+    @Test
     func returnKeyPolicySubmitsOnBareReturnAndKeepsShiftReturnForNewLine() {
         #expect(InspirationEditorKeyPolicy.returnAction(for: []) == .submit)
         #expect(InspirationEditorKeyPolicy.returnAction(for: [.shift]) == .insertNewline)
@@ -109,16 +131,95 @@ struct InspirationViewModelTests {
     }
 
     @Test
-    func startupCompileRunsOnlyOncePerVault() async throws {
+    func failedCompileStatusShowsFailedBadgePresentation() {
+        let presentation = InspirationStatusPresentation.make(for: "failed")
+
+        #expect(presentation.label == "整理失败")
+        #expect(presentation.tone == .failed)
+    }
+
+    @Test
+    func loadIfNeededDoesNotCompileInspirations() async throws {
         let runtime = InspirationRuntimeService()
+        runtime.listResponse = [makeInspiration(id: "insp_pending", content: "待整理想法")]
         let appState = makeAppState(runtime: runtime)
         let viewModel = InspirationViewModel()
 
-        await viewModel.compilePendingOnLaunchIfNeeded(appState: appState)
-        await viewModel.compilePendingOnLaunchIfNeeded(appState: appState)
+        await viewModel.loadIfNeeded(appState: appState)
+
+        #expect(runtime.compileRequests.isEmpty)
+        #expect(viewModel.items.map(\.id) == ["insp_pending"])
+    }
+
+    @Test
+    func manualUpdateWikiStartsCompileRequest() async throws {
+        let runtime = InspirationRuntimeService()
+        runtime.compileResponse = InspirationCompileResponse(
+            compiledCount: 1,
+            taskId: nil,
+            sourcePath: "raw/sources/inspirations.md",
+            error: nil
+        )
+        let appState = makeAppState(runtime: runtime)
+        let viewModel = InspirationViewModel()
+
+        await viewModel.updateWiki(appState: appState)
 
         #expect(runtime.compileRequests == ["/tmp/piki-vault"])
-        #expect(viewModel.statusMessage == "随手记正在后台整理进 Wiki")
+        #expect(viewModel.statusMessage == "随手记已更新到 Wiki")
+    }
+
+    @Test
+    func manualUpdateWikiReloadsAfterReturnedTaskCompletes() async throws {
+        let runtime = InspirationRuntimeService()
+        runtime.compileResponse = InspirationCompileResponse(
+            compiledCount: 1,
+            taskId: "task-1",
+            sourcePath: "raw/sources/inspirations.md",
+            error: nil
+        )
+        runtime.taskResponses["task-1"] = TaskRecordDTO(
+            id: "task-1",
+            status: "completed",
+            summary: "done",
+            output: .init(answer: nil, summary: "done", lintResult: nil, sessionId: nil, pendingInput: nil)
+        )
+        runtime.listResponse = [
+            makeInspiration(
+                id: "insp_compiled",
+                content: "已整理想法",
+                compileStatus: "compiled",
+                compiledHash: "sha256:insp_compiled"
+            )
+        ]
+        let appState = makeAppState(runtime: runtime)
+        let viewModel = InspirationViewModel()
+
+        await viewModel.updateWiki(appState: appState)
+
+        #expect(runtime.compileRequests == ["/tmp/piki-vault"])
+        #expect(runtime.getTaskRequests == ["task-1"])
+        #expect(runtime.listRequests == [InspirationRuntimeService.ListRequest(vaultPath: "/tmp/piki-vault", query: nil)])
+        #expect(viewModel.items.map(\.id) == ["insp_compiled"])
+        #expect(viewModel.statusMessage == "随手记已更新到 Wiki")
+    }
+
+    @Test
+    func manualUpdateWikiShowsNoChangesMessage() async throws {
+        let runtime = InspirationRuntimeService()
+        runtime.compileResponse = InspirationCompileResponse(
+            compiledCount: 0,
+            taskId: nil,
+            sourcePath: nil,
+            error: nil
+        )
+        let appState = makeAppState(runtime: runtime)
+        let viewModel = InspirationViewModel()
+
+        await viewModel.updateWiki(appState: appState)
+
+        #expect(runtime.compileRequests == ["/tmp/piki-vault"])
+        #expect(viewModel.statusMessage == "没有需要更新的随手记")
     }
 
     private func makeAppState(runtime: InspirationRuntimeService) -> AppState {
@@ -131,7 +232,9 @@ struct InspirationViewModelTests {
     private func makeInspiration(
         id: String,
         content: String,
-        createdAt: String = "2026-07-07T10:00:00+00:00"
+        createdAt: String = "2026-07-07T10:00:00+00:00",
+        compileStatus: String = "pending",
+        compiledHash: String? = nil
     ) -> InspirationDTO {
         InspirationDTO(
             id: id,
@@ -141,11 +244,22 @@ struct InspirationViewModelTests {
             createdAt: createdAt,
             updatedAt: createdAt,
             contentHash: "sha256:\(id)",
-            compileStatus: "pending",
+            compileStatus: compileStatus,
             compileTaskId: nil,
-            compiledHash: nil,
+            compiledHash: compiledHash,
             sourcePath: nil
         )
+    }
+
+    private func makePNGData() throws -> Data {
+        let image = NSImage(size: NSSize(width: 4, height: 4))
+        image.lockFocus()
+        NSColor.red.setFill()
+        NSRect(x: 0, y: 0, width: 4, height: 4).fill()
+        image.unlockFocus()
+        let tiff = try #require(image.tiffRepresentation)
+        let bitmap = try #require(NSBitmapImageRep(data: tiff))
+        return try #require(bitmap.representation(using: .png, properties: [:]))
     }
 }
 
@@ -168,6 +282,14 @@ private final class InspirationRuntimeService: RuntimeServiceProtocol {
     var createRequests: [InspirationCreateRequest] = []
     var updateRequests: [UpdateRequest] = []
     var compileRequests: [String] = []
+    var compileResponse = InspirationCompileResponse(
+        compiledCount: 1,
+        taskId: "task-1",
+        sourcePath: "raw/sources/inspirations.md",
+        error: nil
+    )
+    var getTaskRequests: [String] = []
+    var taskResponses: [String: TaskRecordDTO] = [:]
     var deleteRequests: [(id: String, vaultPath: String)] = []
     var uploadedFiles: [URL] = []
 
@@ -179,7 +301,13 @@ private final class InspirationRuntimeService: RuntimeServiceProtocol {
     func smokeTestRuntime() async throws -> RuntimeSmokeTestResponse { throw InspirationTestError.unimplemented }
     func createTask(_ request: TaskCreateRequest) async throws -> TaskCreateResponse { throw InspirationTestError.unimplemented }
     func taskEvents(taskId: String) -> AsyncThrowingStream<TaskEvent, Error> { AsyncThrowingStream { $0.finish() } }
-    func getTask(taskId: String) async throws -> TaskRecordDTO { throw InspirationTestError.unimplemented }
+    func getTask(taskId: String) async throws -> TaskRecordDTO {
+        getTaskRequests.append(taskId)
+        guard let response = taskResponses[taskId] else {
+            throw InspirationTestError.unimplemented
+        }
+        return response
+    }
     func submitTaskInput(taskId: String, message: String) async throws -> TaskRecordDTO { throw InspirationTestError.unimplemented }
     func cancelTask(taskId: String) async throws -> TaskRecordDTO { throw InspirationTestError.unimplemented }
     func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse {
@@ -192,10 +320,6 @@ private final class InspirationRuntimeService: RuntimeServiceProtocol {
         )
     }
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] { [] }
-    func rollback(entryId: String) async throws {}
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] { [] }
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {}
-    func processIngestQueue(vaultPath: String?) async throws {}
     func runLint(vaultPath: String) async throws -> LintResultDTO { throw InspirationTestError.unimplemented }
     func fixLint(vaultPath: String, issueIds: [String]?) async throws {}
 
@@ -240,7 +364,7 @@ private final class InspirationRuntimeService: RuntimeServiceProtocol {
 
     func compileInspirations(vaultPath: String) async throws -> InspirationCompileResponse {
         compileRequests.append(vaultPath)
-        return InspirationCompileResponse(compiledCount: 1, taskId: "task-1", sourcePath: "raw/sources/inspirations.md", error: nil)
+        return compileResponse
     }
 
     func deleteInspiration(id: String, vaultPath: String) async throws {

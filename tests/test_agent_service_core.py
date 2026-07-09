@@ -76,7 +76,12 @@ def test_vault_writer_and_journal_commit_changes(tmp_path: Path):
 
     assert journal is not None
     assert journal.affected_files == ["wiki/log.md"]
+    assert journal.snapshots == []
     assert store.list_events(task.id)[-1].type == "journal.created"
+    with store.connect() as conn:
+        row = conn.execute("SELECT diff, snapshots_json FROM journal_entries WHERE id = ?", (journal.id,)).fetchone()
+    assert row["diff"] == ""
+    assert row["snapshots_json"] == "[]"
 
 
 def test_change_journal_skips_non_wiki_and_non_raw_files(tmp_path: Path):
@@ -97,8 +102,6 @@ def test_change_journal_skips_non_wiki_and_non_raw_files(tmp_path: Path):
                 path="system/source_manifest.json",
                 before_hash="sha256:old",
                 after_hash="sha256:new",
-                before_content="{}",
-                after_content='{"ok": true}',
             )
         ],
     )

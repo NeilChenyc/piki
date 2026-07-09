@@ -9,12 +9,10 @@ from typing import Any, Callable
 from agent_service.diagnostics import runtime_log
 from agent_service.application.event_stream import EventStreamService
 from agent_service.application.events import EventPublisher
-from agent_service.application.maintenance import ApprovalService, IngestQueueService, JournalService, LintService, SourceService
+from agent_service.application.maintenance import ApprovalService, JournalService, LintService, SourceService
 from agent_service.application.task_service import TaskService
 from agent_service.config import ServiceConfig, load_environment
 from agent_service.models import (
-    IngestQueueEnqueueRequest,
-    IngestQueueProcessRequest,
     LintFixRequest,
     TaskCreateRequest,
     TaskInputRequest,
@@ -64,7 +62,6 @@ class RuntimeWorker:
         self.event_stream = EventStreamService(self.store)
         self.journal_service = JournalService(self.store, self._events)
         self.source_service = SourceService(self.store, self._events)
-        self.ingest_queue_service = IngestQueueService(self.store, self._events)
         self.lint_service = LintService(self.store, self._events)
         self.approval_service = ApprovalService(self.store, self._events)
         runtime_log(
@@ -137,8 +134,6 @@ class RuntimeWorker:
                 limit=int(params.get("limit", 20)),
                 vault_path=params.get("vault_path"),
             )
-        if method == "rollback":
-            return self.journal_service.rollback(params["entry_id"], None).model_dump(mode="json")
         if method == "task_events":
             result = self.task_events(params["task_id"], params.get("cursor"))
             runtime_log(
@@ -151,29 +146,6 @@ class RuntimeWorker:
                 },
             )
             return result
-        if method == "list_ingest_queue":
-            return self.ingest_queue_service.list(
-                status=params.get("status"),
-                vault_path=params.get("vault_path"),
-                limit=int(params.get("limit", 100)),
-            )
-        if method == "enqueue_ingest":
-            return self.ingest_queue_service.enqueue(
-                IngestQueueEnqueueRequest.model_validate(
-                    {
-                        "vault_path": params["vault_path"],
-                        "selected_paths": params.get("paths", []),
-                    }
-                )
-            ).model_dump(mode="json")
-        if method == "process_ingest_queue":
-            return self.ingest_queue_service.process(
-                IngestQueueProcessRequest.model_validate(
-                    {
-                        "vault_path": params.get("vault_path") or None,
-                    }
-                )
-            ).model_dump(mode="json")
         if method == "run_lint":
             from agent_service.system import run_wiki_lint
             from agent_service.vault import Vault

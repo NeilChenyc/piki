@@ -22,7 +22,14 @@ struct InspirationPanel: View {
         @Bindable var viewModel = viewModel
 
         VStack(alignment: .leading, spacing: 0) {
-            header(searchQuery: $viewModel.searchQuery)
+            header(
+                searchQuery: $viewModel.searchQuery,
+                isUpdatingWiki: viewModel.isCompiling,
+                canUpdateWiki: appState.isConnected,
+                onUpdateWiki: {
+                    Task { await viewModel.updateWiki(appState: appState) }
+                }
+            )
                 .padding(.horizontal, 18)
                 .padding(.top, 16)
                 .padding(.bottom, 12)
@@ -64,11 +71,37 @@ struct InspirationPanel: View {
         }
     }
 
-    private func header(searchQuery: Binding<String>) -> some View {
+    private func header(
+        searchQuery: Binding<String>,
+        isUpdatingWiki: Bool,
+        canUpdateWiki: Bool,
+        onUpdateWiki: @escaping () -> Void
+    ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("随手记")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Theme.textPrimary)
+            HStack(spacing: 8) {
+                Text("随手记")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+
+                Spacer(minLength: 8)
+
+                Button(action: onUpdateWiki) {
+                    HStack(spacing: 6) {
+                        if isUpdatingWiki {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                        Text("灵感注入")
+                    }
+                    .frame(minWidth: 86, minHeight: 28)
+                }
+                .controlSize(.regular)
+                .disabled(isUpdatingWiki || !canUpdateWiki)
+                .help("把最新的随手记内容增量注入到 Wiki 中。AI 会自动识别重要和有价值的随手记内容，并整理进合适的 Wiki 页面。")
+            }
 
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
@@ -127,7 +160,7 @@ struct InspirationPanel: View {
                         Text("还没有随手记")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(Theme.textPrimary)
-                        Text("零散想法先放在这里，Piki 会在后台把它们整理进 Wiki。")
+                        Text("零散想法先放在这里。")
                             .font(.system(size: 12))
                             .foregroundStyle(Theme.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -556,28 +589,50 @@ private struct InspirationStatusBadge: View {
     let status: String
 
     var body: some View {
-        Text(label)
+        Text(presentation.label)
             .font(.system(size: 10, weight: .semibold))
-            .foregroundStyle(color)
+            .foregroundStyle(presentation.color)
             .padding(.horizontal, 7)
             .padding(.vertical, 3)
-            .background(color.opacity(0.1))
+            .background(presentation.color.opacity(0.1))
             .clipShape(.capsule)
     }
 
-    private var label: String {
-        switch status {
-        case "processing": "整理中"
-        case "compiled", "completed": "已整理"
-        default: "待整理"
+    private var presentation: InspirationStatusPresentation {
+        InspirationStatusPresentation.make(for: status)
+    }
+}
+
+enum InspirationStatusTone: Equatable {
+    case pending
+    case processing
+    case compiled
+    case failed
+}
+
+struct InspirationStatusPresentation {
+    let label: String
+    let tone: InspirationStatusTone
+
+    var color: Color {
+        switch tone {
+        case .pending: Theme.textTertiary
+        case .processing: Theme.warning
+        case .compiled: Theme.success
+        case .failed: Theme.error
         }
     }
 
-    private var color: Color {
+    static func make(for status: String) -> InspirationStatusPresentation {
         switch status {
-        case "processing": Theme.warning
-        case "compiled", "completed": Theme.success
-        default: Theme.textTertiary
+        case "processing":
+            InspirationStatusPresentation(label: "整理中", tone: .processing)
+        case "compiled", "completed":
+            InspirationStatusPresentation(label: "已整理", tone: .compiled)
+        case "failed":
+            InspirationStatusPresentation(label: "整理失败", tone: .failed)
+        default:
+            InspirationStatusPresentation(label: "待整理", tone: .pending)
         }
     }
 }
@@ -670,17 +725,20 @@ private final class InspirationNSTextView: NSTextView {
     }
 }
 
-private enum InspirationPasteboardImageReader {
+enum InspirationPasteboardImageReader {
     static func images(from pasteboard: NSPasteboard) -> [NSImage] {
         if let images = pasteboard.readObjects(forClasses: [NSImage.self], options: nil) as? [NSImage],
            !images.isEmpty {
             return images
         }
 
-        for type in [NSPasteboard.PasteboardType.png, .tiff, NSPasteboard.PasteboardType("public.jpeg")] {
-            if let data = pasteboard.data(forType: type), let image = NSImage(data: data) {
-                return [image]
-            }
+        if let image = imageFromDirectData(in: pasteboard) {
+            return [image]
+        }
+
+        let htmlImages = imagesFromHTML(in: pasteboard)
+        if !htmlImages.isEmpty {
+            return htmlImages
         }
 
         let options: [NSPasteboard.ReadingOptionKey: Any] = [
@@ -699,6 +757,79 @@ private enum InspirationPasteboardImageReader {
             guard let url else { return nil }
             return NSImage(contentsOf: url)
         }
+    }
+
+    private static func imageFromDirectData(in pasteboard: NSPasteboard) -> NSImage? {
+        let imageTypes = NSImage.imageTypes.map { NSPasteboard.PasteboardType($0) }
+        let preferredTypes = [
+            NSPasteboard.PasteboardType.png,
+            .tiff,
+            NSPasteboard.PasteboardType("public.jpeg")
+        ]
+        let candidateTypes = preferredTypes + imageTypes
+        guard let type = pasteboard.availableType(from: candidateTypes),
+              let data = pasteboard.data(forType: type) else {
+            return nil
+        }
+        return NSImage(data: data)
+    }
+
+    private static func imagesFromHTML(in pasteboard: NSPasteboard) -> [NSImage] {
+        let htmlTypes: [NSPasteboard.PasteboardType] = [
+            .html,
+            NSPasteboard.PasteboardType("public.html"),
+            NSPasteboard.PasteboardType("text/html")
+        ]
+        var seenHTML = Set<String>()
+        return htmlTypes
+            .compactMap { pasteboard.string(forType: $0) }
+            .filter { seenHTML.insert($0).inserted }
+            .flatMap(imageSources(in:))
+            .compactMap(image(fromHTMLSource:))
+    }
+
+    private static func imageSources(in html: String) -> [String] {
+        let pattern = #"(?i)<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let range = NSRange(html.startIndex..<html.endIndex, in: html)
+        return regex.matches(in: html, range: range).compactMap { match in
+            guard let sourceRange = Range(match.range(at: 1), in: html) else { return nil }
+            return htmlDecoded(String(html[sourceRange]))
+        }
+    }
+
+    private static func image(fromHTMLSource source: String) -> NSImage? {
+        if let dataImage = imageFromDataURL(source) {
+            return dataImage
+        }
+        guard let url = URL(string: source), url.isFileURL else { return nil }
+        return NSImage(contentsOf: url)
+    }
+
+    private static func imageFromDataURL(_ source: String) -> NSImage? {
+        let lowercased = source.lowercased()
+        guard lowercased.hasPrefix("data:image/"),
+              let commaIndex = source.firstIndex(of: ",") else {
+            return nil
+        }
+        let metadata = lowercased[..<commaIndex]
+        let payload = String(source[source.index(after: commaIndex)...])
+        let decodedPayload = payload.removingPercentEncoding ?? payload
+        let data: Data?
+        if metadata.contains(";base64") {
+            data = Data(base64Encoded: decodedPayload, options: .ignoreUnknownCharacters)
+        } else {
+            data = decodedPayload.data(using: .utf8)
+        }
+        guard let data else { return nil }
+        return NSImage(data: data)
+    }
+
+    private static func htmlDecoded(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
     }
 }
 

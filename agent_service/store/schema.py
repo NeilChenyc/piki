@@ -59,31 +59,6 @@ CREATE TABLE IF NOT EXISTS journal_entries (
   rolled_back_at TEXT,
   FOREIGN KEY(task_id) REFERENCES tasks(id)
 );
-
-CREATE TABLE IF NOT EXISTS update_queue (
-  id TEXT PRIMARY KEY,
-  source_path TEXT NOT NULL,
-  change_type TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',
-  previous_hash TEXT,
-  current_hash TEXT,
-  reason TEXT NOT NULL DEFAULT '',
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS ingest_queue (
-  id TEXT PRIMARY KEY,
-  vault_path TEXT NOT NULL,
-  original_path TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',
-  attempts INTEGER NOT NULL DEFAULT 0,
-  error TEXT,
-  task_id TEXT,
-  source_path TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
 """
 
 

@@ -168,22 +168,6 @@ private final class StubRuntimeService: RuntimeServiceProtocol {
         throw StubRuntimeError.unimplemented
     }
 
-    func rollback(entryId: String) async throws {
-        throw StubRuntimeError.unimplemented
-    }
-
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] {
-        throw StubRuntimeError.unimplemented
-    }
-
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {
-        throw StubRuntimeError.unimplemented
-    }
-
-    func processIngestQueue(vaultPath: String?) async throws {
-        throw StubRuntimeError.unimplemented
-    }
-
     func runLint(vaultPath: String) async throws -> LintResultDTO {
         throw StubRuntimeError.unimplemented
     }

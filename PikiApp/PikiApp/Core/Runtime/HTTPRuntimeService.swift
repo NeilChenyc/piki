@@ -33,17 +33,6 @@ final class HTTPRuntimeService: RuntimeServiceProtocol {
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] {
         try await client.recentJournal(limit: limit, vaultPath: vaultPath)
     }
-    func rollback(entryId: String) async throws { try await client.rollback(entryId: entryId) }
-
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] {
-        try await client.listIngestQueue(status: status)
-    }
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {
-        try await client.enqueueIngest(vaultPath: vaultPath, paths: paths)
-    }
-    func processIngestQueue(vaultPath: String?) async throws {
-        try await client.processIngestQueue(vaultPath: vaultPath)
-    }
 
     func listInspirations(vaultPath: String, query: String?) async throws -> [InspirationDTO] {
         try await client.listInspirations(vaultPath: vaultPath, query: query)

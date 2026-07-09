@@ -12,11 +12,11 @@ struct LayoutStabilityTests {
 
     @Test
     func detailLayoutGuideKeepsStableIdealPaneWidths() {
-        #expect(DetailLayoutGuide.sidebarIdealWidth == 220)
-        #expect(DetailLayoutGuide.homeAuxiliaryWidth == 280)
+        #expect(DetailLayoutGuide.sidebarIdealWidth == 154)
+        #expect(DetailLayoutGuide.homeAuxiliaryWidth == 392)
         #expect(DetailLayoutGuide.wikiSidebarIdealWidth == 240)
-        #expect(DetailLayoutGuide.inboxPrimaryIdealWidth == 500)
-        #expect(DetailLayoutGuide.inboxSecondaryIdealWidth == 500)
+        #expect(DetailLayoutGuide.inboxPrimaryIdealWidth == 380)
+        #expect(DetailLayoutGuide.inboxSecondaryIdealWidth == 580)
     }
 
     @Test

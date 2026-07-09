@@ -49,8 +49,6 @@ class VaultWriter:
             path=write.path,
             before_hash=write.before_hash,
             after_hash=write.after_hash,
-            before_content=write.before_content,
-            after_content=write.after_content,
         )
 
     def _validate_write_path(self, path: str) -> str:

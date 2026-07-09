@@ -1,8 +1,8 @@
 import CoreGraphics
 
 enum DetailLayoutGuide {
-    static let sidebarIdealWidth: CGFloat = 220
-    static let homeAuxiliaryWidth: CGFloat = 280
+    static let sidebarIdealWidth: CGFloat = 154
+    static let homeAuxiliaryWidth: CGFloat = 392
     static let wikiSidebarIdealWidth: CGFloat = 240
     static let wikiSidebarMaxWidth: CGFloat = 280
     static let inboxPrimaryIdealWidth: CGFloat = 380

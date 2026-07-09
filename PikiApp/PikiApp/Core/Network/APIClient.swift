@@ -143,50 +143,6 @@ final class APIClient {
         return journalResponse.entries
     }
 
-    func rollback(entryId: String) async throws {
-        let url = baseURL.appending(path: "journal/\(entryId)/rollback")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try JSONSerialization.data(withJSONObject: [:])
-        let (data, response) = try await URLSession.shared.data(for: req)
-        try validate(response: response, data: data)
-    }
-
-    // MARK: - Ingest Queue
-
-    func listIngestQueue(status: String? = nil) async throws -> [IngestQueueItemDTO] {
-        var url = baseURL.appending(path: "ingest-queue")
-        if let status {
-            url.append(queryItems: [URLQueryItem(name: "status", value: status)])
-        }
-        let (data, _) = try await URLSession.shared.data(from: url)
-        return try JSONDecoder().decode(IngestQueueResponse.self, from: data).items
-    }
-
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {
-        let url = baseURL.appending(path: "ingest-queue/enqueue")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body = ["vault_path": vaultPath, "selected_paths": paths] as [String: Any]
-        req.httpBody = try JSONSerialization.data(withJSONObject: body)
-        let (data, response) = try await URLSession.shared.data(for: req)
-        try validate(response: response, data: data)
-    }
-
-    func processIngestQueue(vaultPath: String? = nil) async throws {
-        let url = baseURL.appending(path: "ingest-queue/process")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let vaultPath {
-            req.httpBody = try JSONSerialization.data(withJSONObject: ["vault_path": vaultPath])
-        }
-        let (data, response) = try await URLSession.shared.data(for: req)
-        try validate(response: response, data: data)
-    }
-
     // MARK: - Inspirations
 
     func listInspirations(vaultPath: String, query: String? = nil) async throws -> [InspirationDTO] {

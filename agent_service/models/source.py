@@ -1,5 +1,4 @@
 from agent_service.models.core import (
-    SourceChangeType,
     SourceFormat,
     SourceIntakeResult,
     SourceManifestRecord,
@@ -9,7 +8,6 @@ from agent_service.models.core import (
 )
 
 __all__ = [
-    "SourceChangeType",
     "SourceFormat",
     "SourceIntakeResult",
     "SourceManifestRecord",

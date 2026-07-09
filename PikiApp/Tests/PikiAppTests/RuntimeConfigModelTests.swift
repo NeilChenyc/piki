@@ -234,22 +234,6 @@ private final class TingwuConfigRuntimeService: RuntimeServiceProtocol {
         throw RuntimeConfigTestError.unimplemented
     }
 
-    func rollback(entryId: String) async throws {
-        throw RuntimeConfigTestError.unimplemented
-    }
-
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] {
-        throw RuntimeConfigTestError.unimplemented
-    }
-
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {
-        throw RuntimeConfigTestError.unimplemented
-    }
-
-    func processIngestQueue(vaultPath: String?) async throws {
-        throw RuntimeConfigTestError.unimplemented
-    }
-
     func runLint(vaultPath: String) async throws -> LintResultDTO {
         throw RuntimeConfigTestError.unimplemented
     }

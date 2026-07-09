@@ -171,10 +171,6 @@ private final class HealthCachingRuntimeService: RuntimeServiceProtocol {
     func cancelTask(taskId: String) async throws -> TaskRecordDTO { throw HealthTestError.unimplemented }
     func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse { throw HealthTestError.unimplemented }
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] { [] }
-    func rollback(entryId: String) async throws {}
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] { [] }
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {}
-    func processIngestQueue(vaultPath: String?) async throws {}
     func runLint(vaultPath: String) async throws -> LintResultDTO {
         runLintCallCount += 1
         guard let stubbedLintResult else { throw HealthTestError.unimplemented }

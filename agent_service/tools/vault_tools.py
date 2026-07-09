@@ -456,7 +456,6 @@ class VaultToolRegistry:
             self._journal_snapshots[snapshot.path] = snapshot
             return
         existing.after_hash = snapshot.after_hash
-        existing.after_content = snapshot.after_content
 
     def _allowed_external_file(self, path: str) -> Path:
         resolved = _resolve_external_path(path)
@@ -610,8 +609,8 @@ def _vault_file_exists(vault: Vault, relative_path: str) -> bool:
 
 
 def _snapshot_diff(snapshot: FileSnapshot) -> str:
-    old_lines = (snapshot.before_content or "").splitlines(keepends=True)
-    new_lines = (snapshot.after_content or "").splitlines(keepends=True)
+    old_lines: list[str] = []
+    new_lines: list[str] = []
     return "".join(
         difflib.unified_diff(
             old_lines,

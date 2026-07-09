@@ -79,17 +79,16 @@ struct HomeView: View {
         GeometryReader { proxy in
             let dividerWidth: CGFloat = 1
             let availableWidth = max(proxy.size.width - dividerWidth, 0)
-            let chatWidth = availableWidth * CGFloat(HomeSplitMetrics.chatFraction)
-            let inspirationWidth = availableWidth * CGFloat(HomeSplitMetrics.inspirationFraction)
+            let paneWidths = HomeSplitMetrics.paneWidths(for: availableWidth)
 
             HStack(spacing: 0) {
                 conversationPane
-                    .frame(width: chatWidth, height: proxy.size.height)
+                    .frame(width: paneWidths.chat, height: proxy.size.height)
 
                 Divider()
 
                 InspirationPanel()
-                    .frame(width: inspirationWidth, height: proxy.size.height)
+                    .frame(width: paneWidths.inspiration, height: proxy.size.height)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

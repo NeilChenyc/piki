@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ActivityRow: View {
     let entry: ActivityEntry
-    let onRollback: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
@@ -25,14 +24,6 @@ struct ActivityRow: View {
                 .foregroundStyle(Theme.textTertiary)
             }
             Spacer()
-            if entry.canRollback {
-                Button(action: onRollback) {
-                    Image(systemName: "arrow.uturn.backward")
-                        .font(.system(size: 11, weight: .semibold))
-                }
-                .buttonStyle(.borderless)
-                .help("Rollback this vault change")
-            }
         }
     }
 
@@ -41,7 +32,6 @@ struct ActivityRow: View {
         case .ingest: Theme.accent
         case .query: .blue
         case .lint: .orange
-        case .rollback: .purple
         }
     }
 }

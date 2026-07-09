@@ -4,7 +4,6 @@ import hashlib
 from pathlib import Path
 
 from agent_service.models import (
-    SourceChangeType,
     SourceFormat,
     SourceManifestRecord,
     SourceRescanResult,
@@ -20,7 +19,7 @@ from agent_service.workflows.source_intake import (
 )
 
 
-def scan_sources_for_updates(*, vault: Vault, store: SQLiteStore) -> SourceRescanResult:
+def scan_sources_for_updates(*, vault: Vault, store: SQLiteStore | None = None) -> SourceRescanResult:
     manifest = read_source_manifest(vault)
     records_by_path = {record.source_path: (source_hash, record) for source_hash, record in manifest.items()}
     now = utc_now_iso()
@@ -54,15 +53,7 @@ def scan_sources_for_updates(*, vault: Vault, store: SQLiteStore) -> SourceResca
                 missing=False,
             )
             manifest[current_hash] = record
-            item = store.create_update_queue_item(
-                source_path=relative,
-                change_type=SourceChangeType.NEW,
-                previous_hash=None,
-                current_hash=current_hash,
-                reason="发现新的 canonical source。",
-            )
             result.new_sources.append(relative)
-            result.queued_items.append(item)
             continue
 
         source_hash, record = key_record
@@ -80,15 +71,7 @@ def scan_sources_for_updates(*, vault: Vault, store: SQLiteStore) -> SourceResca
             record.content_hash = current_hash
             record.ingest_status = "pending_update"
             record.updated_at = now
-            item = store.create_update_queue_item(
-                source_path=relative,
-                change_type=SourceChangeType.MODIFIED,
-                previous_hash=previous_hash,
-                current_hash=current_hash,
-                reason="canonical source 内容发生变化。",
-            )
             result.modified_sources.append(relative)
-            result.queued_items.append(item)
         else:
             result.unchanged_sources.append(relative)
         manifest[source_hash] = record
@@ -100,15 +83,7 @@ def scan_sources_for_updates(*, vault: Vault, store: SQLiteStore) -> SourceResca
             record.missing = True
             record.ingest_status = "missing"
             record.updated_at = now
-            item = store.create_update_queue_item(
-                source_path=record.source_path,
-                change_type=SourceChangeType.MISSING,
-                previous_hash=record.content_hash,
-                current_hash=None,
-                reason="manifest 中的 canonical source 已不存在。",
-            )
             result.missing_sources.append(record.source_path)
-            result.queued_items.append(item)
             manifest[source_hash] = record
 
     write_source_manifest(vault, manifest)

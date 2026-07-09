@@ -3,7 +3,6 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 
 from agent_service.application.maintenance import JournalService
-from agent_service.models import RollbackRequest
 
 
 def register_journal_routes(app: FastAPI, *, journal_service: JournalService):
@@ -12,8 +11,8 @@ def register_journal_routes(app: FastAPI, *, journal_service: JournalService):
         return journal_service.recent(limit=limit, vault_path=vault_path)
 
     @app.post("/journal/{journal_entry_id}/rollback")
-    def rollback_journal_entry(journal_entry_id: str, request: RollbackRequest | None = None):
-        try:
-            return journal_service.rollback(journal_entry_id, request)
-        except KeyError as exc:
-            raise HTTPException(status_code=404, detail=str(exc)) from exc
+    def rollback_journal_entry(journal_entry_id: str):
+        raise HTTPException(
+            status_code=410,
+            detail="Rollback has been removed; journal entries are write activity records.",
+        )

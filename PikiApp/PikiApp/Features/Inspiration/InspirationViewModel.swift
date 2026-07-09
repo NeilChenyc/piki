@@ -4,6 +4,16 @@ import AppKit
 enum HomeSplitMetrics {
     static let chatFraction = 0.6
     static let inspirationFraction = 0.4
+
+    static func paneWidths(for availableWidth: CGFloat) -> (chat: CGFloat, inspiration: CGFloat) {
+        let boundedWidth = max(availableWidth, 0)
+        let proportionalInspirationWidth = boundedWidth * CGFloat(inspirationFraction)
+        let inspirationWidth = min(DetailLayoutGuide.homeAuxiliaryWidth, proportionalInspirationWidth)
+        return (
+            chat: boundedWidth - inspirationWidth,
+            inspiration: inspirationWidth
+        )
+    }
 }
 
 @Observable
@@ -23,7 +33,15 @@ final class InspirationViewModel {
     var statusMessage: String?
 
     private var loadedVaultPath: String?
-    private var compiledVaultPaths: Set<String> = []
+    private static let terminalTaskStatuses: Set<String> = [
+        "completed",
+        "failed",
+        "cancelled",
+        "input_required",
+        "needs_approval"
+    ]
+    private static let wikiUpdatePollLimit = 120
+    private static let wikiUpdatePollIntervalNanoseconds: UInt64 = 1_000_000_000
 
     func loadIfNeeded(appState: AppState) async {
         let vaultPath = normalizedVaultPath(appState)
@@ -163,22 +181,57 @@ final class InspirationViewModel {
         editingAttachments.removeAll { $0 == attachment }
     }
 
-    func compilePendingOnLaunchIfNeeded(appState: AppState) async {
-        guard appState.isConnected, let vaultPath = normalizedVaultPath(appState) else { return }
-        guard compiledVaultPaths.insert(vaultPath).inserted else { return }
+    func updateWiki(appState: AppState) async {
+        guard appState.isConnected, let vaultPath = normalizedVaultPath(appState) else {
+            statusMessage = "连接 Runtime 并选择知识库后才能更新 Wiki。"
+            return
+        }
+        guard !isCompiling else { return }
         isCompiling = true
         defer { isCompiling = false }
         do {
             let response = try await appState.runtimeService.compileInspirations(vaultPath: vaultPath)
-            if response.compiledCount > 0 {
-                statusMessage = "随手记正在后台整理进 Wiki"
-                await load(appState: appState)
-            } else if let error = response.error, !error.isEmpty {
+            if let error = response.error, !error.isEmpty {
                 statusMessage = error
+                await load(appState: appState)
+                return
+            }
+            if response.compiledCount == 0 {
+                await load(appState: appState)
+                statusMessage = "没有需要更新的随手记"
+                return
+            }
+
+            statusMessage = "随手记正在后台整理进 Wiki"
+            var terminalTask: TaskRecordDTO?
+            if let taskId = response.taskId, !taskId.isEmpty {
+                terminalTask = try await waitForWikiUpdateTask(taskId: taskId, appState: appState)
+            }
+            await load(appState: appState)
+            if let terminalTask, terminalTask.status != "completed" {
+                let detail = terminalTask.summary ?? terminalTask.status
+                statusMessage = "随手记更新未完成：\(detail)"
+            } else {
+                statusMessage = "随手记已更新到 Wiki"
             }
         } catch {
-            statusMessage = "随手记暂未整理：\(error.localizedDescription)"
+            statusMessage = "随手记暂未更新：\(error.localizedDescription)"
         }
+    }
+
+    private func waitForWikiUpdateTask(taskId: String, appState: AppState) async throws -> TaskRecordDTO {
+        var latest: TaskRecordDTO?
+        for attempt in 0..<Self.wikiUpdatePollLimit {
+            let task = try await appState.runtimeService.getTask(taskId: taskId)
+            latest = task
+            if Self.terminalTaskStatuses.contains(task.status) {
+                return task
+            }
+            if attempt < Self.wikiUpdatePollLimit - 1 {
+                try await Task.sleep(nanoseconds: Self.wikiUpdatePollIntervalNanoseconds)
+            }
+        }
+        return latest ?? TaskRecordDTO(id: taskId, status: "running", summary: nil, output: nil)
     }
 
     private enum AttachmentTarget {

@@ -19,6 +19,7 @@ from agent_service.models import (
     InspirationListResponse,
     InspirationUpdateRequest,
     TaskCreateRequest,
+    TaskStatus,
     utc_now_iso,
 )
 from agent_service.runtime import PikiWikiAgentRunner
@@ -45,6 +46,7 @@ class InspirationService:
 
     def list(self, *, vault_path: str | Path, query: str | None = None) -> InspirationListResponse:
         vault = _validated_vault(vault_path)
+        self._reconcile_processing(vault)
         items = self._load_all(vault)
         normalized_query = (query or "").strip().casefold()
         if normalized_query:
@@ -120,10 +122,11 @@ class InspirationService:
 
     def compile(self, request: InspirationCompileRequest) -> InspirationCompileResponse:
         vault = _validated_vault(request.vault_path)
+        self._reconcile_processing(vault)
         pending = [
             item
             for item in self._load_all(vault)
-            if item.compile_status == "pending" and item.content_hash != item.compiled_hash
+            if item.compile_status in {"pending", "failed"} and item.content_hash != item.compiled_hash
         ][: request.max_items]
         if not pending:
             return InspirationCompileResponse()
@@ -211,6 +214,57 @@ class InspirationService:
             if attachment.path:
                 materialized.append(_validate_existing_attachment(vault, memo_id, attachment))
         return materialized
+
+    def _reconcile_processing(self, vault: Vault) -> None:
+        for item in self._load_all(vault):
+            if item.compile_status != "processing":
+                continue
+            reconciled = self._reconciled_item(item)
+            if reconciled is not None:
+                _write_inspiration(vault, reconciled)
+
+    def _reconciled_item(self, item: InspirationDTO) -> InspirationDTO | None:
+        if not item.compile_task_id:
+            return item.model_copy(
+                update={
+                    "compile_status": "pending",
+                    "compile_task_id": None,
+                    "source_path": None,
+                    "updated_at": utc_now_iso(),
+                }
+            )
+        try:
+            task = self.task_service.get_task(item.compile_task_id)
+        except KeyError:
+            return item.model_copy(
+                update={
+                    "compile_status": "pending",
+                    "compile_task_id": None,
+                    "source_path": None,
+                    "updated_at": utc_now_iso(),
+                }
+            )
+        if task.status == TaskStatus.COMPLETED:
+            return item.model_copy(
+                update={
+                    "compile_status": "compiled",
+                    "compiled_hash": item.content_hash,
+                    "updated_at": utc_now_iso(),
+                }
+            )
+        if task.status in {
+            TaskStatus.FAILED,
+            TaskStatus.CANCELLED,
+            TaskStatus.INPUT_REQUIRED,
+            TaskStatus.NEEDS_APPROVAL,
+        }:
+            return item.model_copy(
+                update={
+                    "compile_status": "failed",
+                    "updated_at": utc_now_iso(),
+                }
+            )
+        return None
 
 
 def _validated_vault(vault_path: str | Path) -> Vault:

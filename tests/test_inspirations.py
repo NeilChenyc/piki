@@ -1,10 +1,12 @@
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
 from fastapi.testclient import TestClient
 
 from agent_service.app import create_app
 from agent_service.config import ServiceConfig
+from agent_service.models import RiskLevel, TaskKind, TaskStatus
 from agent_service.runtime import RunnerStatus
 from agent_service.store import SQLiteStore
 
@@ -39,6 +41,21 @@ def make_client(tmp_path: Path, *, enable_agent_runtime: bool = False) -> TestCl
         store=store,
     )
     return TestClient(app)
+
+
+def mark_inspiration_processing(
+    vault: Path,
+    memo: dict,
+    *,
+    task_id: str,
+    source_path: str = "raw/sources/inspirations-test.md",
+) -> None:
+    path = vault / memo["path"]
+    text = path.read_text(encoding="utf-8")
+    text = text.replace('compile_status: "pending"', 'compile_status: "processing"')
+    text = text.replace("compile_task_id: null", f'compile_task_id: "{task_id}"')
+    text = text.replace("source_path: null", f'source_path: "{source_path}"')
+    path.write_text(text, encoding="utf-8")
 
 
 def test_inspiration_create_list_search_and_update_write_markdown_files(tmp_path: Path):
@@ -212,7 +229,46 @@ def test_inspiration_compile_leaves_pending_when_runtime_unconfigured(tmp_path: 
     assert not list((vault / "raw/sources").glob("inspirations-*.md"))
 
 
-def test_inspiration_compile_creates_source_and_async_agent_task(tmp_path: Path, monkeypatch):
+def test_inspiration_list_reconciles_completed_processing_memo(tmp_path: Path):
+    vault = make_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            runtime_config_path=tmp_path / "runtime-config.json",
+            staging_root=tmp_path / ".piki/task-staging",
+            enable_agent_runtime=False,
+            agent_model="claude-test",
+        ),
+        store=store,
+    )
+    client = TestClient(app)
+    memo = client.post(
+        "/inspirations",
+        json={"vault_path": str(vault), "content": "已经整理完成的灵感", "attachments": []},
+    ).json()
+    task = store.create_task(
+        task_kind=TaskKind.AGENT,
+        risk_level=RiskLevel.LOW,
+        vault_path=str(vault),
+        user_input="整理随手记",
+        status=TaskStatus.COMPLETED,
+        summary="done",
+    )
+    mark_inspiration_processing(vault, memo, task_id=task.id)
+
+    reloaded = client.get("/inspirations", params={"vault_path": str(vault)}).json()["items"][0]
+
+    assert reloaded["compile_status"] == "compiled"
+    assert reloaded["compiled_hash"] == memo["content_hash"]
+    assert reloaded["compile_task_id"] == task.id
+
+
+@pytest.mark.parametrize(
+    "status",
+    [TaskStatus.FAILED, TaskStatus.CANCELLED, TaskStatus.INPUT_REQUIRED, TaskStatus.NEEDS_APPROVAL],
+)
+def test_inspiration_compile_retries_failed_processing_memo(tmp_path: Path, monkeypatch, status: TaskStatus):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     vault = make_vault(tmp_path)
     store = SQLiteStore(tmp_path / "agent.sqlite3")
@@ -228,10 +284,85 @@ def test_inspiration_compile_creates_source_and_async_agent_task(tmp_path: Path,
     )
 
     async def fake_query(*, prompt, options):
-        assert "ingest_inspirations" in prompt
-        yield SimpleNamespace(content=[SimpleNamespace(text="已整理随手记。")], session_id="sess_insp")
+        yield SimpleNamespace(content=[SimpleNamespace(text="重新整理随手记。")], session_id="sess_retry")
 
     app.state.runner._query_impl = fake_query
+    app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
+    client = TestClient(app)
+    memo = client.post(
+        "/inspirations",
+        json={"vault_path": str(vault), "content": "需要重试的灵感", "attachments": []},
+    ).json()
+    old_task = store.create_task(
+        task_kind=TaskKind.AGENT,
+        risk_level=RiskLevel.LOW,
+        vault_path=str(vault),
+        user_input="整理随手记",
+        status=status,
+        summary="terminal",
+    )
+    mark_inspiration_processing(vault, memo, task_id=old_task.id)
+
+    reconciled = client.get("/inspirations", params={"vault_path": str(vault)}).json()["items"][0]
+    response = client.post("/inspirations/compile", json={"vault_path": str(vault)})
+    payload = response.json()
+
+    assert reconciled["compile_status"] == "failed"
+    assert response.status_code == 200
+    assert payload["compiled_count"] == 1
+    assert payload["task_id"] != old_task.id
+
+
+def test_inspiration_compile_recovers_processing_memo_with_missing_task(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    vault = make_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            runtime_config_path=tmp_path / "runtime-config.json",
+            staging_root=tmp_path / ".piki/task-staging",
+            enable_agent_runtime=True,
+            agent_model="claude-test",
+        ),
+        store=store,
+    )
+
+    async def fake_query(*, prompt, options):
+        yield SimpleNamespace(content=[SimpleNamespace(text="重新整理缺失任务。")], session_id="sess_missing")
+
+    app.state.runner._query_impl = fake_query
+    app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
+    client = TestClient(app)
+    memo = client.post(
+        "/inspirations",
+        json={"vault_path": str(vault), "content": "任务丢失的灵感", "attachments": []},
+    ).json()
+    mark_inspiration_processing(vault, memo, task_id="task_missing")
+
+    recovered = client.get("/inspirations", params={"vault_path": str(vault)}).json()["items"][0]
+    response = client.post("/inspirations/compile", json={"vault_path": str(vault)})
+
+    assert recovered["compile_status"] == "pending"
+    assert recovered["compile_task_id"] is None
+    assert response.json()["compiled_count"] == 1
+
+
+def test_inspiration_compile_creates_source_and_async_agent_task(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    vault = make_vault(tmp_path)
+    store = SQLiteStore(tmp_path / "agent.sqlite3")
+    app = create_app(
+        ServiceConfig(
+            db_path=tmp_path / "agent.sqlite3",
+            runtime_config_path=tmp_path / "runtime-config.json",
+            staging_root=tmp_path / ".piki/task-staging",
+            enable_agent_runtime=True,
+            agent_model="claude-test",
+        ),
+        store=store,
+    )
+    app.state.task_service.executor.execute = lambda *args, **kwargs: None
     app.state.runner.status = RunnerStatus(True, "Claude Agent SDK available")
     client = TestClient(app)
     created = client.post(
@@ -250,7 +381,12 @@ def test_inspiration_compile_creates_source_and_async_agent_task(tmp_path: Path,
     assert created["id"] in source_text
     assert "需要进入 wiki 的灵感" in source_text
 
+    processing_text = (vault / created["path"]).read_text(encoding="utf-8")
+    assert 'compile_status: "processing"' in processing_text
+    assert f'compile_task_id: "{payload["task_id"]}"' in processing_text
+    assert f'source_path: "{payload["source_path"]}"' in processing_text
+
+    store.update_task(payload["task_id"], status=TaskStatus.COMPLETED, summary="done")
     reloaded = client.get("/inspirations", params={"vault_path": str(vault)}).json()["items"][0]
-    assert reloaded["compile_status"] == "processing"
-    assert reloaded["compile_task_id"] == payload["task_id"]
-    assert reloaded["source_path"] == payload["source_path"]
+    assert reloaded["compile_status"] == "compiled"
+    assert reloaded["compiled_hash"] == created["content_hash"]

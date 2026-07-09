@@ -14,7 +14,3 @@ def register_source_routes(app: FastAPI, *, source_service: SourceService):
             return source_service.rescan(request)
         except VaultAccessError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    @app.get("/update-queue")
-    def update_queue(status: str | None = "pending", limit: int = 100):
-        return source_service.update_queue(status=status, limit=limit)

@@ -81,10 +81,6 @@ private final class VaultBootstrapRuntimeService: RuntimeServiceProtocol {
     func cancelTask(taskId: String) async throws -> TaskRecordDTO { throw VaultBootstrapError.unimplemented }
     func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse { throw VaultBootstrapError.unimplemented }
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] { [] }
-    func rollback(entryId: String) async throws {}
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] { [] }
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {}
-    func processIngestQueue(vaultPath: String?) async throws {}
     func runLint(vaultPath: String) async throws -> LintResultDTO { throw VaultBootstrapError.unimplemented }
     func fixLint(vaultPath: String, issueIds: [String]?) async throws {}
 }

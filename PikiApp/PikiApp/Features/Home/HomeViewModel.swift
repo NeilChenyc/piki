@@ -264,21 +264,7 @@ final class HomeViewModel {
             recentActivity = entries.map(ActivityEntry.init(journalEntry:))
         } catch {
             guard !Task.isCancelled else { return }
-            statusText = "Unable to load Change Journal: \(error.localizedDescription)"
-        }
-    }
-
-    func rollback(_ entry: ActivityEntry, appState: AppState) {
-        guard let journalId = entry.journalId else { return }
-        Task {
-            do {
-                statusText = "正在回退变更"
-                try await appState.runtimeService.rollback(entryId: journalId)
-                await loadRecentJournal(appState: appState)
-                statusText = nil
-            } catch {
-                statusText = "Rollback failed: \(error.localizedDescription)"
-            }
+            statusText = "Unable to load write activity: \(error.localizedDescription)"
         }
     }
 
@@ -896,7 +882,6 @@ struct ActivityEntry: Identifiable {
     let journalId: String?
     let affectedFiles: [String]
     let status: String
-    let canRollback: Bool
 
     init(
         id: String,
@@ -905,8 +890,7 @@ struct ActivityEntry: Identifiable {
         type: ActivityType,
         journalId: String? = nil,
         affectedFiles: [String] = [],
-        status: String = "",
-        canRollback: Bool = false
+        status: String = ""
     ) {
         self.id = id
         self.description = description
@@ -915,7 +899,6 @@ struct ActivityEntry: Identifiable {
         self.journalId = journalId
         self.affectedFiles = affectedFiles
         self.status = status
-        self.canRollback = canRollback
     }
 
     init(journalEntry: JournalEntry) {
@@ -923,12 +906,11 @@ struct ActivityEntry: Identifiable {
         journalId = journalEntry.id
         affectedFiles = journalEntry.affectedFiles
         status = journalEntry.status
-        canRollback = journalEntry.eligibleForRollback
         timestamp = Date.fromISO8601(journalEntry.createdAt) ?? Date()
-        type = journalEntry.status == "rolled_back" ? .rollback : .ingest
+        type = .ingest
         let visibleFiles = journalEntry.affectedFiles.filter { !$0.hasPrefix("system/") }
         if journalEntry.affectedFiles.isEmpty {
-            description = "Vault change"
+            description = "写入记录"
         } else if visibleFiles.isEmpty {
             description = "内部状态更新"
         } else {
@@ -944,7 +926,7 @@ struct ActivityEntry: Identifiable {
     }
 
     enum ActivityType {
-        case ingest, query, lint, rollback
+        case ingest, query, lint
     }
 }
 

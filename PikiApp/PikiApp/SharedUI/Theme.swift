@@ -33,7 +33,7 @@ struct Theme {
     static let cornerRadius: CGFloat = 10
     static let cardShadowRadius: CGFloat = 3
     static let spacing: CGFloat = 8
-    static let sidebarWidth: CGFloat = 220
+    static let sidebarWidth: CGFloat = 154
 
     // MARK: - Aliases (backward compat)
     static let primary = accent

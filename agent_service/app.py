@@ -5,7 +5,6 @@ from fastapi import FastAPI
 from agent_service.api.routes import (
     register_approval_routes,
     register_health_routes,
-    register_ingest_queue_routes,
     register_inspiration_routes,
     register_journal_routes,
     register_lint_routes,
@@ -16,7 +15,6 @@ from agent_service.application.event_stream import EventStreamService
 from agent_service.application.events import EventPublisher
 from agent_service.application.maintenance import (
     ApprovalService,
-    IngestQueueService,
     JournalService,
     LintService,
     SourceService,
@@ -53,7 +51,6 @@ def create_app(config: ServiceConfig | None = None, store: SQLiteStore | None = 
     event_stream = EventStreamService(sqlite_store)
     journal_service = JournalService(sqlite_store, events)
     source_service = SourceService(sqlite_store, events)
-    ingest_queue_service = IngestQueueService(sqlite_store, events)
     lint_service = LintService(sqlite_store, events)
     approval_service = ApprovalService(sqlite_store, events)
     inspiration_service = InspirationService(
@@ -73,7 +70,6 @@ def create_app(config: ServiceConfig | None = None, store: SQLiteStore | None = 
     register_task_routes(app, task_service=task_service, event_stream=event_stream, config=service_config)
     register_journal_routes(app, journal_service=journal_service)
     register_source_routes(app, source_service=source_service)
-    register_ingest_queue_routes(app, ingest_queue_service=ingest_queue_service)
     register_inspiration_routes(app, inspiration_service=inspiration_service)
     register_lint_routes(app, lint_service=lint_service)
     register_approval_routes(app, approval_service=approval_service)

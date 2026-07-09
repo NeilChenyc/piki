@@ -24,14 +24,14 @@ macOS 客户端通过 `LocalServiceManager` 自动启动 uvicorn 子进程并管
 
 | 目录 | 说明 |
 | --- | --- |
-| `api/routes/` | FastAPI HTTP 端点（tasks, health, journal, ingest, lint）|
+| `api/routes/` | FastAPI HTTP 端点（tasks, health, journal, sources, lint）|
 | `application/` | 任务执行、事件发布、系统动作协调 |
 | `config.py` | 服务配置、环境变量与运行时开关 |
 | `models/` | Pydantic 数据模型和枚举 |
 | `runtime/` | Claude Agent runner、CLI 工具 |
-| `store/` | SQLite 持久化（任务、事件、journal、queue）|
+| `store/` | SQLite 持久化（任务、事件、写入记录、运行时会话）|
 | `vault/` | vault 路径校验和安全读写封装 |
-| `workflows/` | 确定性系统工作流（ingest、lint、rollback）|
+| `workflows/` | 确定性系统工作流（source intake、source scan、lint、podcast）|
 
 ## 开发运行
 

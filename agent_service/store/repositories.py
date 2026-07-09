@@ -38,14 +38,3 @@ class JournalRepository:
 
     def list_recent(self, limit: int = 20):
         return self.store.list_journal_entries(limit=limit)
-
-
-class QueueRepository:
-    def __init__(self, store):
-        self.store = store
-
-    def list_ingest(self, **kwargs):
-        return self.store.list_ingest_queue_items(**kwargs)
-
-    def list_updates(self, **kwargs):
-        return self.store.list_update_queue_items(**kwargs)

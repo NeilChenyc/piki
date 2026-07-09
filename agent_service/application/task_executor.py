@@ -1,6 +1,4 @@
 from __future__ import annotations
-
-import difflib
 import hashlib
 from pathlib import Path
 
@@ -174,7 +172,7 @@ class TaskExecutor:
         if agent_result.affected_files:
             self.events.progress(task_id, "writing_wiki", "正在写入 Wiki", "已更新 vault 文件。")
         if agent_result.journal_entry:
-            self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
+            self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成写入记录。")
         output = agent_result.model_dump(mode="json")
         output["action_context"] = task_input.action_context
         output["selected_paths"] = task_input.selected_paths
@@ -230,16 +228,14 @@ class TaskExecutor:
                 path=relative_path,
                 before_hash=before_hash,
                 after_hash=None,
-                before_content=before_content,
-                after_content=None,
             )
             journal_entry = self.store.create_journal_entry(
                 conversation_id=request.conversation_id or task_id,
                 task_id=task_id,
                 reason=f"Clear inbox file {relative_path}",
                 affected_files=[relative_path],
-                snapshots=[snapshot],
-                diff=_delete_diff(relative_path, before_content),
+                snapshots=[],
+                diff="",
             )
         except (OSError, VaultAccessError) as exc:
             error = str(exc)
@@ -249,7 +245,7 @@ class TaskExecutor:
 
         summary = f"已清理 inbox 文件：{relative_path}"
         self.events.emit(task_id, EventType.SOURCE_CLEARED, {"path": relative_path, "journal_entry_id": journal_entry.id})
-        self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成可回退的 Change Journal。")
+        self.events.progress(task_id, "recording_changes", "正在记录变更", "已生成写入记录。")
         self.store.update_task(
             task_id,
             status=TaskStatus.COMPLETED,
@@ -396,17 +392,6 @@ def _relative_inbox_path(vault: Vault, raw_path: str) -> str:
 
 def _content_hash(content: str) -> str:
     return "sha256:" + hashlib.sha256(content.encode("utf-8")).hexdigest()
-
-
-def _delete_diff(relative_path: str, before_content: str) -> str:
-    return "".join(
-        difflib.unified_diff(
-            before_content.splitlines(keepends=True),
-            [],
-            fromfile=f"a/{relative_path}",
-            tofile=f"b/{relative_path}",
-        )
-    )
 
 
 def _last_agent_session_id(messages: list[dict]) -> str | None:

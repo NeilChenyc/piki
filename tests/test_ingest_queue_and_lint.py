@@ -27,7 +27,7 @@ def make_client(tmp_path: Path) -> TestClient:
     return TestClient(app)
 
 
-def test_ingest_queue_processes_files_and_dedupes_pending_items(tmp_path: Path):
+def test_ingest_queue_public_api_is_removed(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     source = tmp_path / "article.md"
     source.write_text("# 队列来源\n\n正文内容。", encoding="utf-8")
@@ -37,56 +37,11 @@ def test_ingest_queue_processes_files_and_dedupes_pending_items(tmp_path: Path):
         "/ingest-queue/enqueue",
         json={"vault_path": str(vault_path), "selected_paths": [str(source), str(source)]},
     )
-    assert enqueued.status_code == 200
-    items = enqueued.json()["items"]
-    assert len({item["id"] for item in items}) == 1
-
-    processed = client.post(
-        "/ingest-queue/process",
-        json={"vault_path": str(vault_path), "max_items": 5},
-    )
-
-    assert processed.status_code == 200
-    payload = processed.json()
-    assert payload["processed"] == 1
-    assert len(payload["completed"]) == 1
-    item = payload["completed"][0]
-    assert item["status"] == "completed"
-    assert item["task_id"].startswith("task_")
-    assert item["source_path"].startswith("raw/sources/")
-    assert (vault_path / item["source_path"]).exists()
-
-
-def test_ingest_queue_records_failure_retry_and_cancel(tmp_path: Path):
-    vault_path = make_vault(tmp_path)
-    bad_source = tmp_path / "data.csv"
-    bad_source.write_text("a,b\n1,2\n", encoding="utf-8")
-    later_source = tmp_path / "later.md"
-    later_source.write_text("# 稍后处理\n\n正文。", encoding="utf-8")
-    client = make_client(tmp_path)
-
-    enqueued = client.post(
-        "/ingest-queue/enqueue",
-        json={"vault_path": str(vault_path), "selected_paths": [str(bad_source), str(later_source)]},
-    ).json()["items"]
-    bad_id, later_id = enqueued[0]["id"], enqueued[1]["id"]
-
-    cancelled = client.post(f"/ingest-queue/{later_id}/cancel")
-    assert cancelled.status_code == 200
-    assert cancelled.json()["status"] == "cancelled"
-
-    processed = client.post(
-        "/ingest-queue/process",
-        json={"vault_path": str(vault_path), "max_items": 5},
-    ).json()
-    assert processed["processed"] == 1
-    assert processed["failed"][0]["id"] == bad_id
-    assert "Unsupported source format" in processed["failed"][0]["error"]
-
-    retried = client.post(f"/ingest-queue/{bad_id}/retry")
-    assert retried.status_code == 200
-    assert retried.json()["status"] == "pending"
-    assert retried.json()["error"] is None
+    assert enqueued.status_code == 404
+    assert client.get("/ingest-queue").status_code == 404
+    assert client.post("/ingest-queue/process", json={"vault_path": str(vault_path)}).status_code == 404
+    assert client.post("/ingest-queue/deadbeef/retry").status_code == 404
+    assert client.post("/ingest-queue/deadbeef/cancel").status_code == 404
 
 
 def write_page(vault: Path, relative: str, content: str):
@@ -180,5 +135,6 @@ def test_lint_fix_adds_missing_index_entries_and_journal(tmp_path: Path):
     assert "wiki/index.md" in payload["affected_files"]
     assert "wiki/log.md" in payload["affected_files"]
     assert payload["journal_entry"] is not None
+    assert payload["journal_entry"]["snapshots"] == []
     assert "[[concepts/待索引]]" in (vault_path / "wiki/index.md").read_text(encoding="utf-8")
     assert "自动补充索引" in (vault_path / "wiki/log.md").read_text(encoding="utf-8")

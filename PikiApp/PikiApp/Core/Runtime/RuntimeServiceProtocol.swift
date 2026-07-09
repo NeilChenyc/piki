@@ -15,11 +15,6 @@ protocol RuntimeServiceProtocol: AnyObject {
     func uploadFile(_ fileURL: URL) async throws -> BufferedUploadResponse
 
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry]
-    func rollback(entryId: String) async throws
-
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO]
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws
-    func processIngestQueue(vaultPath: String?) async throws
 
     func listInspirations(vaultPath: String, query: String?) async throws -> [InspirationDTO]
     func createInspiration(_ request: InspirationCreateRequest) async throws -> InspirationDTO

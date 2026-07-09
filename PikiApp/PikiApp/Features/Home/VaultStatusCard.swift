@@ -111,7 +111,6 @@ struct StatItem: View {
 
 struct RecentActivityList: View {
     let entries: [ActivityEntry]
-    let onRollback: (ActivityEntry) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -126,7 +125,7 @@ struct RecentActivityList: View {
                     .padding(.vertical, 8)
             } else {
                 ForEach(entries) { entry in
-                    ActivityRow(entry: entry, onRollback: { onRollback(entry) })
+                    ActivityRow(entry: entry)
                 }
             }
         }

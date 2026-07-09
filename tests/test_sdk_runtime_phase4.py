@@ -207,6 +207,7 @@ def test_claude_hooks_record_write_and_create_single_journal(tmp_path: Path, mon
     task = client.get(f"/tasks/{task_id}").json()
     assert task["status"] == "completed"
     assert task["output"]["journal_entry"] is not None
+    assert task["output"]["journal_entry"]["snapshots"] == []
     assert task["output"]["affected_files"] == ["wiki/log.md"]
     events = client.get(f"/tasks/{task_id}/events").text
     assert "event: tool.finished" in events

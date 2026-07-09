@@ -247,32 +247,6 @@ class SourceManifestRecord(BaseModel):
     missing: bool = False
 
 
-class UpdateQueueStatus(StrEnum):
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    DEFERRED = "deferred"
-
-
-class SourceChangeType(StrEnum):
-    NEW = "new"
-    MODIFIED = "modified"
-    MISSING = "missing"
-
-
-class UpdateQueueItem(BaseModel):
-    id: str
-    source_path: str
-    change_type: SourceChangeType
-    status: UpdateQueueStatus = UpdateQueueStatus.PENDING
-    previous_hash: str | None = None
-    current_hash: str | None = None
-    reason: str = ""
-    created_at: str
-    updated_at: str
-
-
 class SourceRescanRequest(BaseModel):
     vault_path: Path
 
@@ -283,53 +257,7 @@ class SourceRescanResult(BaseModel):
     modified_sources: list[str] = Field(default_factory=list)
     missing_sources: list[str] = Field(default_factory=list)
     unchanged_sources: list[str] = Field(default_factory=list)
-    queued_items: list[UpdateQueueItem] = Field(default_factory=list)
     manifest_path: str = "system/source_manifest.json"
-
-
-class IngestQueueStatus(StrEnum):
-    PENDING = "pending"
-    PROCESSING = "processing"
-    FAILED = "failed"
-    RETRY = "retry"
-    CANCELLED = "cancelled"
-    COMPLETED = "completed"
-
-
-class IngestQueueItem(BaseModel):
-    id: str
-    vault_path: str
-    original_path: str
-    status: IngestQueueStatus = IngestQueueStatus.PENDING
-    attempts: int = 0
-    error: str | None = None
-    task_id: str | None = None
-    source_path: str | None = None
-    created_at: str
-    updated_at: str
-
-
-class IngestQueueEnqueueRequest(BaseModel):
-    vault_path: Path
-    selected_paths: list[str] = Field(min_length=1)
-
-
-class IngestQueueEnqueueResult(BaseModel):
-    items: list[IngestQueueItem] = Field(default_factory=list)
-    task_id: str | None = None
-
-
-class IngestQueueProcessRequest(BaseModel):
-    vault_path: Path | None = None
-    max_items: int = Field(default=5, ge=1, le=25)
-
-
-class IngestQueueProcessResult(BaseModel):
-    processed: int = 0
-    completed: list[IngestQueueItem] = Field(default_factory=list)
-    failed: list[IngestQueueItem] = Field(default_factory=list)
-    skipped: list[IngestQueueItem] = Field(default_factory=list)
-    task_id: str | None = None
 
 
 class InspirationAttachment(BaseModel):
@@ -427,19 +355,6 @@ class LintFixRequest(BaseModel):
     issue_ids: list[str] = Field(default_factory=list)
 
 
-class RollbackRequest(BaseModel):
-    reason: str = ""
-
-
-class RollbackResult(BaseModel):
-    ok: bool
-    journal_entry_id: str
-    task_id: str | None = None
-    status: str
-    affected_files: list[str] = Field(default_factory=list)
-    error: str | None = None
-
-
 class SourceMeta(BaseModel):
     path: str
     title: str = ""
@@ -477,8 +392,6 @@ class FileSnapshot(BaseModel):
     path: str
     before_hash: str | None = None
     after_hash: str | None = None
-    before_content: str | None = None
-    after_content: str | None = None
 
 
 class JournalEntry(BaseModel):

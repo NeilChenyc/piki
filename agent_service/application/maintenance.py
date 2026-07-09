@@ -7,25 +7,15 @@ from agent_service.models import (
     ApprovalDecisionRequest,
     ApprovalStatus,
     EventType,
-    IngestQueueEnqueueRequest,
-    IngestQueueProcessRequest,
-    IngestQueueStatus,
     LintFixRequest,
     RiskLevel,
-    RollbackRequest,
     SourceRescanRequest,
     TaskKind,
     TaskStatus,
-    UpdateQueueStatus,
 )
 from agent_service.store import SQLiteStore
 from agent_service.system import (
     apply_lint_fixes,
-    cancel_ingest_queue_item,
-    enqueue_ingest_files,
-    process_ingest_queue,
-    retry_ingest_queue_item,
-    run_journal_rollback,
     scan_sources_for_updates,
 )
 from agent_service.vault import Vault, VaultAccessError
@@ -37,7 +27,6 @@ class JournalService:
         self.events = events
 
     def recent(self, *, limit: int = 20, vault_path: str | None = None) -> dict:
-        eligible_ids = {entry.id for entry in self.store.list_recent_active_journal_entries(limit=2)}
         entries = []
         for entry in self.store.list_journal_entries(limit=limit):
             task = self.store.get_task_for_journal_entry(entry.id)
@@ -52,31 +41,9 @@ class JournalService:
                     "affected_files": entry.affected_files,
                     "created_at": entry.created_at,
                     "rolled_back_at": entry.rolled_back_at,
-                    "eligible_for_rollback": entry.id in eligible_ids and entry.status == "active",
                 }
             )
         return {"entries": entries}
-
-    def rollback(self, journal_entry_id: str, request: RollbackRequest | None = None):
-        journal_task = self.store.get_task_for_journal_entry(journal_entry_id)
-        rollback_task = self.store.create_task(
-            task_kind=TaskKind.ROLLBACK,
-            risk_level=RiskLevel.LOW,
-            vault_path=journal_task.vault_path,
-            user_input=f"rollback {journal_entry_id}",
-            status=TaskStatus.RUNNING,
-            summary=f"回退 journal entry：{journal_entry_id}",
-        )
-        self.events.task_created(
-            rollback_task.id,
-            {"task_id": rollback_task.id, "journal_entry_id": journal_entry_id},
-        )
-        return run_journal_rollback(
-            store=self.store,
-            journal_entry_id=journal_entry_id,
-            task_id=rollback_task.id,
-            reason=(request.reason if request else ""),
-        )
 
 
 class SourceService:
@@ -93,12 +60,10 @@ class SourceService:
             vault_path=str(vault.root),
             user_input="source rescan",
             status=TaskStatus.RUNNING,
-            summary="扫描 raw/sources 并更新 source manifest / update queue。",
+            summary="扫描 raw/sources 并更新 source manifest。",
         )
         self.events.emit(task.id, EventType.SOURCE_RESCAN_STARTED, {"vault_path": str(vault.root)})
         result = scan_sources_for_updates(vault=vault, store=self.store)
-        for item in result.queued_items:
-            self.events.emit(task.id, EventType.UPDATE_QUEUE_ITEM_CREATED, item.model_dump(mode="json"))
         self.events.emit(task.id, EventType.SOURCE_RESCAN_COMPLETED, result.model_dump(mode="json"))
         self.store.update_task(
             task.id,
@@ -108,96 +73,6 @@ class SourceService:
         )
         self.events.task_completed(task.id, summary="source rescan completed")
         return result
-
-    def update_queue(self, *, status: str | None = "pending", limit: int = 100) -> dict:
-        queue_status = UpdateQueueStatus(status) if status else None
-        items = self.store.list_update_queue_items(status=queue_status, limit=limit)
-        return {"items": [item.model_dump(mode="json") for item in items]}
-
-
-class IngestQueueService:
-    def __init__(self, store: SQLiteStore, events: EventPublisher):
-        self.store = store
-        self.events = events
-
-    def enqueue(self, request: IngestQueueEnqueueRequest):
-        vault = Vault(request.vault_path)
-        vault.validate()
-        task = self.store.create_task(
-            task_kind=TaskKind.INGEST_QUEUE,
-            risk_level=RiskLevel.LOW,
-            vault_path=str(vault.root),
-            user_input="enqueue ingest files",
-            status=TaskStatus.RUNNING,
-            summary=f"加入 ingest queue：{len(request.selected_paths)} 个文件。",
-        )
-        result = enqueue_ingest_files(
-            store=self.store,
-            vault=vault,
-            selected_paths=request.selected_paths,
-        )
-        result.task_id = task.id
-        for item in result.items:
-            self.events.emit(task.id, EventType.INGEST_QUEUE_ITEM_CREATED, item.model_dump(mode="json"))
-        self.store.update_task(
-            task.id,
-            status=TaskStatus.COMPLETED,
-            summary=f"已加入 ingest queue：{len(result.items)} 个文件。",
-            output=result.model_dump(mode="json"),
-        )
-        self.events.task_completed(task.id, summary="ingest queue enqueue completed")
-        return result
-
-    def list(self, *, status: str | None = None, vault_path: str | None = None, limit: int = 100) -> dict:
-        queue_status = IngestQueueStatus(status) if status else None
-        normalized_vault = str(Path(vault_path).expanduser().resolve()) if vault_path else None
-        items = self.store.list_ingest_queue_items(
-            status=queue_status,
-            vault_path=normalized_vault,
-            limit=limit,
-        )
-        return {"items": [item.model_dump(mode="json") for item in items]}
-
-    def process(self, request: IngestQueueProcessRequest):
-        normalized_vault = None
-        if request.vault_path is not None:
-            vault = Vault(request.vault_path)
-            vault.validate()
-            normalized_vault = str(vault.root)
-        task = self.store.create_task(
-            task_kind=TaskKind.INGEST_QUEUE,
-            risk_level=RiskLevel.LOW,
-            vault_path=normalized_vault or "",
-            user_input="process ingest queue",
-            status=TaskStatus.RUNNING,
-            summary="处理 ingest queue。",
-        )
-        self.events.emit(
-            task.id,
-            EventType.INGEST_QUEUE_PROCESS_STARTED,
-            {"vault_path": normalized_vault, "max_items": request.max_items},
-        )
-        result = process_ingest_queue(
-            store=self.store,
-            vault_path=normalized_vault,
-            max_items=request.max_items,
-        )
-        result.task_id = task.id
-        self.events.emit(task.id, EventType.INGEST_QUEUE_PROCESS_COMPLETED, result.model_dump(mode="json"))
-        self.store.update_task(
-            task.id,
-            status=TaskStatus.COMPLETED,
-            summary=f"队列处理完成：成功 {len(result.completed)}，失败 {len(result.failed)}。",
-            output=result.model_dump(mode="json"),
-        )
-        self.events.task_completed(task.id, summary="ingest queue process completed")
-        return result
-
-    def retry(self, item_id: str):
-        return retry_ingest_queue_item(store=self.store, item_id=item_id)
-
-    def cancel(self, item_id: str):
-        return cancel_ingest_queue_item(store=self.store, item_id=item_id)
 
 
 class LintService:

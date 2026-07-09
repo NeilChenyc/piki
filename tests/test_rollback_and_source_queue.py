@@ -51,7 +51,7 @@ def create_journal(store: SQLiteStore, vault_path: Path, path: str, content: str
     return journal
 
 
-def test_rollback_latest_journal_restores_files(tmp_path: Path):
+def test_rollback_endpoint_is_gone_and_does_not_modify_files(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     client = make_client(tmp_path)
     store = client.app.state.store
@@ -60,71 +60,31 @@ def test_rollback_latest_journal_restores_files(tmp_path: Path):
 
     response = client.post(f"/journal/{journal.id}/rollback", json={"reason": "undo"})
 
-    assert response.status_code == 200
-    payload = response.json()
-    assert payload["ok"] is True
-    assert payload["status"] == "rolled_back"
-    assert (vault_path / "wiki/log.md").read_text(encoding="utf-8") == "# 日志\n"
-    assert store.get_journal_entry(journal.id).status == "rolled_back"
+    assert response.status_code == 410
+    assert "removed" in response.json()["detail"]
+    assert (vault_path / "wiki/log.md").read_text(encoding="utf-8") == "# 日志\n\n- 新内容\n"
+    assert store.get_journal_entry(journal.id).status == "active"
+    with store.connect() as conn:
+        rollback_tasks = conn.execute("SELECT COUNT(*) AS count FROM tasks WHERE task_kind = 'rollback'").fetchone()
+    assert rollback_tasks["count"] == 0
 
 
-def test_rollback_hash_mismatch_fails_without_partial_write(tmp_path: Path):
+def test_recent_journal_is_write_activity_without_rollback_eligibility(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     client = make_client(tmp_path)
     store = client.app.state.store
     journal = create_journal(store, vault_path, "wiki/log.md", "# 日志\n\n- 新内容\n")
-    (vault_path / "wiki/log.md").write_text("# 日志\n\n- 用户后续修改\n", encoding="utf-8")
 
-    response = client.post(f"/journal/{journal.id}/rollback", json={})
-
-    assert response.status_code == 200
-    payload = response.json()
-    assert payload["ok"] is False
-    assert "hash mismatch" in payload["error"]
-    assert (vault_path / "wiki/log.md").read_text(encoding="utf-8") == "# 日志\n\n- 用户后续修改\n"
-    assert store.get_journal_entry(journal.id).status == "rollback_failed"
-
-
-def test_rollback_only_latest_two_active_journals(tmp_path: Path):
-    vault_path = make_vault(tmp_path)
-    client = make_client(tmp_path)
-    store = client.app.state.store
-    oldest = create_journal(store, vault_path, "wiki/old.md", "# old\n")
-    create_journal(store, vault_path, "wiki/middle.md", "# middle\n")
-    create_journal(store, vault_path, "wiki/latest.md", "# latest\n")
-
-    response = client.post(f"/journal/{oldest.id}/rollback", json={})
+    response = client.get(f"/journal/recent?vault_path={vault_path}")
 
     assert response.status_code == 200
-    assert response.json()["ok"] is False
-    assert "latest-two" in response.json()["error"]
-    assert (vault_path / "wiki/old.md").read_text(encoding="utf-8") == "# old\n"
+    entry = response.json()["entries"][0]
+    assert entry["id"] == journal.id
+    assert entry["affected_files"] == ["wiki/log.md"]
+    assert "eligible_for_rollback" not in entry
 
 
-def test_rollback_two_entries_in_sequence_restores_previous_states(tmp_path: Path):
-    vault_path = make_vault(tmp_path)
-    client = make_client(tmp_path)
-    store = client.app.state.store
-    target = vault_path / "wiki/log.md"
-    target.write_text("# 日志\n", encoding="utf-8")
-
-    first = create_journal(store, vault_path, "wiki/log.md", "# 日志\n\n- 第一版\n")
-    second = create_journal(store, vault_path, "wiki/log.md", "# 日志\n\n- 第二版\n")
-
-    newest_rollback = client.post(f"/journal/{second.id}/rollback", json={"reason": "回到上一版"})
-    assert newest_rollback.status_code == 200
-    assert newest_rollback.json()["ok"] is True
-    assert target.read_text(encoding="utf-8") == "# 日志\n\n- 第一版\n"
-    assert store.get_journal_entry(second.id).status == "rolled_back"
-
-    previous_rollback = client.post(f"/journal/{first.id}/rollback", json={"reason": "继续回退"})
-    assert previous_rollback.status_code == 200
-    assert previous_rollback.json()["ok"] is True
-    assert target.read_text(encoding="utf-8") == "# 日志\n"
-    assert store.get_journal_entry(first.id).status == "rolled_back"
-
-
-def test_clear_inbox_file_creates_journal_and_can_rollback(tmp_path: Path):
+def test_clear_inbox_file_creates_write_activity_without_restore_snapshot(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     client = make_client(tmp_path)
     inbox_file = vault_path / "raw/inbox/note.md"
@@ -147,16 +107,12 @@ def test_clear_inbox_file_creates_journal_and_can_rollback(tmp_path: Path):
     assert inbox_file.exists() is False
     journal = client.get(f"/journal/recent?vault_path={vault_path}").json()["entries"][0]
     assert journal["affected_files"] == ["raw/inbox/note.md"]
-    assert journal["eligible_for_rollback"] is True
-
-    rollback = client.post(f"/journal/{journal['id']}/rollback", json={"reason": "restore"})
-
-    assert rollback.status_code == 200
-    assert rollback.json()["ok"] is True
-    assert inbox_file.read_text(encoding="utf-8") == "# 临时笔记\n"
+    assert "eligible_for_rollback" not in journal
+    stored_journal = client.app.state.store.get_journal_entry(journal["id"])
+    assert stored_journal.snapshots == []
 
 
-def test_source_rescan_queues_new_modified_and_missing_sources(tmp_path: Path):
+def test_source_rescan_updates_manifest_without_update_queue(tmp_path: Path):
     vault_path = make_vault(tmp_path)
     client = make_client(tmp_path)
     source = vault_path / "raw/sources/测试来源.md"
@@ -165,25 +121,20 @@ def test_source_rescan_queues_new_modified_and_missing_sources(tmp_path: Path):
     first = client.post("/sources/rescan", json={"vault_path": str(vault_path)})
     assert first.status_code == 200
     assert first.json()["new_sources"] == ["raw/sources/测试来源.md"]
-    queue = client.get("/update-queue").json()["items"]
-    assert len(queue) == 1
-    assert queue[0]["change_type"] == "new"
+    assert "queued_items" not in first.json()
+    assert client.get("/update-queue").status_code == 404
 
     second = client.post("/sources/rescan", json={"vault_path": str(vault_path)})
     assert second.status_code == 200
     assert second.json()["unchanged_sources"] == ["raw/sources/测试来源.md"]
-    assert len(client.get("/update-queue").json()["items"]) == 1
 
     source.write_text("# 测试来源\n\n第二版。", encoding="utf-8")
     modified = client.post("/sources/rescan", json={"vault_path": str(vault_path)})
     assert modified.json()["modified_sources"] == ["raw/sources/测试来源.md"]
-    queue = client.get("/update-queue").json()["items"]
-    assert {item["change_type"] for item in queue} == {"new", "modified"}
+    assert "queued_items" not in modified.json()
 
     source.unlink()
     missing = client.post("/sources/rescan", json={"vault_path": str(vault_path)})
     assert missing.json()["missing_sources"] == ["raw/sources/测试来源.md"]
-    queue = client.get("/update-queue").json()["items"]
-    assert {item["change_type"] for item in queue} == {"new", "modified", "missing"}
     manifest_text = (vault_path / "system/source_manifest.json").read_text(encoding="utf-8")
     assert '"missing": true' in manifest_text

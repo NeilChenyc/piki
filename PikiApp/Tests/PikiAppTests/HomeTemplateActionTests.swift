@@ -167,10 +167,6 @@ private final class HomeTemplateRuntimeService: RuntimeServiceProtocol {
     }
 
     func recentJournal(limit: Int, vaultPath: String?) async throws -> [JournalEntry] { [] }
-    func rollback(entryId: String) async throws {}
-    func listIngestQueue(status: String?) async throws -> [IngestQueueItemDTO] { [] }
-    func enqueueIngest(vaultPath: String, paths: [String]) async throws {}
-    func processIngestQueue(vaultPath: String?) async throws {}
     func runLint(vaultPath: String) async throws -> LintResultDTO { throw LocalTestError.unimplemented }
     func fixLint(vaultPath: String, issueIds: [String]?) async throws {}
 
